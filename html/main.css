@@ -17,3 +17,7 @@ html, body{
     background-color: #fff;
     font-size: 26px;
 }
+
+.element {
+    position:absolute;
+}
