@@ -12,6 +12,8 @@ class SwipeLoader {
 	var scene_index = 0;
 	var page_index = 0;
 
+	SwipeScreen.init(this.data.dimension[0], this.data.dimension[1]);
+	
 	$.each(this.data["pages"], (index, page) => {
 	    var scene = null;
 	    if (page["scene"] && (scene = this.data["scenes"][page["scene"]]) ){
@@ -58,6 +60,7 @@ class SwipeLoader {
 	    $(this).attr("__default_width", $(this).width());
 	    $(this).attr("__default_height", $(this).height());
 	    instance.initData($(this).attr("__page_id"), $(this).attr("__element_id"));
+	    
 	});
 	// add load event
     }

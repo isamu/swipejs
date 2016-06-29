@@ -28,6 +28,7 @@ class SwipePage {
 	ret.push(element);
 	if(element["elements"]){
 	    element["elements"].forEach(function(elem, elem_index){
+		//ret.push($.extend(element, instance.elementLoad(elem)));
 		ret.push(instance.elementLoad(elem));
 	    });
 	    ret =  Array.prototype.concat.apply([], ret);

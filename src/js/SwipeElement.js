@@ -13,7 +13,6 @@ class SwipeElement {
     }
 
     initData() {
-	console.log("called");
 	var info = this.info;
 	
 	if (info["pos"]) {
@@ -51,6 +50,26 @@ class SwipeElement {
 	} else if (info["opacity"] != null) {
 	    this.opacity = info["opacity"];
 	}
+
+	this.setInitPos();
+    }
+
+    setInitPos(){
+	var leftPosN = SwipeScreen.virtualX(this.x);
+	var topPosN = SwipeScreen.virtualY(this.y);
+	
+	var widthN = SwipeScreen.virtualX(this.w);
+	var heightN = SwipeScreen.virtualY(this.h);
+	
+	console.log(this.css_id);
+	$("#" + this.css_id).css({
+	    'left': leftPosN + 'px',
+	    'top': topPosN + 'px',
+	    'width': widthN + 'px',
+	    'height': heightN + 'px',
+	    'opacity' : this.opacity
+	});
+	
     }
 
     data() {

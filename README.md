@@ -1,6 +1,6 @@
 # swipejs
 
-Year another swipe engine.
+Yet another swipe engine.
 
 Original Swipe engine is here.
 
