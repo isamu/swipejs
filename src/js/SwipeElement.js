@@ -15,18 +15,6 @@ class SwipeElement {
     initData() {
 	var info = this.info;
 	
-	if (info["pos"]) {
-	    this.x = info["pos"][0];
-	    this.y = info["pos"][1];
-	} else {
-	    if (info["x"]){
-		this.x = info["x"];
-	    }
-	    if (info["y"]){
-		this.y = info["y"];
-	    }
-	}
-
 	if (info["size"]) {
 	    this.w = info["size"][0];
 	    this.h = info["size"][1];
@@ -40,6 +28,31 @@ class SwipeElement {
 		this.h = info["h"];
 	    } else {
 		this.h = $("#" + this.css_id).attr("__default_height");
+	    }
+	}
+
+	if (info["pos"]) {
+	    this.x = info["pos"][0];
+	    this.y = info["pos"][1];
+	} else {
+	    if (info["x"] == "right"){
+		this.x = SwipeScreen.vwidth() - this.w;
+	    } else if (info["x"] == "left"){
+		this.x = 0;
+	    } else if (info["x"] == "center"){
+		this.x = (SwipeScreen.vwidth() - this.w) / 2.0;
+	    } else if (info["x"]){
+		this.x = info["x"];
+	    }
+
+	    if (info["y"] == "bottom"){
+		this.y = SwipeScreen.vheight() - this.h;
+	    } else if (info["y"] == "top"){
+		this.y = 0;
+	    } else if (info["y"] == "center"){
+		this.y = (SwipeScreen.vheight() - this.h) / 2.0;
+	    } else if (info["y"]){
+		this.y = info["y"];
 	    }
 	}
 

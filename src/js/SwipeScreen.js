@@ -21,6 +21,14 @@ class SwipeScreen {
 	this.virtual_width = this.width / this.height * this.virtual_height;
     }
 
+    static vwidth() {
+	return this.width;
+    }
+
+    static vheight() {
+	return this.height;
+    }
+    
     static refresh() {
 	SwipeScreen.setOriginalSize();
 	SwipeScreen.setVirtualSize();
