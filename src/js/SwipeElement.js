@@ -2,7 +2,8 @@ class SwipeElement {
 
     constructor (info, css_id) {
 	this.info = info;
-
+	this.css_id = css_id;
+	
 	this.x = 0;
 	this.y = 0;
 
@@ -47,11 +48,16 @@ class SwipeElement {
 	}
     }
 
-    resourceUrl(){
-	if (this.urls != null) {
-	    return this.urls;
+    data() {
+	return this.info;
+    }
+
+    html() {
+	if (this.info.img) {
+	    return "<img src='" + this.info.img + "' class='element' id='" + this.css_id + "' />";
+	} else {
+	    return "";
 	}
-	
     }
     
 }

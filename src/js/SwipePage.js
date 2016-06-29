@@ -16,14 +16,16 @@ class SwipePage {
 	    elems.push(instance.elementLoad(element));
 	});
 	
-	this.elements = Array.prototype.concat.apply([], elems);
-	
+	Array.prototype.concat.apply([], elems).forEach(function(element, elem_index){
+	    var css_id = "element-" + instance.index + "-" + elem_index;
+	    instance.elements.push(new SwipeElement(element, css_id));
+	});
     }
 
     elementLoad(element){
 	var ret = [];
 	var instance = this;
-
+	
 	ret.push(element);
 	if(element["elements"]){
 	    element["elements"].forEach(function(elem, elem_index){
@@ -39,19 +41,11 @@ class SwipePage {
 	var instance = this;
 	var elems = []
 	this.elements.forEach(function(element, elem_index){
-	    elems.push(instance.element2html(element));
+	    elems.push(element.html());
 	});
 	return elems.join("");
     }
 
-    element2html(element){
-	if (element.img) {
-	    return "<img src='" + element.img + "' class='element' />";
-	} else {
-	    return "";
-	}
-    }
-    
     
     
 }
