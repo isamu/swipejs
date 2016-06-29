@@ -1,12 +1,21 @@
 class SwipeElement {
 
-    constructor (info, css_id) {
+    constructor (info, page_id, element_id) {
+	var css_id = "element-" + page_id + "-" + element_id;
+
 	this.info = info;
 	this.css_id = css_id;
+	this.page_id = page_id;
+	this.element_id = element_id;
 	
 	this.x = 0;
 	this.y = 0;
+    }
 
+    initData() {
+	console.log("called");
+	var info = this.info;
+	
 	if (info["pos"]) {
 	    this.x = info["pos"][0];
 	    this.y = info["pos"][1];
@@ -26,20 +35,16 @@ class SwipeElement {
 	    if (info["w"]){
 		this.w = info["w"];
 	    } else {
-		this.w = $("#" + css_id).attr("__default_width");
+		this.w = $("#" + this.css_id).attr("__default_width");
 	    }
 	    if (info["h"]){
-		console.log("AAA1");
 		this.h = info["h"];
 	    } else {
-		console.log("AAA2");
-		console.log($("#" + css_id).attr("__default_height"));
-		this.h = $("#" + css_id).attr("__default_height");
+		this.h = $("#" + this.css_id).attr("__default_height");
 	    }
 	}
 
 	this.opacity = 1.0;
-	// console.log(info["to"]);
 
 	if(info["to"] && (info["to"]["opacity"] != null) ){
 	    this.opacity = info["to"]["opacity"];
@@ -54,7 +59,7 @@ class SwipeElement {
 
     html() {
 	if (this.info.img) {
-	    return "<img src='" + this.info.img + "' class='element' id='" + this.css_id + "' />";
+	    return "<img src='" + this.info.img + "' class='element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' />";
 	} else {
 	    return "";
 	}

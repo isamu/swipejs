@@ -17,8 +17,7 @@ class SwipePage {
 	});
 	
 	Array.prototype.concat.apply([], elems).forEach(function(element, elem_index){
-	    var css_id = "element-" + instance.index + "-" + elem_index;
-	    instance.elements.push(new SwipeElement(element, css_id));
+	    instance.elements.push(new SwipeElement(element, instance.index, elem_index));
 	});
     }
 
@@ -46,6 +45,8 @@ class SwipePage {
 	return elems.join("");
     }
 
-    
+    initElement(index) {
+	this.elements[index].initData();
+    }
     
 }

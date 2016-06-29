@@ -51,12 +51,13 @@ class SwipeLoader {
 
 	// hide page
 	for (var i = 1; i < this.pages.length; i++) {
-	    $("#page_" + i ).hide();
+	    $("#page_" + i ).css("opacity", 0);
 	}	
 
 	$(".element").load(function() {
 	    $(this).attr("__default_width", $(this).width());
 	    $(this).attr("__default_height", $(this).height());
+	    instance.initData($(this).attr("__page_id"), $(this).attr("__element_id"));
 	});
 	// add load event
     }
@@ -64,13 +65,17 @@ class SwipeLoader {
     steps() {
     }
 
+    initData(page_id, element_id){
+	this.pages[page_id].initElement(element_id);
+    }
+    
     next(){
 	this.show(this.step + 1);
     }
     
     show(step){
-	$("#page_" + this.step ).hide();
-	$("#page_" + step ).show();
+	$("#page_" + this.step ).css("opacity", 0);
+	$("#page_" + step ).css("opacity", 1);
 	this.step = step;
     }
 }
