@@ -7,7 +7,7 @@ $(document).ready(function() {
     var json = data();
     var swipe_loader = new SwipeLoader(json);
 
-    $(".swipe").on("click", function(){
+    $(".swipe").on("click touchstart", function(){
 	swipe_loader.next();
     });
     
