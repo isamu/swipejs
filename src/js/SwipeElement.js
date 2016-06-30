@@ -34,6 +34,12 @@ class SwipeElement {
 	}
 	
 	var info = this.info;
+
+	if (this.type() == "div") {
+	    if (!this.parent) {
+		$("#" + this.css_id).css("position", "fixed");
+	    }
+	}
 	
 	if (info["size"]) {
 	    this.w = info["size"][0];
@@ -45,7 +51,7 @@ class SwipeElement {
 		if (info.img) {
 		    this.w = $("#" + this.css_id).attr("__default_width");
 		} else {
-		    this.w = SwipeScreen.virtualwidth();
+		    this.w = SwipeScreen.swipewidth();
 		}
 	    }
 	    if (info["h"]){
@@ -54,7 +60,7 @@ class SwipeElement {
 		if (info.img) {
 		    this.h = $("#" + this.css_id).attr("__default_height");
 		} else {
-		    this.h = SwipeScreen.virtualheight();
+		    this.h = SwipeScreen.swipeheight();
 		}
 	    }
 	}
@@ -64,8 +70,8 @@ class SwipeElement {
 	    this.y = info["pos"][1];
 	} else {
 	    if (info["x"] == "right"){
-		// todo if parent, this is parent size
 		this.x = this.parentWidth() - this.w;
+		
 	    } else if (info["x"] == "left"){
 		this.x = 0;
 	    } else if (info["x"] == "center"){
@@ -92,6 +98,13 @@ class SwipeElement {
 	} else if (info["opacity"] != null) {
 	    this.opacity = info["opacity"];
 	}
+
+	// for debug
+	$("#" + this.css_id).attr("__x", this.x);
+	$("#" + this.css_id).attr("__y", this.y);	
+
+	$("#" + this.css_id).attr("__w", this.w);
+	$("#" + this.css_id).attr("__h", this.h);
 
 	//this.setInitPos();
 	this.setPrevPos();
@@ -130,6 +143,7 @@ class SwipeElement {
     }
     parentHeight(){
 	var height;
+
 	if (this.parent) {
 	    height = this.parent.getHeight();
 	}
@@ -147,8 +161,8 @@ class SwipeElement {
 	var heightN = SwipeScreen.virtualY(this.h);
 
 	if (this.info["translate"]) {
-	    leftPosN = leftPosN + this.info["translate"][0];
-	    topPosN = topPosN + this.info["translate"][1];
+	    leftPosN = leftPosN + SwipeScreen.virtualX(this.info["translate"][0]);
+	    topPosN = topPosN +  SwipeScreen.virtualY(this.info["translate"][1]);
 	}
 	
 	$("#" + this.css_id).css({
@@ -206,14 +220,24 @@ class SwipeElement {
 	return this.info;
     }
 
-    html() {
+    type() {
 	if (this.info.img) {
-	    return "<img src='" + this.info.img + "' class='element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' />";
+	    return "image";
 	} else {
+	    return "div";
+	} 
+    }
+
+    html() {
+	if (this.type() == "image") {
+	    return "<img src='" + this.info.img + "' class='element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' />";
+	} else if (this.type() == "div") {
 	    var html = this.elements.map(function(element, key){
 		return element.html();
 	    });
-	    return "<div class='boxelement' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + html + "</div>" ;
+	    return "<div class='boxelement' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + html.join("") + "</div>" ;
+	} else {
+	    return "";
 	}
     }
     
