@@ -10,9 +10,28 @@ class SwipeElement {
 	
 	this.x = 0;
 	this.y = 0;
+
+	this.elements = [];
+	var instance = this;
+	if (this.info["elements"]) {
+	    this.info["elements"].forEach(function(element, elem_index){
+		var e_id = element_id + "-" + elem_index;
+		instance.elements.push(new SwipeElement(element, page_id, e_id));
+	    });
+	}
     }
 
-    initData() {
+    initData(index) {
+	if (index !== undefined) {
+	    var indexes = index.split("-");
+	    if (indexes.length == 1) {
+		this.elements[index].initData();
+	    } else {
+		this.elements[indexes.shift()].initData(indexes.join("-"));
+	    }
+	    return;
+	}
+	
 	var info = this.info;
 	
 	if (info["size"]) {
@@ -64,6 +83,10 @@ class SwipeElement {
 	    this.opacity = info["opacity"];
 	}
 
+	this.elements.forEach(function(element, elem_index){
+	    element.initData();
+	});
+	
 	//this.setInitPos();
 	this.setPrevPos();
 	this.setFinPos();
@@ -91,9 +114,7 @@ class SwipeElement {
     }
 
     setFinPos(){
-	console.log("FIN");
 	if (this.info["to"]) {
-	    console.log("FIN2");
 	    var leftPosN = SwipeScreen.virtualX(this.x);
 	    var topPosN = SwipeScreen.virtualY(this.y);
 	
@@ -142,7 +163,10 @@ class SwipeElement {
 	if (this.info.img) {
 	    return "<img src='" + this.info.img + "' class='element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' />";
 	} else {
-	    return "";
+	    var html = this.elements.map(function(element, key){
+		return element.html();
+	    });
+	    return "<div class='boxelement' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + html + "</div>" ;
 	}
     }
     

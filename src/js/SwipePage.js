@@ -13,12 +13,6 @@ class SwipePage {
 	var instance = this;
 	var elems = []
 	this.page["elements"].forEach(function(element, elem_index){
-	    instance.elementLoad(element).forEach(function(elem, index){
-		elems.push(elem);
-	    });
-	});
-	
-	elems.forEach(function(element, elem_index){
 	    instance.elements.push(new SwipeElement(element, instance.index, elem_index));
 	});
     }
@@ -51,7 +45,12 @@ class SwipePage {
     }
 
     initElement(index) {
-	this.elements[index].initData();
+	var indexes = index.split("-");
+	if (indexes.length == 1) {
+	    this.elements[index].initData();
+	} else {
+	    this.elements[indexes.shift()].initData(indexes.join("-"));
+	}
     }
     
 }
