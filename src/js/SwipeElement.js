@@ -64,9 +64,59 @@ class SwipeElement {
 	    this.opacity = info["opacity"];
 	}
 
-	this.setInitPos();
+	//this.setInitPos();
+	this.setPrevPos();
+	this.setFinPos();
     }
 
+    setPrevPos(){
+	var leftPosN = SwipeScreen.virtualX(this.x);
+	var topPosN = SwipeScreen.virtualY(this.y);
+	
+	var widthN = SwipeScreen.virtualX(this.w);
+	var heightN = SwipeScreen.virtualY(this.h);
+
+	if (this.info["translate"]) {
+	    leftPosN = leftPosN + this.info["translate"][0];
+	    topPosN = topPosN + this.info["translate"][1];
+	}
+	
+	$("#" + this.css_id).css({
+	    'left': leftPosN + 'px',
+	    'top': topPosN + 'px',
+	    'width': widthN + 'px',
+	    'height': heightN + 'px',
+	    'opacity' : this.opacity
+	});
+    }
+
+    setFinPos(){
+	console.log("FIN");
+	if (this.info["to"]) {
+	    console.log("FIN2");
+	    var leftPosN = SwipeScreen.virtualX(this.x);
+	    var topPosN = SwipeScreen.virtualY(this.y);
+	
+	    var widthN = SwipeScreen.virtualX(this.w);
+	    var heightN = SwipeScreen.virtualY(this.h);
+	    
+	    if (this.info["to"]["translate"]) {
+		leftPosN = leftPosN + this.info["to"]["translate"][0];
+		topPosN = topPosN + this.info["to"]["translate"][1];
+	    }
+	    
+	    $("#" + this.css_id).animate({
+		'left': leftPosN + 'px',
+		'top': topPosN + 'px',
+		'width': widthN + 'px',
+		'height': heightN + 'px',
+		'opacity' : this.opacity
+	    }, {
+		duration: 1
+	    });
+	}
+    }
+    
     setInitPos(){
 	var leftPosN = SwipeScreen.virtualX(this.x);
 	var topPosN = SwipeScreen.virtualY(this.y);
@@ -74,7 +124,6 @@ class SwipeElement {
 	var widthN = SwipeScreen.virtualX(this.w);
 	var heightN = SwipeScreen.virtualY(this.h);
 	
-	console.log(this.css_id);
 	$("#" + this.css_id).css({
 	    'left': leftPosN + 'px',
 	    'top': topPosN + 'px',

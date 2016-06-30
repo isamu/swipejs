@@ -13,10 +13,12 @@ class SwipePage {
 	var instance = this;
 	var elems = []
 	this.page["elements"].forEach(function(element, elem_index){
-	    elems.push(instance.elementLoad(element));
+	    instance.elementLoad(element).forEach(function(elem, index){
+		elems.push(elem);
+	    });
 	});
 	
-	Array.prototype.concat.apply([], elems).forEach(function(element, elem_index){
+	elems.forEach(function(element, elem_index){
 	    instance.elements.push(new SwipeElement(element, instance.index, elem_index));
 	});
     }
@@ -27,10 +29,10 @@ class SwipePage {
 	
 	ret.push(element);
 	if(element["elements"]){
-	    var copy_obj = Object.assign({}, element);
-	    delete copy_obj.elements;
 	    element["elements"].forEach(function(elem, elem_index){
 		instance.elementLoad(elem).forEach(function(elem2, elem_index2){
+		    var copy_obj = Object.assign({}, element);
+		    delete copy_obj.elements;
 		    ret.push($.extend(true, copy_obj, elem2));
 		});
 	    });
