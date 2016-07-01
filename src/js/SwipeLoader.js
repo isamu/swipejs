@@ -43,7 +43,7 @@ class SwipeLoader {
 	    page.loadElement();
 	    
 	    // todo snbinder
-	    var page_html = "<div id='page_" + page_index + "'>" + page.getHtml() + "</div>";
+	    var page_html = "<div id='page_" + page_index + "' class='page'>" + page.getHtml() + "</div>";
 	    
 	    pages.push(page_html);
 	});
@@ -61,6 +61,7 @@ class SwipeLoader {
 	    instance.initData($(this).attr("__page_id"), $(this).attr("__element_id"));
 	});
 
+	$(".page").css({"position": "absolute"});
 	$(".boxelement").each(function(index, element) {
 	    instance.initData($(element).attr("__page_id"), $(element).attr("__element_id"));
 	});
@@ -84,5 +85,10 @@ class SwipeLoader {
 	$("#page_" + this.step ).css("opacity", 0);
 	$("#page_" + step ).css("opacity", 1);
 	this.step = step;
+	location.hash = this.step;
+    }
+
+    getStep() {
+	return this.step;
     }
 }
