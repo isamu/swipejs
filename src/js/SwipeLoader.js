@@ -21,17 +21,6 @@ class SwipeLoader {
 	    }
 	    var page_instance = new SwipePage(page, scene, index);
 
-	    /*
-	    if (scene_name != page["scene"]) {
-		scene_index += 1;
-		scene_name = page["scene"];
-		page_index = 0;
-	    }
-	    page["scene_index"] = scene_index;
-	    page["page_index"] = page_index;	
-	    page_index += 1;
-	    */
-
 	    this.pages.push(page_instance);
 	});
     }
@@ -120,8 +109,6 @@ class SwipeLoader {
 	}, {
 	    duration: 500
 	});
-	
-	
     }
 
 }

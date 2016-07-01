@@ -1,4 +1,4 @@
-# swipejs
+# Swipe Javascript Engine 
 
 Yet another swipe engine.
 
