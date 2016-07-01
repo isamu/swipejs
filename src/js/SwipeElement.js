@@ -37,7 +37,7 @@ class SwipeElement {
 
 	if (this.type() == "div") {
 	    if (!this.parent) {
-		$("#" + this.css_id).css("position", "fixed");
+		$("#" + this.css_id).css("position", "absolute");
 	    }
 	}
 	
