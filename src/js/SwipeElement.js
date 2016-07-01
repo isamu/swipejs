@@ -51,7 +51,7 @@ class SwipeElement {
 		if (info.img) {
 		    this.w = $("#" + this.css_id).attr("__default_width");
 		} else {
-		    this.w = SwipeScreen.swipewidth();
+		    this.w = this.parentWidth();
 		}
 	    }
 	    if (info["h"]){
@@ -60,7 +60,7 @@ class SwipeElement {
 		if (info.img) {
 		    this.h = $("#" + this.css_id).attr("__default_height");
 		} else {
-		    this.h = SwipeScreen.swipeheight();
+		    this.h =  this.parentHeight();
 		}
 	    }
 	}
@@ -93,9 +93,7 @@ class SwipeElement {
 
 	this.opacity = 1.0;
 
-	if(info["to"] && (info["to"]["opacity"] != null) ){
-	    this.opacity = info["to"]["opacity"];
-	} else if (info["opacity"] != null) {
+	if (info["opacity"] != null) {
 	    this.opacity = info["opacity"];
 	}
 
@@ -108,7 +106,7 @@ class SwipeElement {
 
 	//this.setInitPos();
 	this.setPrevPos();
-	this.setFinPos();
+	// this.setFinPos();
     }
 
     getWidth() {
@@ -176,6 +174,13 @@ class SwipeElement {
 
     setFinPos(){
 	if (this.info["to"]) {
+	    this.fin_opacity = this.opacity;
+	    
+	    if(this.info["to"]["opacity"] != null) {
+		this.fin_opacity = this.info["to"]["opacity"];
+		console.log( this.fin_opacity);
+	    }
+	    
 	    var leftPosN = SwipeScreen.virtualX(this.x);
 	    var topPosN = SwipeScreen.virtualY(this.y);
 	
@@ -192,9 +197,9 @@ class SwipeElement {
 		'top': topPosN + 'px',
 		'width': widthN + 'px',
 		'height': heightN + 'px',
-		'opacity' : this.opacity
+		'opacity' : this.fin_opacity
 	    }, {
-		duration: 1
+		duration: 500
 	    });
 	}
     }
@@ -239,6 +244,15 @@ class SwipeElement {
 	} else {
 	    return "";
 	}
+    }
+
+    show(){
+	if (this.elements) {
+	    this.elements.forEach(function(element, elem_index){
+		element.show();
+	    });
+	}
+	this.setFinPos();
     }
     
 }

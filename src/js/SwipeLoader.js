@@ -79,6 +79,8 @@ class SwipeLoader {
     }
     
     show(step){
+	this.pages[step].show();
+	
 	$("#page_" + this.step ).css("opacity", 0);
 	$("#page_" + step ).css("opacity", 1);
 	this.step = step;

@@ -52,5 +52,11 @@ class SwipePage {
 	    this.elements[indexes.shift()].initData(indexes.join("-"));
 	}
     }
+
+    show(){
+	this.elements.forEach(function(element, elem_index){
+	    element.show();
+	});
+    }
     
 }
