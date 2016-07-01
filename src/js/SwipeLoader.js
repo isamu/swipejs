@@ -81,9 +81,17 @@ class SwipeLoader {
     
     show(step){
 	this.pages[step].show();
-	
-	$("#page_" + this.step ).css("opacity", 0);
-	$("#page_" + step ).css("opacity", 1);
+	if (this.pages[step].getScene() == this.pages[this.step].getScene()) {
+	    $("#page_" + this.step ).css("opacity", 0);
+	    $("#page_" + step ).css("opacity", 1);
+	} else {
+	    $("#page_" + this.step ).animate({
+		"opacity": 0
+	    }, {
+		duration: 500
+	    });
+	    this.pageSlideIn(step);
+	}
 	this.step = step;
 	location.hash = this.step;
     }
@@ -91,4 +99,17 @@ class SwipeLoader {
     getStep() {
 	return this.step;
     }
+
+    pageSlideIn(step) {
+	$("#page_" + step ).css("top", SwipeScreen.virtualheight());
+	$("#page_" + step ).css("opacity", 1);
+	$("#page_" + step ).animate({
+	    "top": 0
+	}, {
+	    duration: 500
+	});
+	
+	
+    }
+
 }

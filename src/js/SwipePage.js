@@ -58,5 +58,9 @@ class SwipePage {
 	    element.show();
 	});
     }
-    
+
+    getScene() {
+	return this.scene;
+    }
+
 }
