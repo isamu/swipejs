@@ -101,6 +101,18 @@ class SwipeLoader {
     }
 
     pageSlideIn(step) {
+	$(".boxelement-" + step).each(function(index, element) {
+	    var org_top = parseInt($(element).css("top"));
+	    var from_top = org_top + SwipeScreen.virtualheight();
+
+	    $(element).css("top", from_top);
+	    $(element).animate({
+		"top": org_top
+            }, {
+		duration: 500
+            });
+	});
+	
 	$("#page_" + step ).css("top", SwipeScreen.virtualheight());
 	$("#page_" + step ).css("opacity", 1);
 	$("#page_" + step ).animate({
