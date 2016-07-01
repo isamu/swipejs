@@ -59,6 +59,16 @@ class SwipePage {
 	});
     }
 
+    back() { 
+	this.elements.forEach(function(element, elem_index){
+	    element.back();
+	});
+    }
+    finShow() {
+	this.elements.forEach(function(element, elem_index){
+	    element.finShow();
+	});
+    }
     getScene() {
 	return this.scene;
     }

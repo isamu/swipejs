@@ -151,7 +151,7 @@ class SwipeElement {
 	return SwipeScreen.swipeheight();
     }
     
-    setPrevPos(){
+    getPrevPos(){
 	var leftPosN = SwipeScreen.virtualX(this.x);
 	var topPosN = SwipeScreen.virtualY(this.y);
 	
@@ -162,48 +162,64 @@ class SwipeElement {
 	    leftPosN = leftPosN + SwipeScreen.virtualX(this.info["translate"][0]);
 	    topPosN = topPosN +  SwipeScreen.virtualY(this.info["translate"][1]);
 	}
-	
-	$("#" + this.css_id).css({
+	return {
 	    'left': leftPosN + 'px',
 	    'top': topPosN + 'px',
 	    'width': widthN + 'px',
 	    'height': heightN + 'px',
 	    'opacity' : this.opacity
+	}
+    }
+    setPrevPos(){
+	$("#" + this.css_id).css(this.getPrevPos());
+    }
+    animatePrevPos(){
+	console.log("animate");
+	$("#" + this.css_id).animate(this.getPrevPos(), {
+		duration: 500
 	});
     }
 
-    setFinPos(){
+    getFinPos() {
+	var leftPosN = SwipeScreen.virtualX(this.x);
+	var topPosN = SwipeScreen.virtualY(this.y);
+	
+	var widthN = SwipeScreen.virtualX(this.w);
+	var heightN = SwipeScreen.virtualY(this.h);
+	
+	this.fin_opacity = this.opacity;
 	if (this.info["to"]) {
-	    this.fin_opacity = this.opacity;
 	    
 	    if(this.info["to"]["opacity"] != null) {
 		this.fin_opacity = this.info["to"]["opacity"];
-		console.log( this.fin_opacity);
 	    }
-	    
-	    var leftPosN = SwipeScreen.virtualX(this.x);
-	    var topPosN = SwipeScreen.virtualY(this.y);
-	
-	    var widthN = SwipeScreen.virtualX(this.w);
-	    var heightN = SwipeScreen.virtualY(this.h);
 	    
 	    if (this.info["to"]["translate"]) {
 		leftPosN = leftPosN + this.info["to"]["translate"][0];
 		topPosN = topPosN + this.info["to"]["translate"][1];
 	    }
-	    
-	    $("#" + this.css_id).animate({
-		'left': leftPosN + 'px',
-		'top': topPosN + 'px',
-		'width': widthN + 'px',
-		'height': heightN + 'px',
-		'opacity' : this.fin_opacity
-	    }, {
+	}
+	return {
+	    'left': leftPosN + 'px',
+	    'top': topPosN + 'px',
+	    'width': widthN + 'px',
+	    'height': heightN + 'px',
+	    'opacity' : this.fin_opacity
+	}
+    }
+    animateFinPos(){
+	console.log("fin");
+	if (this.info["to"]) {
+	    $("#" + this.css_id).animate(this.getFinPos(), {
 		duration: 500
 	    });
 	}
     }
-    
+
+    setFinPos() {
+	$("#" + this.css_id).css(this.getFinPos());
+    }
+
     setInitPos(){
 	var leftPosN = SwipeScreen.virtualX(this.x);
 	var topPosN = SwipeScreen.virtualY(this.y);
@@ -247,9 +263,32 @@ class SwipeElement {
     }
 
     show(){
+	console.log("show");
 	if (this.elements) {
 	    this.elements.forEach(function(element, elem_index){
 		element.show();
+	    });
+	}
+	this.setPrevPos();
+	this.animateFinPos();
+    }
+
+    back(){
+	console.log("back");
+	if (this.elements) {
+	    this.elements.forEach(function(element, elem_index){
+		element.back();
+	    });
+	}
+	this.setFinPos();
+	this.animatePrevPos();
+    }
+
+    finShow(){
+	console.log("finShow");
+	if (this.elements) {
+	    this.elements.forEach(function(element, elem_index){
+		element.finShow();
 	    });
 	}
 	this.setFinPos();

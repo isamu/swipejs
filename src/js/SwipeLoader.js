@@ -1,10 +1,10 @@
 class SwipeLoader {
-    constructor (data) {
+    constructor (data, default_page = 0) {
+	this.step = default_page;
 	this.data = data;
 	this.pages = [];
 	this.load();
 	this.domLoad();
-	this.step = 0;
     }
     
     load(){
@@ -40,8 +40,10 @@ class SwipeLoader {
 	$(".swipe").html(pages.join(""));
 
 	// hide page
-	for (var i = 1; i < this.pages.length; i++) {
-	    $("#page_" + i ).css("opacity", 0);
+	for (var i = 0; i < this.pages.length; i++) {
+	    if (this.step != i) {
+		$("#page_" + i ).css("opacity", 0);
+	    }
 	}	
 
 	$(".element").load(function() {
@@ -69,17 +71,45 @@ class SwipeLoader {
     }
     
     show(step){
-	this.pages[step].show();
-	if (this.pages[step].getScene() == this.pages[this.step].getScene()) {
-	    $("#page_" + this.step ).css("opacity", 0);
-	    $("#page_" + step ).css("opacity", 1);
+	var mode = (step >= this.step) ? "forward" : "back";
+	var same_scene = (this.pages[step].getScene() == this.pages[this.step].getScene());
+
+	if (step >= this.step) {
+	    this.pages[step].show();
 	} else {
-	    $("#page_" + this.step ).animate({
-		"opacity": 0
-	    }, {
-		duration: 500
-	    });
-	    this.pageSlideIn(step);
+	    if (same_scene) {
+		this.pages[this.step].back();
+	    }
+	    // this.pages[step].finShow();
+	}
+	
+	var prev_step = Number(this.step);
+	if (same_scene) {
+	    if (mode ==  "forward") {
+		$("#page_" + this.step ).css("opacity", 0);
+		$("#page_" + step ).css("opacity", 1);
+	    } else {
+		setTimeout(function(){
+		    $("#page_" + prev_step ).css({"opacity": 0});
+		    $("#page_" + step).css({"opacity": 1});
+		}, 500);
+	    }
+	} else {
+	    if (mode ==  "forward") {
+		$("#page_" + this.step ).animate({
+		    "opacity": 0
+		}, {
+		    duration: 500
+		});
+		this.pageSlide("in", step);
+	    } else {
+		$("#page_" + step).css({"opacity": 1});
+
+		this.pageSlide("out", this.step);
+		setTimeout(function(){
+		    $("#page_" + prev_step ).css({"opacity": 0});
+		}, 500);
+	    }
 	}
 	this.step = step;
 	location.hash = this.step;
@@ -89,10 +119,15 @@ class SwipeLoader {
 	return this.step;
     }
 
-    pageSlideIn(step) {
+    pageSlide(mode, step) {
 	$(".boxelement-" + step).each(function(index, element) {
-	    var org_top = parseInt($(element).css("top"));
-	    var from_top = org_top + SwipeScreen.virtualheight();
+	    if (mode == "in") {
+		var org_top = parseInt($(element).css("top"));
+		var from_top = org_top + SwipeScreen.virtualheight();
+	    } else {
+		var from_top = parseInt($(element).css("top"));
+		var org_top = from_top + SwipeScreen.virtualheight();
+	    }
 
 	    $(element).css("top", from_top);
 	    $(element).animate({
@@ -101,14 +136,24 @@ class SwipeLoader {
 		duration: 500
             });
 	});
-	
-	$("#page_" + step ).css("top", SwipeScreen.virtualheight());
-	$("#page_" + step ).css("opacity", 1);
-	$("#page_" + step ).animate({
-	    "top": 0
-	}, {
-	    duration: 500
-	});
+
+	if (mode == "in") {
+	    $("#page_" + step ).css("top", SwipeScreen.virtualheight());
+	    $("#page_" + step ).css("opacity", 1);
+	    $("#page_" + step ).animate({
+		"top": 0
+	    }, {
+		duration: 500
+	    });
+	} else {
+	    $("#page_" + step ).css("top", 0);
+	    $("#page_" + step ).animate({
+		"top": SwipeScreen.virtualheight(),
+	    }, {
+		duration: 500
+	    });
+
+	}
     }
 
 }
