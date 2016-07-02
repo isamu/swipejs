@@ -75,12 +75,15 @@ class SwipeLoader {
 	var same_scene = (this.pages[step].getScene() == this.pages[this.step].getScene());
 
 	if (step >= this.step) {
-	    this.pages[step].show();
+	    if (same_scene) {
+		this.pages[step].show();
+	    } else {
+		this.pages[step].delayShow();
+	    }
 	} else {
 	    if (same_scene) {
 		this.pages[this.step].back();
 	    }
-	    // this.pages[step].finShow();
 	}
 	
 	var prev_step = Number(this.step);

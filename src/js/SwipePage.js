@@ -59,6 +59,12 @@ class SwipePage {
 	});
     }
 
+    delayShow(){
+	this.elements.forEach(function(element, elem_index){
+	    element.delayShow();
+	});
+    }
+    
     back() { 
 	this.elements.forEach(function(element, elem_index){
 	    element.back();

@@ -273,6 +273,20 @@ class SwipeElement {
 	this.animateFinPos();
     }
 
+    delayShow(){
+	console.log("delayShow");
+	if (this.elements) {
+	    this.elements.forEach(function(element, elem_index){
+		element.delayShow();
+	    });
+	}
+	this.setPrevPos();
+	var instance = this;
+	setTimeout(function(){
+	    instance.animateFinPos();
+	}, 500);
+    }
+    
     back(){
 	console.log("back");
 	if (this.elements) {
