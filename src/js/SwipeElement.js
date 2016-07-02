@@ -33,69 +33,15 @@ class SwipeElement {
 	    return;
 	}
 	
-	var info = this.info;
-
 	if (this.type() == "div") {
 	    if (!this.parent) {
 		$("#" + this.css_id).css("position", "absolute");
 	    }
 	}
 	
-	if (info["size"]) {
-	    this.w = info["size"][0];
-	    this.h = info["size"][1];
-	} else {
-	    if (info["w"]){
-		this.w = info["w"];
-	    } else {
-		if (info.img) {
-		    this.w = $("#" + this.css_id).attr("__default_width");
-		} else {
-		    this.w = this.parentWidth();
-		}
-	    }
-	    if (info["h"]){
-		this.h = info["h"];
-	    } else {
-		if (info.img) {
-		    this.h = $("#" + this.css_id).attr("__default_height");
-		} else {
-		    this.h =  this.parentHeight();
-		}
-	    }
-	}
-
-	if (info["pos"]) {
-	    this.x = info["pos"][0];
-	    this.y = info["pos"][1];
-	} else {
-	    if (info["x"] == "right"){
-		this.x = this.parentWidth() - this.w;
-		
-	    } else if (info["x"] == "left"){
-		this.x = 0;
-	    } else if (info["x"] == "center"){
-		this.x = (this.parentWidth() - this.w) / 2.0;
-	    } else if (info["x"]){
-		this.x = info["x"];
-	    }
-
-	    if (info["y"] == "bottom"){
-		this.y = this.parentHeight() - this.h;
-	    } else if (info["y"] == "top"){
-		this.y = 0;
-	    } else if (info["y"] == "center"){
-		this.y = (this.parentHeight() - this.h) / 2.0;
-	    } else if (info["y"]){
-		this.y = info["y"];
-	    }
-	}
-
-	this.opacity = 1.0;
-
-	if (info["opacity"] != null) {
-	    this.opacity = info["opacity"];
-	}
+	this.setSize();
+	this.setPosition();
+	this.setOpacity();
 
 	// for debug
 	$("#" + this.css_id).attr("__x", this.x);
@@ -104,11 +50,72 @@ class SwipeElement {
 	$("#" + this.css_id).attr("__w", this.w);
 	$("#" + this.css_id).attr("__h", this.h);
 
-	//this.setInitPos();
 	this.setPrevPos();
-	// this.setFinPos();
     }
 
+
+    setOpacity() {
+	this.opacity = 1.0;
+
+	if (this.info["opacity"] != null) {
+	    this.opacity = this.info["opacity"];
+	}
+    }	
+    
+    setSize() {
+    	if (this.info["size"]) {
+	    this.w = this.info["size"][0];
+	    this.h = this.info["size"][1];
+	} else {
+	    if (this.info["w"]){
+		this.w = this.info["w"];
+	    } else {
+		if (this.info.img) {
+		    this.w = $("#" + this.css_id).attr("__default_width");
+		} else {
+		    this.w = this.parentWidth();
+		}
+	    }
+	    if (this.info["h"]){
+		this.h = this.info["h"];
+	    } else {
+		if (this.info.img) {
+		    this.h = $("#" + this.css_id).attr("__default_height");
+		} else {
+		    this.h =  this.parentHeight();
+		}
+	    }
+	}
+    }
+
+    setPosition() {
+	if (this.info["pos"]) {
+	    this.x = this.info["pos"][0];
+	    this.y = this.info["pos"][1];
+	} else {
+	    if (this.info["x"] == "right"){
+		this.x = this.parentWidth() - this.w;
+		
+	    } else if (this.info["x"] == "left"){
+		this.x = 0;
+	    } else if (this.info["x"] == "center"){
+		this.x = (this.parentWidth() - this.w) / 2.0;
+	    } else if (this.info["x"]){
+		this.x = this.info["x"];
+	    }
+
+	    if (this.info["y"] == "bottom"){
+		this.y = this.parentHeight() - this.h;
+	    } else if (this.info["y"] == "top"){
+		this.y = 0;
+	    } else if (this.info["y"] == "center"){
+		this.y = (this.parentHeight() - this.h) / 2.0;
+	    } else if (this.info["y"]){
+		this.y = this.info["y"];
+	    }
+	}
+    }
+    
     getWidth() {
 	if (this.w) {
 	    return this.w;

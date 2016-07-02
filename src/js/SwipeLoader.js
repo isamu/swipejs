@@ -1,6 +1,6 @@
 class SwipeLoader {
-    constructor (data, default_page = 0) {
-	this.step = default_page;
+    constructor (data, defaultPage = 0) {
+	this.step = defaultPage;
 	this.data = data;
 	this.pages = [];
 	this.load();
@@ -8,20 +8,16 @@ class SwipeLoader {
     }
     
     load(){
-	var scene_name = this.data["pages"][0]["scene"];
-	var scene_index = 0;
-	var page_index = 0;
-
 	SwipeScreen.init(this.data.dimension[0], this.data.dimension[1]);
 	
 	$.each(this.data["pages"], (index, page) => {
-	    var scene = null;
+	    var scene;
 	    if (page["scene"] && (scene = this.data["scenes"][page["scene"]]) ){
 		scene = this.data["scenes"][page["scene"]];
 	    }
-	    var page_instance = new SwipePage(page, scene, index);
+	    var pageInstance = new SwipePage(page, scene, index);
 
-	    this.pages.push(page_instance);
+	    this.pages.push(pageInstance);
 	});
     }
 
@@ -39,7 +35,6 @@ class SwipeLoader {
 	
 	$(".swipe").html(pages.join(""));
 
-	// hide page
 	for (var i = 0; i < this.pages.length; i++) {
 	    if (this.step != i) {
 		$("#page_" + i ).css("opacity", 0);
@@ -56,7 +51,6 @@ class SwipeLoader {
 	$(".boxelement").each(function(index, element) {
 	    instance.initData($(element).attr("__page_id"), $(element).attr("__element_id"));
 	});
-	// add load event
     }
     
     steps() {
@@ -70,52 +64,45 @@ class SwipeLoader {
 	this.show(this.step + 1);
     }
     
-    show(step){
-	var mode = (step >= this.step) ? "forward" : "back";
-	var same_scene = (this.pages[step].getScene() == this.pages[this.step].getScene());
+    show(nextStep){
+	var currentStep =  this.step;
+	var mode = (nextStep >= currentStep) ? "forward" : "back";
+	var same_scene = (this.pages[nextStep].getScene() == this.pages[currentStep].getScene());
 
-	if (step >= this.step) {
+	if (mode == "forward") {
 	    if (same_scene) {
-		this.pages[step].show();
+		this.pages[nextStep].show();
+		$("#page_" + currentStep ).css("opacity", 0);
+		$("#page_" + nextStep ).css("opacity", 1);
 	    } else {
-		this.pages[step].delayShow();
-	    }
-	} else {
-	    if (same_scene) {
-		this.pages[this.step].back();
-	    }
-	}
-	
-	var prev_step = Number(this.step);
-	if (same_scene) {
-	    if (mode ==  "forward") {
-		$("#page_" + this.step ).css("opacity", 0);
-		$("#page_" + step ).css("opacity", 1);
-	    } else {
-		setTimeout(function(){
-		    $("#page_" + prev_step ).css({"opacity": 0});
-		    $("#page_" + step).css({"opacity": 1});
-		}, 500);
-	    }
-	} else {
-	    if (mode ==  "forward") {
-		$("#page_" + this.step ).animate({
+		$("#page_" + currentStep ).animate({
 		    "opacity": 0
 		}, {
 		    duration: 500
 		});
-		this.pageSlide("in", step);
-	    } else {
-		$("#page_" + step).css({"opacity": 1});
-
-		this.pageSlide("out", this.step);
+		this.pageSlide("in", nextStep);
+		this.pages[nextStep].delayShow();
+	    }
+	} else { // in case back
+	    if (same_scene) {
+		this.pages[currentStep].back();
+		// todo more smooth.
 		setTimeout(function(){
-		    $("#page_" + prev_step ).css({"opacity": 0});
+		    $("#page_" + currentStep ).css({"opacity": 0});
+		    $("#page_" + nextStep).css({"opacity": 1});
+		}, 500);
+	    } else {
+		$("#page_" + nextStep).css({"opacity": 1});
+		
+		this.pageSlide("out", currentStep);
+		setTimeout(function(){
+		    $("#page_" + currentStep ).css({"opacity": 0});
 		}, 500);
 	    }
 	}
-	this.step = step;
-	location.hash = this.step;
+	
+	this.step = nextStep;
+	location.hash = nextStep;
     }
 
     getStep() {
@@ -125,16 +112,16 @@ class SwipeLoader {
     pageSlide(mode, step) {
 	$(".boxelement-" + step).each(function(index, element) {
 	    if (mode == "in") {
-		var org_top = parseInt($(element).css("top"));
-		var from_top = org_top + SwipeScreen.virtualheight();
+		var orgTop = parseInt($(element).css("top"));
+		var fromTop = orgTop + SwipeScreen.virtualheight();
 	    } else {
-		var from_top = parseInt($(element).css("top"));
-		var org_top = from_top + SwipeScreen.virtualheight();
+		var fromTop = parseInt($(element).css("top"));
+		var orgTop = fromTop + SwipeScreen.virtualheight();
 	    }
 
-	    $(element).css("top", from_top);
+	    $(element).css("top", fromTop);
 	    $(element).animate({
-		"top": org_top
+		"top": orgTop
             }, {
 		duration: 500
             });
