@@ -276,6 +276,10 @@ class SwipeElement {
 	}
 	this.setPrevPos();
 	this.animateFinPos();
+	if ( this.info["loop"]) {
+	    this.loop(this);
+	    console.log("loop2");
+	}
     }
 
     delayShow(){
@@ -289,7 +293,21 @@ class SwipeElement {
 	var instance = this;
 	setTimeout(function(){
 	    instance.animateFinPos();
+	    if ( instance.info["loop"]) {
+		instance.loop(instance);
+	    }
 	}, 500);
+    }
+
+    loop(instance){
+	$("#" + instance.css_id).rotate({angle:0, animateTo: 20, duration: 100});
+	setTimeout(function(){
+	    $("#" + instance.css_id).rotate({angle:20, animateTo: -20, duration: 200});
+	    setTimeout(function(){
+		$("#" + instance.css_id).rotate({angle:-20, animateTo: 0, duration: 100});
+		
+	    }, 200);
+	}, 100);
     }
     
     back(){
