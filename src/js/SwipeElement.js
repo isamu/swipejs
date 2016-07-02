@@ -158,24 +158,24 @@ class SwipeElement {
 	return SwipeScreen.swipeheight();
     }
     
+    // end of data parse 
+
+    // set or animate position
+    setInitPos(){
+	var data = this.getInitPos();
+	data = getScreenPosition(data);
+	$("#" + this.css_id).css(this.convCssPos(data, this.opacity));
+    }
+
     getPrevPos(){
-	var leftPosN = SwipeScreen.virtualX(this.x);
-	var topPosN = SwipeScreen.virtualY(this.y);
-	
-	var widthN = SwipeScreen.virtualX(this.w);
-	var heightN = SwipeScreen.virtualY(this.h);
+	var data = this.getInitPos();
 
 	if (this.info["translate"]) {
-	    leftPosN = leftPosN + SwipeScreen.virtualX(this.info["translate"][0]);
-	    topPosN = topPosN +  SwipeScreen.virtualY(this.info["translate"][1]);
+	    data = this.addPosition(data, this.info["translate"]);
 	}
-	return {
-	    'left': leftPosN + 'px',
-	    'top': topPosN + 'px',
-	    'width': widthN + 'px',
-	    'height': heightN + 'px',
-	    'opacity' : this.opacity
-	}
+	
+	data = this.getScreenPosition(data);
+	return this.convCssPos(data, this.opacity);
     }
     setPrevPos(){
 	$("#" + this.css_id).css(this.getPrevPos());
@@ -188,32 +188,26 @@ class SwipeElement {
     }
 
     getFinPos() {
-	var leftPosN = SwipeScreen.virtualX(this.x);
-	var topPosN = SwipeScreen.virtualY(this.y);
-	
-	var widthN = SwipeScreen.virtualX(this.w);
-	var heightN = SwipeScreen.virtualY(this.h);
-	
-	this.fin_opacity = this.opacity;
-	if (this.info["to"]) {
-	    
-	    if(this.info["to"]["opacity"] != null) {
-		this.fin_opacity = this.info["to"]["opacity"];
+	var data = this.getInitPos();
+
+	var fin_opacity = this.opacity;
+	var to = this.info["to"];
+	if (to) {
+	    if(to["opacity"] != null) {
+		fin_opacity = to["opacity"];
 	    }
-	    
-	    if (this.info["to"]["translate"]) {
-		leftPosN = leftPosN + this.info["to"]["translate"][0];
-		topPosN = topPosN + this.info["to"]["translate"][1];
+	    if (to["translate"]) {
+		data = this.addPosition(data, to["translate"]);
 	    }
 	}
-	return {
-	    'left': leftPosN + 'px',
-	    'top': topPosN + 'px',
-	    'width': widthN + 'px',
-	    'height': heightN + 'px',
-	    'opacity' : this.fin_opacity
-	}
+
+	data = this.getScreenPosition(data);
+	return this.convCssPos(data, fin_opacity);
     }
+    setFinPos() {
+	$("#" + this.css_id).css(this.getFinPos());
+    }
+
     animateFinPos(){
 	console.log("fin");
 	if (this.info["to"]) {
@@ -223,31 +217,35 @@ class SwipeElement {
 	}
     }
 
-    setFinPos() {
-	$("#" + this.css_id).css(this.getFinPos());
+    // calculate position
+    getInitPos() {
+	return [this.x, this.y, this.w, this.h];
     }
 
-    setInitPos(){
-	var leftPosN = SwipeScreen.virtualX(this.x);
-	var topPosN = SwipeScreen.virtualY(this.y);
-	
-	var widthN = SwipeScreen.virtualX(this.w);
-	var heightN = SwipeScreen.virtualY(this.h);
-	
-	$("#" + this.css_id).css({
-	    'left': leftPosN + 'px',
-	    'top': topPosN + 'px',
-	    'width': widthN + 'px',
-	    'height': heightN + 'px',
-	    'opacity' : this.opacity
-	});
-	
+    addPosition(data, translate){
+	data[0] = data[0] + translate[0];	
+	data[1] = data[1] + translate[1];
+	return data;
     }
 
-    data() {
-	return this.info;
+    getScreenPosition(data) {
+	return [
+	    SwipeScreen.virtualX(data[0]),
+	    SwipeScreen.virtualY(data[1]),
+	    SwipeScreen.virtualX(data[2]),
+	    SwipeScreen.virtualY(data[3]),
+	];
     }
-
+    convCssPos(data, opacity) {
+	return {
+	    'left': data[0] + 'px',
+	    'top': data[1] + 'px',
+	    'width': data[2] + 'px',
+	    'height': data[3] + 'px',
+	    'opacity' : opacity
+	};
+    }
+  
     type() {
 	if (this.info.img) {
 	    return "image";
