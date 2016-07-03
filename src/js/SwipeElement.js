@@ -43,7 +43,6 @@ class SwipeElement {
 	this.setPosition();
 	this.setOpacity();
 
-	// for debug
 	$("#" + this.css_id).attr("__x", this.x);
 	$("#" + this.css_id).attr("__y", this.y);	
 

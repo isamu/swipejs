@@ -111,14 +111,17 @@ class SwipeLoader {
 
     pageSlide(mode, step) {
 	$(".boxelement-" + step).each(function(index, element) {
+	    console.log("box");
+	    
 	    if (mode == "in") {
-		var orgTop = parseInt($(element).css("top"));
+		// todo not use css top. use virtual x.
+		var orgTop = $("#" + this.css_id).attr("__x");
 		var fromTop = orgTop + SwipeScreen.virtualheight();
 	    } else {
-		var fromTop = parseInt($(element).css("top"));
+		var fromTop = $("#" + this.css_id).attr("__x");
 		var orgTop = fromTop + SwipeScreen.virtualheight();
 	    }
-
+	    
 	    $(element).css("top", fromTop);
 	    $(element).animate({
 		"top": orgTop
