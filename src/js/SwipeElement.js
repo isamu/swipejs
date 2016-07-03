@@ -201,6 +201,7 @@ class SwipeElement {
 	    }
 	}
 
+	console.log(fin_opacity);
 	data = this.getScreenPosition(data);
 	return this.convCssPos(data, fin_opacity);
     }
@@ -278,7 +279,6 @@ class SwipeElement {
 	this.animateFinPos();
 	if ( this.info["loop"]) {
 	    this.loop(this);
-	    console.log("loop2");
 	}
     }
 
@@ -299,17 +299,65 @@ class SwipeElement {
 	}, 500);
     }
 
-    loop(instance){
-	$("#" + instance.css_id).rotate({angle:0, animateTo: 20, duration: 100});
-	setTimeout(function(){
-	    $("#" + instance.css_id).rotate({angle:20, animateTo: -20, duration: 200});
+    loop(instance, repeat=null){
+	console.log("loop");
+	var data = instance.info["loop"];
+	var dulation = 50;
+
+	if (repeat == null && data["repeat"]) {
+	    repeat = data["repeat"];
+	}
+
+	switch(data["style"]){
+	case "vibrate" :
+	    var delta = this.valueFrom(data, "delta", 10);
+	    // not yet
+        case "shift":
+        case "blink":
+	    $("#" + instance.css_id).css({opacity: 1});
 	    setTimeout(function(){
-		$("#" + instance.css_id).rotate({angle:-20, animateTo: 0, duration: 100});
-		
-	    }, 200);
-	}, 100);
+		$("#" + instance.css_id).css({opacity: 0});
+		setTimeout(function(){
+		    $("#" + instance.css_id).css({opacity: 1});
+		    setTimeout(function(){
+			if (repeat != null & repeat > 0) {
+			    repeat --;
+			    instance.loop(instance, repeat);
+			}
+		    }, dulation);
+		}, dulation * 2);
+	    }, dulation);
+        case "spin":
+	    
+	case "wiggle" :
+	    var angle = this.valueFrom(data, "delta", 15);
+	    $("#" + instance.css_id).rotate({angle:0, animateTo: angle, duration: dulation});
+	    setTimeout(function(){
+		$("#" + instance.css_id).rotate({angle:angle, animateTo: -angle, duration: dulation * 2});
+		setTimeout(function(){
+		    $("#" + instance.css_id).rotate({angle:-angle, animateTo: 0, duration: dulation});
+		    setTimeout(function(){
+			if (repeat != null & repeat > 0) {
+			    repeat --;
+			    instance.loop(instance, repeat);
+			}
+		    }, dulation);
+		}, dulation * 2);
+	    }, dulation);
+	    break;
+        case "path":
+        case "sprite":
+	    
+	}
     }
-    
+
+    valueFrom(data, key, defaultValue){
+	var ret = defaultValue;
+	if (data[key]){
+	    ret = data[key];
+	}
+	return ret;
+    }
     back(){
 	console.log("back");
 	if (this.elements) {
