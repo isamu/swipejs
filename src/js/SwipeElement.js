@@ -302,10 +302,16 @@ class SwipeElement {
     loop(instance, repeat=null){
 	console.log("loop");
 	var data = instance.info["loop"];
-	var dulation = 50;
-
-	if (repeat == null && data["repeat"]) {
-	    repeat = data["repeat"];
+	var dulation =  this.valueFrom(data, "dulation", 50);
+	
+	var defaultRepeat;
+	if (data["repeat"]) {
+	    defaultRepeat = data["repeat"];
+	} else {
+	    defaultRepeat = 1;
+	}
+	if (repeat == null){
+	    repeat = defaultRepeat;
 	}
 
 	switch(data["style"]){
@@ -314,21 +320,31 @@ class SwipeElement {
 	    // not yet
         case "shift":
         case "blink":
+	    var timing = dulation / defaultRepeat;
 	    $("#" + instance.css_id).css({opacity: 1});
 	    setTimeout(function(){
 		$("#" + instance.css_id).css({opacity: 0});
 		setTimeout(function(){
 		    $("#" + instance.css_id).css({opacity: 1});
 		    setTimeout(function(){
-			if (repeat != null & repeat > 0) {
-			    repeat --;
+			repeat --;
+			if (repeat > 0) {
 			    instance.loop(instance, repeat);
 			}
-		    }, dulation);
-		}, dulation * 2);
-	    }, dulation);
+		    }, timing);
+		}, timing * 2);
+	    }, timing);
         case "spin":
-	    
+	    var timing = dulation / defaultRepeat;
+	    console.log(timing);
+	    $("#" + instance.css_id).rotate({angle:0, animateTo: 360, duration: timing});
+	    setTimeout(function(){
+		repeat --;
+		if (repeat > 0) {
+		    instance.loop(instance, repeat);
+		}
+	    }, timing);
+	    break;
 	case "wiggle" :
 	    var angle = this.valueFrom(data, "delta", 15);
 	    $("#" + instance.css_id).rotate({angle:0, animateTo: angle, duration: dulation});
@@ -337,8 +353,8 @@ class SwipeElement {
 		setTimeout(function(){
 		    $("#" + instance.css_id).rotate({angle:-angle, animateTo: 0, duration: dulation});
 		    setTimeout(function(){
-			if (repeat != null & repeat > 0) {
-			    repeat --;
+			repeat --;
+			if (repeat > 0) {
 			    instance.loop(instance, repeat);
 			}
 		    }, dulation);
