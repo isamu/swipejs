@@ -166,13 +166,16 @@ class SwipeElement {
 	$("#" + this.css_id).css(this.convCssPos(data, this.opacity));
     }
 
-    getPrevPos(){
+    getOriginalPrevPos(){
 	var data = this.getInitPos();
 
 	if (this.info["translate"]) {
 	    data = this.addPosition(data, this.info["translate"]);
 	}
-	
+	return data;
+    }
+    getPrevPos() {
+	var data = this.getOriginalPrevPos();
 	data = this.getScreenPosition(data);
 	return this.convCssPos(data, this.opacity);
     }
@@ -316,6 +319,29 @@ class SwipeElement {
 	switch(data["style"]){
 	case "vibrate" :
 	    var delta = this.valueFrom(data, "delta", 10);
+	    var data = this.getOriginalPrevPos();
+	    var timing = dulation / repeat / 4
+	    $("#" + instance.css_id).animate({
+		left: parseInt(SwipeScreen.virtualX(data[0] - delta)) + "px", top: SwipeScreen.virtualY(data[1]) + "px"
+	    }, { duration: timing });
+	    setTimeout(function(){
+		$("#" + instance.css_id).animate({
+		    left: parseInt(SwipeScreen.virtualX(data[0] + delta)) + "px", top: SwipeScreen.virtualY(data[1]) + "px"
+		}, { duration: timing * 2 });
+		setTimeout(function(){
+		    $("#" + instance.css_id).animate({
+			left: parseInt(SwipeScreen.virtualX(data[0])) + "px", top: SwipeScreen.virtualY(data[1]) + "px"
+		    }, { duration: timing });
+
+		    setTimeout(function(){
+			repeat --;
+			if (repeat > 0) {
+			    instance.loop(instance, repeat);
+			}
+		    }, timing);
+		}, timing * 2);
+	    }, timing);
+	    break;
 	    // not yet
         case "shift":
         case "blink":
@@ -335,7 +361,6 @@ class SwipeElement {
 	    }, timing);
         case "spin":
 	    var timing = dulation / defaultRepeat;
-	    console.log(timing);
 	    $("#" + instance.css_id).rotate({angle:0, animateTo: 360, duration: timing});
 	    setTimeout(function(){
 		repeat --;
