@@ -50,29 +50,43 @@ class SwipeLoader {
 	    $(this).attr("__default_width", $(this).width());
 	    $(this).attr("__default_height", $(this).height());
 	    instance.initData($(this).attr("__page_id"), $(this).attr("__element_id"));
+	    SwipeCounter.decrease();
+
+	    if(SwipeCounter.getCounter() == 0){
+		instance.show(instance.step);
+	    }
 	});
 
 	$(".page").css({"position": "absolute"});
 	$(".boxelement").each(function(index, element) {
 	    instance.initData($(element).attr("__page_id"), $(element).attr("__element_id"));
+
+	    SwipeCounter.decrease();
+	    console.log(SwipeCounter.getCounter());
+
+	    if(SwipeCounter.getCounter() == 0){
+		instance.show(instance.step);
+	    }
 	});
     }
     
-    steps() {
-    }
-
     initData(page_id, element_id){
 	this.pages[page_id].initElement(element_id);
     }
     
     next(){
-	this.show(this.step + 1);
+	if (this.step < this.pages.length - 1){
+	    this.show(this.step + 1);
+	}
     }
     
     show(nextStep){
 	var currentStep =  this.step;
 	var mode = (nextStep >= currentStep) ? "forward" : "back";
 	var same_scene = (this.pages[nextStep].getScene() == this.pages[currentStep].getScene());
+
+	this.pages[currentStep].inactive()
+	this.pages[nextStep].active();
 
 	if (mode == "forward") {
 	    if (same_scene) {

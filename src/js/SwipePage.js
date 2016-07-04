@@ -79,4 +79,15 @@ class SwipePage {
 	return this.scene;
     }
 
+    active() {
+	this.elements.forEach(function(element, elem_index){
+	    element.active();
+	});
+    }
+    inactive() {
+	this.elements.forEach(function(element, elem_index){
+	    element.inactive();
+	});
+    }
+    
 }

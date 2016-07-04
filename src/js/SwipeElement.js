@@ -8,7 +8,10 @@ class SwipeElement {
 	this.page_id = page_id;
 	this.element_id = element_id;
 	this.parent = parent;
-	
+
+	this.isActive = false;
+	this.isRepeat = Boolean(info["repeat"]);
+	    
 	this.x = 0;
 	this.y = 0;
 
@@ -186,6 +189,7 @@ class SwipeElement {
     }
     
     setPrevPos(){
+	console.log("AAA");
 	$("#" + this.css_id).css(this.getPrevPos());
 	this.setEffect();
     }
@@ -210,7 +214,6 @@ class SwipeElement {
 	    }
 	}
 
-	console.log(fin_opacity);
 	data = this.getScreenPosition(data);
 	return this.convCssPos(data, fin_opacity);
     }
@@ -228,8 +231,9 @@ class SwipeElement {
     }
 
     // calculate position
+    // x, y, w, h, angle
     getInitPos() {
-	return [this.x, this.y, this.w, this.h];
+	return [this.x, this.y, this.w, this.h, 0];
     }
 
     addPosition(data, translate){
@@ -266,8 +270,10 @@ class SwipeElement {
 
     html() {
 	if (this.type() == "image") {
+	    SwipeCounter.increase();
 	    return "<img src='" + this.info.img + "' class='element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' />";
 	} else if (this.type() == "div") {
+	    SwipeCounter.increase();
 	    var html = this.elements.map(function(element, key){
 		return element.html();
 	    });
@@ -308,6 +314,15 @@ class SwipeElement {
 	}, 500);
     }
 
+    moreloop(instance, repeat, defaultRepeat){
+	repeat --;
+	if (repeat > 0) {
+	    instance.loop(instance, repeat);
+	} else if(instance.isRepeat && instance.isActive){
+	    repeat = defaultRepeat;
+	    instance.loop(instance, repeat);
+	}
+    }
     loop(instance, repeat=null){
 	console.log("loop");
 	var data = instance.info["loop"];
@@ -344,6 +359,9 @@ class SwipeElement {
 			repeat --;
 			if (repeat > 0) {
 			    instance.loop(instance, repeat);
+			} else if(instance.isRepeat && instance.isActive){
+			    repeat = defaultRepeat;
+			    instance.loop(instance, repeat);
 			}
 		    }, timing);
 		}, timing * 2);
@@ -351,6 +369,25 @@ class SwipeElement {
 	    break;
 	    // not yet
         case "shift":
+	    var dir;
+	    switch(data["direction"]){
+	    case "n" :
+		dir = { left: parseInt(SwipeScreen.virtualX(data[0])) + "px", top: SwipeScreen.virtualY(data[1] - this.h) + "px" }; break;
+	    case "e" :
+		dir = { left: parseInt(SwipeScreen.virtualX(data[0] + this.w)) + "px", top: SwipeScreen.virtualY(data[1]) + "px" }; break;
+	    case "w" :
+		dir = { left: parseInt(SwipeScreen.virtualX(data[0] - this.w)) + "px", top: SwipeScreen.virtualY(data[1]) + "px" }; break;
+	    default :
+		dir = { left: parseInt(SwipeScreen.virtualX(data[0])) + "px", top: SwipeScreen.virtualY(data[1] - this.h) + "px" }; break;
+	    }
+	    var timing = dulation / repeat;
+	    timing = 1000;
+	    console.log(dir);
+	    $("#" + instance.css_id).animate(dir, { duration: timing });
+	    setTimeout(function(){
+		instance.moreloop(instance, repeat, defaultRepeat);
+	    }, timing);
+	    
         case "blink":
 	    var timing = dulation / defaultRepeat;
 	    $("#" + instance.css_id).css({opacity: 1});
@@ -359,10 +396,7 @@ class SwipeElement {
 		setTimeout(function(){
 		    $("#" + instance.css_id).css({opacity: 1});
 		    setTimeout(function(){
-			repeat --;
-			if (repeat > 0) {
-			    instance.loop(instance, repeat);
-			}
+			instance.moreloop(instance, repeat, defaultRepeat);
 		    }, timing);
 		}, timing * 2);
 	    }, timing);
@@ -370,10 +404,7 @@ class SwipeElement {
 	    var timing = dulation / defaultRepeat;
 	    $("#" + instance.css_id).rotate({angle:0, animateTo: 360, duration: timing});
 	    setTimeout(function(){
-		repeat --;
-		if (repeat > 0) {
-		    instance.loop(instance, repeat);
-		}
+		instance.moreloop(instance, repeat, defaultRepeat);
 	    }, timing);
 	    break;
 	case "wiggle" :
@@ -384,10 +415,7 @@ class SwipeElement {
 		setTimeout(function(){
 		    $("#" + instance.css_id).rotate({angle:-angle, animateTo: 0, duration: dulation});
 		    setTimeout(function(){
-			repeat --;
-			if (repeat > 0) {
-			    instance.loop(instance, repeat);
-			}
+			instance.moreloop(instance, repeat, defaultRepeat);
 		    }, dulation);
 		}, dulation * 2);
 	    }, dulation);
@@ -424,6 +452,49 @@ class SwipeElement {
 	    });
 	}
 	this.setFinPos();
+    }
+
+    inactive(){
+	if (this.elements) {
+	    this.elements.forEach(function(element, elem_index){
+		element.inactive();
+	    });
+	}
+	this.isActive = false;
+    }
+    active(){
+	if (this.elements) {
+	    this.elements.forEach(function(element, elem_index){
+		element.active();
+	    });
+	}
+	this.isActive = true;
+    }
+
+}
+
+class SwipeCounter {
+    
+    static increase(){
+	if(this.counter === undefined){
+	    this.counter = 1;
+	} else {
+	    this.counter ++;
+	}
+	return this.counter;
+    }
+
+    static decrease(){
+	if(this.counter === undefined){
+	    this.counter = -1;
+	} else {
+	    this.counter --;
+	}
+	return this.counter;
+    }
+
+    static getCounter(){
+	return this.counter;
     }
     
 }

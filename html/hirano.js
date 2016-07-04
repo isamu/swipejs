@@ -188,6 +188,7 @@ callback({
 			{ "img":"http://satoshi.blogs.com/swipe/hirano-manga/koma004/kyara2.png", "x":"right", "y":"bottom", "translate":[0,20] },
 			{ "img":"http://satoshi.blogs.com/swipe/hirano-manga/koma004/serifu.png", "x":"right", "y":5 },
 			{ "img":"http://satoshi.blogs.com/swipe/hirano-manga/koma004/gion.png", "x":"right", "y":"bottom", "translate":[-520,-740],
+			  "repeat" : true,
 			  "loop":{ "style":"wiggle", "repeat":2 } },
 		    ]},
 		]
