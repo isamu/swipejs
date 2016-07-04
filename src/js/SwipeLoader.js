@@ -9,7 +9,20 @@ class SwipeLoader {
     
     load(){
 	SwipeScreen.init(this.data.dimension[0], this.data.dimension[1]);
+	this.setSwipeCss();
+	
+	$.each(this.data["pages"], (index, page) => {
+	    var scene;
+	    if (page["scene"] && (scene = this.data["scenes"][page["scene"]]) ){
+		scene = this.data["scenes"][page["scene"]];
+	    }
+	    var pageInstance = new SwipePage(page, scene, index);
 
+	    this.pages.push(pageInstance);
+	});
+    }
+
+    setSwipeCss() {
 	$(".swipe").css({
 	    height: SwipeScreen.virtualheight(),
 	    width: SwipeScreen.virtualwidth()
@@ -24,21 +37,11 @@ class SwipeLoader {
 	    "z-index": 100,
 	    "background-color": "white"
 	});
-	
-	
-	$.each(this.data["pages"], (index, page) => {
-	    var scene;
-	    if (page["scene"] && (scene = this.data["scenes"][page["scene"]]) ){
-		scene = this.data["scenes"][page["scene"]];
-	    }
-	    var pageInstance = new SwipePage(page, scene, index);
-
-	    this.pages.push(pageInstance);
-	});
     }
     
     resize() {
 	SwipeScreen.init(this.data.dimension[0], this.data.dimension[1]);
+	this.setSwipeCss();
 	this.show(this.step);
     }
     
