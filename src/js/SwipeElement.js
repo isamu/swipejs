@@ -179,8 +179,15 @@ class SwipeElement {
 	data = this.getScreenPosition(data);
 	return this.convCssPos(data, this.opacity);
     }
+    setEffect(){
+	if (this.info["rotate"]) {
+	    $("#" + this.css_id).rotate({angle: this.info["rotate"]});
+	}
+    }
+    
     setPrevPos(){
 	$("#" + this.css_id).css(this.getPrevPos());
+	this.setEffect();
     }
     animatePrevPos(){
 	console.log("animate");
