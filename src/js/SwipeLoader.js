@@ -9,6 +9,22 @@ class SwipeLoader {
     
     load(){
 	SwipeScreen.init(this.data.dimension[0], this.data.dimension[1]);
+
+	$(".swipe").css({
+	    height: SwipeScreen.virtualheight(),
+	    width: SwipeScreen.virtualwidth()
+	});
+	$(".right").css({
+	    position: "absolute",
+	    top: 0,
+	    left: SwipeScreen.virtualwidth(),
+	    height: SwipeScreen.virtualheight(),
+	    width:  $(window).width(),
+	    display: "inline-block",
+	    "z-index": 100,
+	    "background-color": "white"
+	});
+	
 	
 	$.each(this.data["pages"], (index, page) => {
 	    var scene;
