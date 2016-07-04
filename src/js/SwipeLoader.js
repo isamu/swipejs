@@ -20,7 +20,12 @@ class SwipeLoader {
 	    this.pages.push(pageInstance);
 	});
     }
-
+    
+    resize() {
+	SwipeScreen.init(this.data.dimension[0], this.data.dimension[1]);
+	this.show(this.step);
+    }
+    
     domLoad() {
 	var pages = [];
 	var instance = this;
@@ -75,11 +80,11 @@ class SwipeLoader {
 		$("#page_" + currentStep ).css("opacity", 0);
 		$("#page_" + nextStep ).css("opacity", 1);
 	    } else {
-		$("#page_" + currentStep ).animate({
-		    "opacity": 0
-		}, {
-		    duration: 500
-		});
+		setTimeout(function(){
+		    $("#page_" + currentStep ).css({
+			"opacity": 0
+		    });
+		}, 500);
 		this.pageSlide("in", nextStep);
 		this.pages[nextStep].delayShow();
 	    }
@@ -108,7 +113,7 @@ class SwipeLoader {
     getStep() {
 	return this.step;
     }
-
+    
     pageSlide(mode, step) {
 	$(".boxelement-" + step).each(function(index, element) {
 	    console.log("box");
@@ -134,7 +139,8 @@ class SwipeLoader {
 	    $("#page_" + step ).css("top", SwipeScreen.virtualheight());
 	    $("#page_" + step ).css("opacity", 1);
 	    $("#page_" + step ).animate({
-		"top": 0
+		"top": 0,
+		"opacity": 1
 	    }, {
 		duration: 500
 	    });

@@ -31,5 +31,13 @@ function callback(data){
 	    swipe_loader.show(Number(location.hash.substr(1)));
 	}
     });
+
+    $(window).resize(function() {
+	clearTimeout(window.resizedFinished);
+	window.resizedFinished = setTimeout(function(){
+	    swipe_loader.resize();
+	}, 250);
+    });
+    
 };
 
