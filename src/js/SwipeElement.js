@@ -14,7 +14,8 @@ class SwipeElement {
 	    
 	this.x = 0;
 	this.y = 0;
-
+	this.angle = 0;
+	
 	this.elements = [];
 	var instance = this;
 	if (this.info["elements"]) {
@@ -116,6 +117,9 @@ class SwipeElement {
 		this.y = this.info["y"];
 	    }
 	}
+	if (this.info["rotate"]) {
+	    this.angle = this.info["rotate"];
+	}
     }
     
     getWidth() {
@@ -166,32 +170,24 @@ class SwipeElement {
     setInitPos(){
 	var data = this.getInitPos();
 	data = getScreenPosition(data);
-	$("#" + this.css_id).css(this.convCssPos(data, this.opacity));
+	$("#" + this.css_id).css(this.convCssPos(data));
     }
 
     getOriginalPrevPos(){
 	var data = this.getInitPos();
 
 	if (this.info["translate"]) {
-	    data = this.addPosition(data, this.info["translate"]);
+	    data = this.updatePosition(data, this.info);
 	}
 	return data;
     }
     getPrevPos() {
 	var data = this.getOriginalPrevPos();
 	data = this.getScreenPosition(data);
-	return this.convCssPos(data, this.opacity);
+	return this.convCssPos(data);
     }
-    setEffect(){
-	if (this.info["rotate"]) {
-	    $("#" + this.css_id).rotate({angle: this.info["rotate"]});
-	}
-    }
-    
     setPrevPos(){
-	console.log("AAA");
 	$("#" + this.css_id).css(this.getPrevPos());
-	this.setEffect();
     }
     animatePrevPos(){
 	console.log("animate");
@@ -203,19 +199,13 @@ class SwipeElement {
     getFinPos() {
 	var data = this.getInitPos();
 
-	var fin_opacity = this.opacity;
 	var to = this.info["to"];
 	if (to) {
-	    if(to["opacity"] != null) {
-		fin_opacity = to["opacity"];
-	    }
-	    if (to["translate"]) {
-		data = this.addPosition(data, to["translate"]);
-	    }
+	    data = this.updatePosition(data, to);
 	}
 
 	data = this.getScreenPosition(data);
-	return this.convCssPos(data, fin_opacity);
+	return this.convCssPos(data);
     }
     setFinPos() {
 	$("#" + this.css_id).css(this.getFinPos());
@@ -231,14 +221,20 @@ class SwipeElement {
     }
 
     // calculate position
-    // x, y, w, h, angle
     getInitPos() {
-	return [this.x, this.y, this.w, this.h, 0];
+	return [this.x, this.y, this.w, this.h, this.angle, this.opacity];
     }
 
-    addPosition(data, translate){
-	data[0] = data[0] + translate[0];	
-	data[1] = data[1] + translate[1];
+    updatePosition(data, to){
+	if(to["opacity"] != null) {
+	    data[5] = to["opacity"];
+	}
+
+	if(to["translate"]) {
+	    var translate = to["translate"];
+	    data[0] = data[0] + translate[0];	
+	    data[1] = data[1] + translate[1];
+	}
 	return data;
     }
 
@@ -248,16 +244,26 @@ class SwipeElement {
 	    SwipeScreen.virtualY(data[1]),
 	    SwipeScreen.virtualX(data[2]),
 	    SwipeScreen.virtualY(data[3]),
+	    data[4],
+	    data[5]
 	];
     }
-    convCssPos(data, opacity) {
-	return {
+    convCssPos(data) {
+	var ret = {
 	    'left': data[0] + 'px',
 	    'top': data[1] + 'px',
 	    'width': data[2] + 'px',
 	    'height': data[3] + 'px',
-	    'opacity' : opacity
+	    'opacity' : data[5]
 	};
+	if (data[4]) {
+	    var rotate = "rotate(" + data[4] +"deg)";
+	    ret["-moz-transform"] = rotate;
+	    ret["-webkit-transform"] = rotate;
+	    ret["-o-transform"] = rotate;
+	    ret["-ms-transform"] = rotate;
+	}
+	return ret;
     }
   
     type() {
@@ -341,18 +347,18 @@ class SwipeElement {
 	switch(data["style"]){
 	case "vibrate" :
 	    var delta = this.valueFrom(data, "delta", 10);
-	    var data = this.getOriginalPrevPos();
+	    var orgPos = this.getOriginalPrevPos();
 	    var timing = dulation / repeat / 4
 	    $("#" + instance.css_id).animate({
-		left: parseInt(SwipeScreen.virtualX(data[0] - delta)) + "px", top: SwipeScreen.virtualY(data[1]) + "px"
+		left: parseInt(SwipeScreen.virtualX(orgPos[0] - delta)) + "px", top: SwipeScreen.virtualY(orgPos[1]) + "px"
 	    }, { duration: timing });
 	    setTimeout(function(){
 		$("#" + instance.css_id).animate({
-		    left: parseInt(SwipeScreen.virtualX(data[0] + delta)) + "px", top: SwipeScreen.virtualY(data[1]) + "px"
+		    left: parseInt(SwipeScreen.virtualX(orgPos[0] + delta)) + "px", top: SwipeScreen.virtualY(orgPos[1]) + "px"
 		}, { duration: timing * 2 });
 		setTimeout(function(){
 		    $("#" + instance.css_id).animate({
-			left: parseInt(SwipeScreen.virtualX(data[0])) + "px", top: SwipeScreen.virtualY(data[1]) + "px"
+			left: parseInt(SwipeScreen.virtualX(orgPos[0])) + "px", top: SwipeScreen.virtualY(orgPos[1]) + "px"
 		    }, { duration: timing });
 
 		    setTimeout(function(){
@@ -367,9 +373,10 @@ class SwipeElement {
 		}, timing * 2);
 	    }, timing);
 	    break;
-	    // not yet
+
         case "shift":
 	    var dir;
+	    var orgPos = this.getOriginalPrevPos();
 	    switch(data["direction"]){
 	    case "n" :
 		dir = { left: parseInt(SwipeScreen.virtualX(data[0])) + "px", top: SwipeScreen.virtualY(data[1] - this.h) + "px" }; break;
@@ -381,14 +388,32 @@ class SwipeElement {
 		dir = { left: parseInt(SwipeScreen.virtualX(data[0])) + "px", top: SwipeScreen.virtualY(data[1] - this.h) + "px" }; break;
 	    }
 	    var timing = dulation / repeat;
-	    timing = 1000;
-	    console.log(dir);
-	    $("#" + instance.css_id).animate(dir, { duration: timing });
+	    // timing = 5000;
+
+	    console.log(this.convCssPos(orgPos, 1));
+	    // ?????
+	    // $("#" + instance.css_id).css(this.convCssPos(orgPos, 1));
+	    this.setPrevPos();
+
 	    setTimeout(function(){
-		instance.moreloop(instance, repeat, defaultRepeat);
-	    }, timing);
-	    
+		$("#" + instance.css_id).animate(
+		    dir,
+		    { duration: timing,
+		      complete: function(){
+			  $("#" + instance.css_id).animate(
+			      instance.convCssPos(orgPos, 1),
+			      { duration: 10,
+				complete: function(){
+				    instance.moreloop(instance, repeat, defaultRepeat);
+				}
+			      }
+			  );  
+		      }
+		    });
+	    }, 50);
+	    break;
         case "blink":
+	    console.log("blink");
 	    var timing = dulation / defaultRepeat;
 	    $("#" + instance.css_id).css({opacity: 1});
 	    setTimeout(function(){
@@ -400,25 +425,34 @@ class SwipeElement {
 		    }, timing);
 		}, timing * 2);
 	    }, timing);
+	    break;
         case "spin":
+	    console.log("spin");
 	    var timing = dulation / defaultRepeat;
-	    $("#" + instance.css_id).rotate({angle:0, animateTo: 360, duration: timing});
-	    setTimeout(function(){
-		instance.moreloop(instance, repeat, defaultRepeat);
-	    }, timing);
+	    $("#" + instance.css_id).rotate({
+		angle:0, animateTo: 360, duration: timing,
+		callback: function(){
+		    instance.moreloop(instance, repeat, defaultRepeat);
+		}
+	    });
 	    break;
 	case "wiggle" :
+	    console.log("wiggle");
 	    var angle = this.valueFrom(data, "delta", 15);
-	    $("#" + instance.css_id).rotate({angle:0, animateTo: angle, duration: dulation});
-	    setTimeout(function(){
-		$("#" + instance.css_id).rotate({angle:angle, animateTo: -angle, duration: dulation * 2});
-		setTimeout(function(){
-		    $("#" + instance.css_id).rotate({angle:-angle, animateTo: 0, duration: dulation});
-		    setTimeout(function(){
-			instance.moreloop(instance, repeat, defaultRepeat);
-		    }, dulation);
-		}, dulation * 2);
-	    }, dulation);
+	    $("#" + instance.css_id).rotate({
+		angle:0, animateTo: angle, duration: dulation,
+		callback: function(){
+		    $("#" + instance.css_id).rotate({
+			angle:angle, animateTo: -angle, duration: dulation * 2,
+			callback: function(){
+			    $("#" + instance.css_id).rotate({
+				angle:-angle, animateTo: 0, duration: dulation,
+				callback: function(){
+				    instance.moreloop(instance, repeat, defaultRepeat);
+				}});
+			}});
+		}
+	    });
 	    break;
         case "path":
         case "sprite":

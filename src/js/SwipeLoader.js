@@ -83,8 +83,8 @@ class SwipeLoader {
     show(nextStep){
 	var currentStep =  this.step;
 	var mode = (nextStep >= currentStep) ? "forward" : "back";
-	var same_scene = (this.pages[nextStep].getScene() == this.pages[currentStep].getScene());
-
+	var same_scene = (this.pages[nextStep]) && (this.pages[nextStep].getScene() == this.pages[currentStep].getScene());
+	
 	this.pages[currentStep].inactive()
 	this.pages[nextStep].active();
 
