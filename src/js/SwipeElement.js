@@ -212,7 +212,6 @@ class SwipeElement {
     }
 
     animateFinPos(){
-	console.log("fin");
 	if (this.info["to"]) {
 	    $("#" + this.css_id).animate(this.getFinPos(), {
 		duration: 500
@@ -222,18 +221,18 @@ class SwipeElement {
 
     // calculate position
     getInitPos() {
-	return [this.x, this.y, this.w, this.h, this.angle, this.opacity];
+	return [Number(this.x), Number(this.y), Number(this.w), Number(this.h), Number(this.angle), Number(this.opacity)];
     }
 
     updatePosition(data, to){
 	if(to["opacity"] != null) {
-	    data[5] = to["opacity"];
+	    data[5] = Number(to["opacity"]);
 	}
 
 	if(to["translate"]) {
 	    var translate = to["translate"];
-	    data[0] = data[0] + translate[0];	
-	    data[1] = data[1] + translate[1];
+	    data[0] = data[0] + Number(translate[0]);
+	    data[1] = data[1] + Number(translate[1]);
 	}
 	return data;
     }
@@ -388,11 +387,7 @@ class SwipeElement {
 		dir = { left: parseInt(SwipeScreen.virtualX(data[0])) + "px", top: SwipeScreen.virtualY(data[1] - this.h) + "px" }; break;
 	    }
 	    var timing = dulation / repeat;
-	    // timing = 5000;
 
-	    console.log(this.convCssPos(orgPos, 1));
-	    // ?????
-	    // $("#" + instance.css_id).css(this.convCssPos(orgPos, 1));
 	    this.setPrevPos();
 
 	    setTimeout(function(){
