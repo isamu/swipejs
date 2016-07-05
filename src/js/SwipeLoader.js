@@ -1,21 +1,34 @@
 class SwipeLoader {
+    static setTemplateElements(template) {
+	this.templateElements = template;
+    }
+    static getTemplateElements() {
+	return this.templateElements;
+    }
     constructor (data, defaultPage = 0) {
 	this.step = defaultPage;
 	this.data = data;
 	this.pages = [];
+
+	SwipeLoader.setTemplateElements(this.getTemplateElements());
+	this.templatePages = this.getTemplatePages();
+	this.setScreen();
+	this.paging = this.getPaging();
 	this.load();
 	this.domLoad();
     }
     
-    load(){
-	SwipeScreen.init(this.data.dimension[0], this.data.dimension[1]);
+    setScreen() {
+	this.dimension = (this.data.dimension) ? this.data.dimension : [ $(window).width(),  $(window).height() ];
+	SwipeScreen.init(this.dimension[0], this.dimension[1]);
 	this.setSwipeCss();
-	this.paging = this.getPaging();
-	
+    }
+    
+    load(){
 	$.each(this.data["pages"], (index, page) => {
 	    var scene;
-	    if (page["scene"] && (scene = this.data["scenes"][page["scene"]]) ){
-		scene = this.data["scenes"][page["scene"]];
+	    if (page["scene"] && (scene = this.templatePages[page["scene"]]) ){
+		scene = this.templatePages[page["scene"]];
 	    }
 	    var pageInstance = new SwipePage(page, scene, index);
 
@@ -23,6 +36,24 @@ class SwipeLoader {
 	});
     }
 
+    getTemplatePages() {
+	if (this.data["templates"] && this.data["templates"]["pages"]) {
+	    return this.data["templates"]["pages"];
+	} else if (this.data["scenes"]) {
+	    return this.data["scenes"];
+	}
+	return {};
+    }
+
+    getTemplateElements() {
+	if (this.data["templates"] && this.data["templates"]["elements"]) {
+	    return this.data["templates"]["elements"];
+	} else if (this.data["elements"]){
+	    return this.data["elements"];
+	}
+	return {};
+    }
+    
     getPaging(){
 	if (this.data["paging"] == "leftToRight" || this.data["paging"] == "vertical" ||  this.data["paging"] == "rightToLeft" ) {
 	    return this.data["paging"];
@@ -35,6 +66,7 @@ class SwipeLoader {
 	    height: SwipeScreen.virtualheight(),
 	    width: SwipeScreen.virtualwidth()
 	});
+	// rename class name and move to css file
 	$(".right").css({
 	    position: "absolute",
 	    top: 0,
@@ -48,8 +80,7 @@ class SwipeLoader {
     }
     
     resize() {
-	SwipeScreen.init(this.data.dimension[0], this.data.dimension[1]);
-	this.setSwipeCss();
+	this.setScreen();
 	this.show(this.step);
     }
     

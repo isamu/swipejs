@@ -3,7 +3,7 @@ class SwipeElement {
     constructor (info, page_id, element_id, parent=null) {
 	var css_id = "element-" + page_id + "-" + element_id;
 
-	this.info = info;
+	this.info = this.mergeTemplate(info);
 	this.css_id = css_id;
 	this.page_id = page_id;
 	this.element_id = element_id;
@@ -18,12 +18,25 @@ class SwipeElement {
 	
 	this.elements = [];
 	var instance = this;
+
 	if (this.info["elements"]) {
 	    this.info["elements"].forEach(function(element, elem_index){
 		var e_id = element_id + "-" + elem_index;
 		instance.elements.push(new SwipeElement(element, page_id, e_id, instance));
 	    });
 	}
+    }
+
+    mergeTemplate(info){
+	// template
+	if (info["element"]) {
+	    var elementTemplate = SwipeLoader.getTemplateElements();
+	    var elem;
+	    if (elem = elementTemplate[info["element"]]) {
+		info = SwipeParser.inheritProperties(info, elem );
+	    }
+	}
+	return info;
     }
 
     initData(index) {
@@ -268,6 +281,8 @@ class SwipeElement {
     type() {
 	if (this.info.img) {
 	    return "image";
+	} else if (this.info.text) {
+	    return "text";
 	} else {
 	    return "div";
 	} 
@@ -277,6 +292,8 @@ class SwipeElement {
 	if (this.type() == "image") {
 	    SwipeCounter.increase();
 	    return "<img src='" + this.info.img + "' class='element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' />";
+	} else if (this.type() == "text") {
+	    return  "<span class='element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + this.info.text + "</span>";
 	} else if (this.type() == "div") {
 	    SwipeCounter.increase();
 	    var html = this.elements.map(function(element, key){

@@ -36,7 +36,7 @@ class SwipeScreen {
     static virtualheight() {
 	return this.virtual_height;
     }
-    
+
     static refresh() {
 	SwipeScreen.setOriginalSize();
 	SwipeScreen.setVirtualSize();
