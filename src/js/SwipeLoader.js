@@ -165,10 +165,10 @@ class SwipeLoader {
 		    var fromTop = orgTop + SwipeScreen.virtualheight();
 		} else if (this.paging == "leftToRight"){
 		    var orgLeft = $("#" + this.css_id).attr("__y");
-		    var fromLeft = orgLeft - SwipeScreen.virtualwidth();
+		    var fromLeft = orgLeft + SwipeScreen.virtualwidth();
 		} else {
 		    var orgLeft = $("#" + this.css_id).attr("__y");
-		    var fromLeft = orgLeft + SwipeScreen.virtualwidth();
+		    var fromLeft = orgLeft - SwipeScreen.virtualwidth();
 		}
 	    } else {
 		if (this.paging == "vertical") {
@@ -176,10 +176,10 @@ class SwipeLoader {
 		    var orgTop = fromTop + SwipeScreen.virtualheight();
 		} else if (this.paging == "leftToRight"){
 		    var fromLeft =  $("#" + this.css_id).attr("__y");
-		    var orgLeft = fromLeft - SwipeScreen.virtualwidth();
+		    var orgLeft = fromLeft + SwipeScreen.virtualwidth();
 		} else {
 		    var fromLeft =  $("#" + this.css_id).attr("__y");
-		    var orgLeft = fromLeft + SwipeScreen.virtualwidth();
+		    var orgLeft = fromLeft - SwipeScreen.virtualwidth();
 		} 
 	    }
 	    
@@ -211,7 +211,7 @@ class SwipeLoader {
 		    duration: 500
 		});
 	    } else if (this.paging == "leftToRight"){
-		$("#page_" + step ).css("left", - SwipeScreen.virtualwidth());
+		$("#page_" + step ).css("left", SwipeScreen.virtualwidth());
 		$("#page_" + step ).css("opacity", 1);
 		$("#page_" + step ).animate({
 		    "left": 0,
@@ -220,7 +220,7 @@ class SwipeLoader {
 		    duration: 500
 		});
 	    } else {
-		$("#page_" + step ).css("left", + SwipeScreen.virtualwidth());
+		$("#page_" + step ).css("left", - SwipeScreen.virtualwidth());
 		$("#page_" + step ).css("opacity", 1);
 		$("#page_" + step ).animate({
 		    "left": 0,
@@ -241,7 +241,7 @@ class SwipeLoader {
 		$("#page_" + step ).css("left", 0);
 		$("#page_" + step ).css("opacity", 1);
 		$("#page_" + step ).animate({
-		    "left": - SwipeScreen.virtualwidth(),
+		    "left": SwipeScreen.virtualwidth(),
 		    "opacity": 1
 		}, {
 		    duration: 500
@@ -250,7 +250,7 @@ class SwipeLoader {
 		$("#page_" + step ).css("left", 0);
 		$("#page_" + step ).css("opacity", 1);
 		$("#page_" + step ).animate({
-		    "left": SwipeScreen.virtualwidth(),
+		    "left": - SwipeScreen.virtualwidth(),
 		    "opacity": 1
 		}, {
 		    duration: 500
