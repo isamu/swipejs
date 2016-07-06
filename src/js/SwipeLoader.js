@@ -136,6 +136,16 @@ class SwipeLoader {
 	    }
 	});
 	
+	$(".videoelement").each(function(index, element) {
+	    instance.initData($(element).attr("__page_id"), $(element).attr("__element_id"));
+	    
+	    SwipeCounter.decrease();
+
+	    if(SwipeCounter.getCounter() == 0){
+		instance.loadFinish();
+	    }
+	});
+	
 	
     }
 

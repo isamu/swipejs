@@ -55,7 +55,9 @@ class SwipeElement {
 		$("#" + this.css_id).css("position", "absolute");
 	    }
 	}
-	
+	if (this.type() == "video") {
+	    $("#" + this.css_id).css("position", "absolute");
+	}
 	this.setSize();
 	this.setPosition();
 	this.setOpacity();
@@ -65,6 +67,13 @@ class SwipeElement {
 	$("#" + this.css_id).attr("__w", this.w);
 	$("#" + this.css_id).attr("__h", this.h);
 
+	if (this.type() == "video") {
+	    $("#" + this.css_id + "-video").attr("__x", this.x);
+	    $("#" + this.css_id + "-video").attr("__y", this.y);
+	    $("#" + this.css_id + "-video").attr("__w", this.w);
+	    $("#" + this.css_id + "-video").attr("__h", this.h);
+	}
+	
 	this.setPrevPos();
     }
 
@@ -300,7 +309,7 @@ class SwipeElement {
 	} else if (this.type() == "text") {
 	    return  "<div class='textelement' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + this.info.text + "</div>";
 	} else if (this.type() == "video") {
-	    return  "<div class='videoelement' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' ><video><source type='video/mp4' src='" + this.info.video + "'  /></video></div>";
+	    return  "<div class='videoelement' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' ><video id='" + this.css_id + "-video'><source type='video/mp4' src='" + this.info.video + "'  /></video></div>";
 	} else if (this.type() == "div") {
 	    SwipeCounter.increase();
 	    var html = this.elements.map(function(element, key){
