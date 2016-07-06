@@ -274,6 +274,8 @@ class SwipeElement {
     type() {
 	if (this.info.img) {
 	    return "image";
+	} else if (this.info.video){
+	    return "video";
 	} else if (this.info.text) {
 	    return "text";
 	} else {
@@ -281,12 +283,24 @@ class SwipeElement {
 	} 
     }
 
+    isImage() {
+	this.type() == "image";
+    }
+    isVideo() {
+	this.type() == "video";
+    }
+    isText() {
+	this.type() == "text";
+    }
+    
     html() {
 	if (this.type() == "image") {
 	    SwipeCounter.increase();
 	    return "<img src='" + this.info.img + "' class='element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' />";
 	} else if (this.type() == "text") {
 	    return  "<div class='textelement' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + this.info.text + "</div>";
+	} else if (this.type() == "video") {
+	    return  "<div class='videoelement' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' ><video><source type='video/mp4' src='" + this.info.video + "'  /></video></div>";
 	} else if (this.type() == "div") {
 	    SwipeCounter.increase();
 	    var html = this.elements.map(function(element, key){
