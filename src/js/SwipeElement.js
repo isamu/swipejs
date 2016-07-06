@@ -61,8 +61,7 @@ class SwipeElement {
 	this.setOpacity();
 
 	$("#" + this.css_id).attr("__x", this.x);
-	$("#" + this.css_id).attr("__y", this.y);	
-
+	$("#" + this.css_id).attr("__y", this.y);
 	$("#" + this.css_id).attr("__w", this.w);
 	$("#" + this.css_id).attr("__h", this.h);
 
@@ -180,12 +179,6 @@ class SwipeElement {
     // end of data parse 
 
     // set or animate position
-    setInitPos(){
-	var data = this.getInitPos();
-	data = getScreenPosition(data);
-	$("#" + this.css_id).css(this.convCssPos(data));
-    }
-
     getOriginalPrevPos(){
 	var data = this.getInitPos();
 
@@ -293,7 +286,7 @@ class SwipeElement {
 	    SwipeCounter.increase();
 	    return "<img src='" + this.info.img + "' class='element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' />";
 	} else if (this.type() == "text") {
-	    return  "<span class='element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + this.info.text + "</span>";
+	    return  "<div class='textelement' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + this.info.text + "</div>";
 	} else if (this.type() == "div") {
 	    SwipeCounter.increase();
 	    var html = this.elements.map(function(element, key){

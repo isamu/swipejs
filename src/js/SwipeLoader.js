@@ -125,6 +125,18 @@ class SwipeLoader {
 		instance.show(instance.step);
 	    }
 	});
+
+	$(".textelement").each(function(index, element) {
+	    instance.initData($(element).attr("__page_id"), $(element).attr("__element_id"));
+	    
+	    SwipeCounter.decrease();
+
+	    if(SwipeCounter.getCounter() == 0){
+		instance.show(instance.step);
+	    }
+	});
+	
+	
     }
     
     initData(page_id, element_id){
