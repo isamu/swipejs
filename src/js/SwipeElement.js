@@ -243,9 +243,17 @@ class SwipeElement {
 
     animateFinPos(duration){
 	if (this.info["to"]) {
-	    $("#" + this.css_id).animate(this.getFinPos(), {
-		duration: duration
-	    });
+	    this.setTiming(this.info["to"]);
+	    var start_duration = duration * this.timing[0];
+	    var do_duration = duration * (this.timing[1] - this.timing[0]); 
+	    var end_duration = duration * (1 - this.timing[1]);
+
+	    var instance = this;
+	    setTimeout(function(){
+		$("#" + instance.css_id).animate(instance.getFinPos(), {
+		    duration: do_duration
+		});
+	    }, start_duration);
 	}
     }
 
@@ -350,6 +358,7 @@ class SwipeElement {
 	this.setPrevPos();
 	this.animateFinPos(duration);
 	if ( this.info["loop"]) {
+	    this.setTiming(this.info["loop"]);
 	    this.loop(this);
 	}
     }
@@ -371,6 +380,18 @@ class SwipeElement {
 	}, duration);
     }
 
+    setTiming(element){
+	if (element["timing"]) {
+	    var timing = element["timing"];
+	    if (timing.length == 2 && timing[0] > 0 && timing[1] >= timing[0] && timing[1] <= 1) {
+		this.timing = timing;
+	    } else {
+		this.timing = [0, 1];
+	    }
+	} else {
+	    this.timing = [0, 1];
+	}
+    }
     moreloop(instance, repeat, defaultRepeat){
 	repeat --;
 	if (repeat > 0) {
