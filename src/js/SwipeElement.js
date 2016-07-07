@@ -69,9 +69,6 @@ class SwipeElement {
 		$("#" + this.css_id).css("position", "absolute");
 	    }
 	}
-	if (this.isVideo() || this.isText()) {
-	    $("#" + this.css_id).css("position", "absolute");
-	}
 	this.setSize();
 	this.setPosition();
 	this.setOpacity();
@@ -328,16 +325,16 @@ class SwipeElement {
 	    SwipeCounter.increase();
 	}
 	if (this.isImage()) {
-	    return "<img src='" + this.info.img + "' class='element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' />";
+	    return "<img src='" + this.info.img + "' class='image_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' />";
 	} else if (this.isText()) {
-	    return  "<div class='textelement' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + this.parseText(this.info.text) + "</div>";
+	    return  "<div class='element text_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + this.parseText(this.info.text) + "</div>";
 	} else if (this.isVideo()) {
-	    return  "<div class='videoelement' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' ></div>";
+	    return  "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' ></div>";
 	} else if (this.type() == "div") {
 	    var html = this.elements.map(function(element, key){
 		return element.html();
 	    });
-	    return "<div class='boxelement boxelement-" + this.page_id + "' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + html.join("") + "</div>" ;
+	    return "<div class='element boxelement-" + this.page_id + "' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + html.join("") + "</div>" ;
 	} else {
 	    return "";
 	}

@@ -103,8 +103,8 @@ class SwipeLoader {
 		$("#page_" + i ).css("opacity", 0);
 	    }
 	}	
-
-	$(".element").load(function() {
+	
+	$(".image_element").load(function() {
 	    $(this).attr("__default_width", $(this).width());
 	    $(this).attr("__default_height", $(this).height());
 	    instance.initData($(this).attr("__page_id"), $(this).attr("__element_id"));
@@ -115,38 +115,19 @@ class SwipeLoader {
 	    }
 	});
 
+	$(".element").each(function(index, element) {
+	    instance.initData($(element).attr("__page_id"), $(element).attr("__element_id"));
+
+	    SwipeCounter.decrease();
+	    if(SwipeCounter.getCounter() == 0){
+		instance.loadFinish();
+	    }
+	});
+
 	$(".page").css({"position": "absolute"});
-	$(".boxelement").each(function(index, element) {
-	    instance.initData($(element).attr("__page_id"), $(element).attr("__element_id"));
-
-	    SwipeCounter.decrease();
-
-	    if(SwipeCounter.getCounter() == 0){
-		instance.loadFinish();
-	    }
-	});
-
-	$(".textelement").each(function(index, element) {
-	    instance.initData($(element).attr("__page_id"), $(element).attr("__element_id"));
-	    
-	    SwipeCounter.decrease();
-
-	    if(SwipeCounter.getCounter() == 0){
-		instance.loadFinish();
-	    }
-	});
-	
-	$(".videoelement").each(function(index, element) {
-	    instance.initData($(element).attr("__page_id"), $(element).attr("__element_id"));
-	    
-	    SwipeCounter.decrease();
-
-	    if(SwipeCounter.getCounter() == 0){
-		instance.loadFinish();
-	    }
-	});
-	
-	
+	$(".image_element").css({"position": "absolute"});
+	$(".video_element").css({"position": "absolute"});
+	$(".text_element").css({"position": "absolute"});
     }
 
     loadFinish(){
