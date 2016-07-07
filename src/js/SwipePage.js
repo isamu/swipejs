@@ -84,9 +84,9 @@ class SwipePage {
 	    element.active();
 	});
     }
-    inactive() {
+    inactive(duration) {
 	this.elements.forEach(function(element, elem_index){
-	    element.inactive();
+	    element.inactive(duration);
 	});
     }
     

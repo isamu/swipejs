@@ -535,15 +535,24 @@ class SwipeElement {
 	this.setFinPos();
     }
 
-    inactive(){
+    inactive(duration){
 	if (this.elements) {
 	    this.elements.forEach(function(element, elem_index){
-		element.inactive();
+		element.inactive(duration);
 	    });
 	}
+	var instance = this;
+	setTimeout(function(){
+	    // when horizontal scroll, another page must to clean.
+	    // todo: more smooth when page is back.
+	    $("#" + instance.css_id).animate({"opacity": 0},
+					     { duration: duration });
+	}, duration);
+	
 	this.isActive = false;
     }
     active(){
+	$("#" + this.css_id).css("opacity", 1);
 	if (this.elements) {
 	    this.elements.forEach(function(element, elem_index){
 		element.active();
