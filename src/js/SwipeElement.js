@@ -39,6 +39,20 @@ class SwipeElement {
 	return info;
     }
 
+    parseText(element) {
+	if (typeof element == "string") {
+	    return element;
+	} else if (typeof element == "object"){
+	    if (element["ref"]) {
+		return SwipeParser.localizedStringForKey(element["ref"]);
+	    } else {
+		// todo localize
+		return SwipeParser.localizedString(element, "ja");
+	    }
+	}
+	return "";
+    }
+    
     initData(index) {
 	if (index !== undefined) {
 	    var indexes = index.split("-");
@@ -307,7 +321,7 @@ class SwipeElement {
 	    SwipeCounter.increase();
 	    return "<img src='" + this.info.img + "' class='element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' />";
 	} else if (this.type() == "text") {
-	    return  "<div class='textelement' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + this.info.text + "</div>";
+	    return  "<div class='textelement' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + this.parseText(this.info.text) + "</div>";
 	} else if (this.type() == "video") {
 	    return  "<div class='videoelement' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' ><video id='" + this.css_id + "-video'><source type='video/mp4' src='" + this.info.video + "'  /></video></div>";
 	} else if (this.type() == "div") {

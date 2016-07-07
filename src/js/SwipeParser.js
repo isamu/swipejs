@@ -3,6 +3,18 @@ class SwipeParser {
     constructor (_handlers = {}) {
     }
 
+    static parseColor(){
+	// not implement
+    }
+
+    static transformedPath() {
+	// not implement
+    }
+
+    static parseTransform() {
+	// not implement
+    }
+    
     static is(type, obj) {
 	var clas = Object.prototype.toString.call(obj).slice(8, -1);
 	return obj !== undefined && obj !== null && clas === type;
@@ -39,6 +51,27 @@ class SwipeParser {
 	    });
 	}
 	return ret;
+    }
+
+    static localizedStringForKey(key) {
+	// todo from page element
+	var pageinfo = {};
+
+	var strings;
+	if (strings = pageinfo["strings"]) {
+	    var text = strings[key];
+	    // todo localize
+	    return SwipeParser.localizedString(text, "ja");
+	}
+	return "";
+    }
+    static localizedString(params, langId) {
+	if (params[langId]) {
+	    return params[langId];
+	} else {
+	    return params["*"];
+	}
+	return "";
     }
 
     
