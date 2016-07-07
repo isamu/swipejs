@@ -219,10 +219,10 @@ class SwipeElement {
 	    
 	}
     }
-    animatePrevPos(){
+    animatePrevPos(duration){
 	console.log("animate");
 	$("#" + this.css_id).animate(this.getPrevPos(), {
-		duration: 500
+		duration: duration
 	});
     }
 
@@ -241,10 +241,10 @@ class SwipeElement {
 	$("#" + this.css_id).css(this.getFinPos());
     }
 
-    animateFinPos(){
+    animateFinPos(duration){
 	if (this.info["to"]) {
 	    $("#" + this.css_id).animate(this.getFinPos(), {
-		duration: 500
+		duration: duration
 	    });
 	}
     }
@@ -340,35 +340,35 @@ class SwipeElement {
 	}
     }
 
-    show(){
+    show(duration){
 	console.log("show");
 	if (this.elements) {
 	    this.elements.forEach(function(element, elem_index){
-		element.show();
+		element.show(duration);
 	    });
 	}
 	this.setPrevPos();
-	this.animateFinPos();
+	this.animateFinPos(duration);
 	if ( this.info["loop"]) {
 	    this.loop(this);
 	}
     }
 
-    delayShow(){
+    delayShow(duration){
 	console.log("delayShow");
 	if (this.elements) {
 	    this.elements.forEach(function(element, elem_index){
-		element.delayShow();
+		element.delayShow(duration);
 	    });
 	}
 	this.setPrevPos();
 	var instance = this;
 	setTimeout(function(){
-	    instance.animateFinPos();
+	    instance.animateFinPos(duration);
 	    if ( instance.info["loop"]) {
 		instance.loop(instance);
 	    }
-	}, 500);
+	}, duration);
     }
 
     moreloop(instance, repeat, defaultRepeat){
@@ -514,15 +514,15 @@ class SwipeElement {
 	}
 	return ret;
     }
-    back(){
+    back(duration){
 	console.log("back");
 	if (this.elements) {
 	    this.elements.forEach(function(element, elem_index){
-		element.back();
+		element.back(duration);
 	    });
 	}
 	this.setFinPos();
-	this.animatePrevPos();
+	this.animatePrevPos(duration);
     }
 
     finShow(){

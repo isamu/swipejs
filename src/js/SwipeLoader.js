@@ -146,14 +146,16 @@ class SwipeLoader {
     show(nextStep){
 	var currentStep =  this.step;
 	var mode = (nextStep >= currentStep) ? "forward" : "back";
-	var same_scene = (this.pages[nextStep]) && (this.pages[nextStep].getScene() == this.pages[currentStep].getScene());
+	var same_scene = (this.pages[currentStep].getScene()) && (this.pages[nextStep]) &&
+	    (this.pages[nextStep].getScene() == this.pages[currentStep].getScene());
+	var duration = 500;
 	
 	this.pages[currentStep].inactive()
 	this.pages[nextStep].active();
 
 	if (mode == "forward") {
 	    if (same_scene) {
-		this.pages[nextStep].show();
+		this.pages[nextStep].show(duration);
 		$("#page_" + currentStep ).css("opacity", 0);
 		$("#page_" + nextStep ).css("opacity", 1);
 	    } else {
@@ -161,25 +163,25 @@ class SwipeLoader {
 		    $("#page_" + currentStep ).css({
 			"opacity": 0
 		    });
-		}, 500);
-		this.pageSlide("in", nextStep);
-		this.pages[nextStep].delayShow();
+		}, duration);
+		this.pageSlide("in", nextStep, duration);
+		this.pages[nextStep].delayShow(duration);
 	    }
 	} else { // in case back
 	    if (same_scene) {
-		this.pages[currentStep].back();
+		this.pages[currentStep].back(duration);
 		// todo more smooth.
 		setTimeout(function(){
 		    $("#page_" + currentStep ).css({"opacity": 0});
 		    $("#page_" + nextStep).css({"opacity": 1});
-		}, 500);
+		}, duration);
 	    } else {
 		$("#page_" + nextStep).css({"opacity": 1});
 		
-		this.pageSlide("out", currentStep);
+		this.pageSlide("out", currentStep, duration);
 		setTimeout(function(){
 		    $("#page_" + currentStep ).css({"opacity": 0});
-		}, 500);
+		}, duration);
 	    }
 	}
 	
@@ -191,12 +193,11 @@ class SwipeLoader {
 	return this.step;
     }
     
-    pageSlide(mode, step) {
+    pageSlide(mode, step, duration) {
 	$(".boxelement-" + step).each(function(index, element) {
 	    console.log("box");
 	    
 	    if (mode == "in") {
-		// todo not use css top. use virtual x.
 		if (this.paging == "vertical") {
 		    var orgTop = $("#" + this.css_id).attr("__x");
 		    var fromTop = orgTop + SwipeScreen.virtualheight();
@@ -225,14 +226,14 @@ class SwipeLoader {
 		$(element).animate({
 		    "top": orgTop
 		}, {
-		    duration: 500
+		    duration: duration
 		});
 	    } else {
 		$(element).css("left", fromLeft);
 		$(element).animate({
 		    "left": orgLeft
 		}, {
-		    duration: 500
+		    duration: duration
 		});
 	    }
 	});
@@ -245,7 +246,7 @@ class SwipeLoader {
 		    "top": 0,
 		    "opacity": 1
 		}, {
-		    duration: 500
+		    duration: duration
 		});
 	    } else if (this.paging == "leftToRight"){
 		$("#page_" + step ).css("left", SwipeScreen.virtualwidth());
@@ -254,7 +255,7 @@ class SwipeLoader {
 		    "left": 0,
 		    "opacity": 1
 		}, {
-		    duration: 500
+		    duration: duration
 		});
 	    } else {
 		$("#page_" + step ).css("left", - SwipeScreen.virtualwidth());
@@ -263,7 +264,7 @@ class SwipeLoader {
 		    "left": 0,
 		    "opacity": 1
 		}, {
-		    duration: 500
+		    duration: duration
 		});
 	    }
 	} else {
@@ -272,7 +273,7 @@ class SwipeLoader {
 		$("#page_" + step ).animate({
 		    "top": SwipeScreen.virtualheight(),
 		}, {
-		    duration: 500
+		    duration: duration
 		});
 	    } else if (this.paging == "leftToRight"){
 		$("#page_" + step ).css("left", 0);
@@ -281,7 +282,7 @@ class SwipeLoader {
 		    "left": SwipeScreen.virtualwidth(),
 		    "opacity": 1
 		}, {
-		    duration: 500
+		    duration: duration
 		});
 	    } else {
 		$("#page_" + step ).css("left", 0);
@@ -290,7 +291,7 @@ class SwipeLoader {
 		    "left": - SwipeScreen.virtualwidth(),
 		    "opacity": 1
 		}, {
-		    duration: 500
+		    duration: duration
 		});
 	    }
 

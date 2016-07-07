@@ -53,21 +53,21 @@ class SwipePage {
 	}
     }
 
-    show(){
+    show(duration){
 	this.elements.forEach(function(element, elem_index){
-	    element.show();
+	    element.show(duration);
 	});
     }
 
-    delayShow(){
+    delayShow(duration){
 	this.elements.forEach(function(element, elem_index){
-	    element.delayShow();
+	    element.delayShow(duration);
 	});
     }
     
-    back() { 
+    back(duration) { 
 	this.elements.forEach(function(element, elem_index){
-	    element.back();
+	    element.back(duration);
 	});
     }
     finShow() {
