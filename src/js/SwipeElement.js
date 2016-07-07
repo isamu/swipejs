@@ -69,7 +69,7 @@ class SwipeElement {
 		$("#" + this.css_id).css("position", "absolute");
 	    }
 	}
-	if (this.type() == "video") {
+	if (this.type() == "video" || this.type() == "text") {
 	    $("#" + this.css_id).css("position", "absolute");
 	}
 	this.setSize();
@@ -217,6 +217,17 @@ class SwipeElement {
     }
     setPrevPos(){
 	$("#" + this.css_id).css(this.getPrevPos());
+	if (this.isVideo()) {
+	    var data = this.getOriginalPrevPos();
+	    data = this.getScreenPosition(data);
+	    $("#" + this.css_id).html("<video id='" + this.css_id + "-video' width='"+ data[2] + "' height='" + data[3] + "'><source type='video/mp4' src='" + this.info.video + "'  /></video>");
+
+	    $('video').mediaelementplayer({
+		flashName: 'flashmediaelement.swf',
+		loop: true,
+            });
+	    
+	}
     }
     animatePrevPos(){
 	console.log("animate");
@@ -303,29 +314,30 @@ class SwipeElement {
 	    return "text";
 	} else {
 	    return "div";
-	} 
+	}
     }
 
     isImage() {
-	this.type() == "image";
+	return this.type() == "image";
     }
     isVideo() {
-	this.type() == "video";
+	return this.type() == "video";
     }
     isText() {
-	this.type() == "text";
+	return this.type() == "text";
     }
     
     html() {
-	if (this.type() == "image") {
+	if (this.type()){
 	    SwipeCounter.increase();
+	}
+	if (this.isImage()) {
 	    return "<img src='" + this.info.img + "' class='element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' />";
-	} else if (this.type() == "text") {
+	} else if (this.isText()) {
 	    return  "<div class='textelement' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + this.parseText(this.info.text) + "</div>";
-	} else if (this.type() == "video") {
-	    return  "<div class='videoelement' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' ><video id='" + this.css_id + "-video'><source type='video/mp4' src='" + this.info.video + "'  /></video></div>";
+	} else if (this.isVideo()) {
+	    return  "<div class='videoelement' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' ></div>";
 	} else if (this.type() == "div") {
-	    SwipeCounter.increase();
 	    var html = this.elements.map(function(element, key){
 		return element.html();
 	    });

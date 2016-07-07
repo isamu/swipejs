@@ -151,12 +151,6 @@ class SwipeLoader {
 
     loadFinish(){
 	this.show(this.step);
-	$('video').mediaelementplayer({
-            flashName: 'flashmediaelement.swf',
-            loop: true,
-            iPhoneUseNativeControls: true,
-            iPadeUseNativeControls: true,
-        });
     }
     initData(page_id, element_id){
 	this.pages[page_id].initElement(element_id);
