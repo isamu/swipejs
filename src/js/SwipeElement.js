@@ -64,12 +64,12 @@ class SwipeElement {
 	    return;
 	}
 	
-	if (this.type() == "div") {
+	if (this.isDiv()) {
 	    if (!this.parent) {
 		$("#" + this.css_id).css("position", "absolute");
 	    }
 	}
-	if (this.type() == "video" || this.type() == "text") {
+	if (this.isVideo() || this.isText()) {
 	    $("#" + this.css_id).css("position", "absolute");
 	}
 	this.setSize();
@@ -81,13 +81,6 @@ class SwipeElement {
 	$("#" + this.css_id).attr("__w", this.w);
 	$("#" + this.css_id).attr("__h", this.h);
 
-	if (this.type() == "video") {
-	    $("#" + this.css_id + "-video").attr("__x", this.x);
-	    $("#" + this.css_id + "-video").attr("__y", this.y);
-	    $("#" + this.css_id + "-video").attr("__w", this.w);
-	    $("#" + this.css_id + "-video").attr("__h", this.h);
-	}
-	
 	this.setPrevPos();
     }
 
@@ -325,6 +318,9 @@ class SwipeElement {
     }
     isText() {
 	return this.type() == "text";
+    }
+    isDiv() {
+	return this.type() == "div";
     }
     
     html() {
