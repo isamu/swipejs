@@ -57,36 +57,32 @@ class SwipePage {
 	this.elements.forEach(function(element, elem_index){
 	    element.show(duration);
 	});
-	var userAgent = window.navigator.userAgent.toLowerCase();
 
-	if ((userAgent.indexOf('chrome') != -1) || (userAgent.indexOf('safari') != -1)){
-	    if (this.page["speech"]) {
-		speechSynthesis.speak(
-		    new SpeechSynthesisUtterance(this.page["speech"]["text"])
-		);
-	    }
-	}
+	let instance = this;
+	setTimeout(function(){
+	    instance.speech(instance);
+	}, duration);
+	
     }
 
     delayShow(duration){
 	this.elements.forEach(function(element, elem_index){
 	    element.delayShow(duration);
 	});
-	var userAgent = window.navigator.userAgent.toLowerCase();
-
-	if ((userAgent.indexOf('chrome') != -1) || (userAgent.indexOf('safari') != -1)){
-	    if (this.page["speech"]) {
-		speechSynthesis.speak(
-		    new SpeechSynthesisUtterance(this.page["speech"]["text"])
-		);
-	    }
-	}
+	let instance = this;
+	setTimeout(function(){
+	    instance.speech(instance);
+	}, duration);
     }
-    
+
     back(duration) { 
 	this.elements.forEach(function(element, elem_index){
 	    element.back(duration);
 	});
+	let instance = this;
+	setTimeout(function(){
+	    instance.speech(instance);
+	}, duration);
     }
     finShow() {
 	this.elements.forEach(function(element, elem_index){
@@ -97,6 +93,16 @@ class SwipePage {
 	return this.scene;
     }
 
+    speech(instance){
+	var userAgent = window.navigator.userAgent.toLowerCase();
+	if ((userAgent.indexOf('chrome') != -1) || (userAgent.indexOf('safari') != -1)){
+	    if (instance.page["speech"]) {
+		speechSynthesis.speak(
+		    new SpeechSynthesisUtterance(instance.page["speech"]["text"])
+		);
+	    }
+	}
+    }
     active() {
 	this.elements.forEach(function(element, elem_index){
 	    element.active();
