@@ -244,6 +244,7 @@ class SwipeElement {
 		break;
 	    }
 	}
+
 	var fontname = SwipeParser.parseFontName(this.info["font"], false);
 	
 	var fontSize = function(info) {
@@ -461,7 +462,9 @@ class SwipeElement {
 	repeat --;
 	var end_duration = this.timing[2];
 
+	
         setTimeout(function(){
+
 	    if (repeat > 0) {
 		instance.loop(instance, repeat);
 	    } else if(instance.isRepeat && instance.isActive){

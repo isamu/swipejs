@@ -6,6 +6,8 @@ class SwipeLoader {
 	return this.templateElements;
     }
     constructor (data, defaultPage = 0) {
+        $('head').prepend('<meta name="viewport" content="width = 640,user-scalable=no">');
+
 	this.step = defaultPage;
 	this.data = data;
 	this.pages = [];
@@ -101,9 +103,11 @@ class SwipeLoader {
 	for (var i = 0; i < this.pages.length; i++) {
 	    if (this.step != i) {
 		$("#page_" + i ).css("opacity", 0);
+	    }else{
 	    }
 	}	
-	
+	this.pages[this.step].active();
+
 	$(".image_element").load(function() {
 	    $(this).attr("__default_width", $(this).width());
 	    $(this).attr("__default_height", $(this).height());

@@ -93,6 +93,7 @@ class SwipePage {
 	return this.scene;
     }
 
+    // todo locale
     speech(instance){
 	var userAgent = window.navigator.userAgent.toLowerCase();
 	if ((userAgent.indexOf('chrome') != -1) || (userAgent.indexOf('safari') != -1)){
