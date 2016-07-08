@@ -57,12 +57,22 @@ class SwipePage {
 	this.elements.forEach(function(element, elem_index){
 	    element.show(duration);
 	});
+	if (this.page["speech"]) {
+	    speechSynthesis.speak(
+		new SpeechSynthesisUtterance(this.page["speech"]["text"])
+	    );
+	}
     }
 
     delayShow(duration){
 	this.elements.forEach(function(element, elem_index){
 	    element.delayShow(duration);
 	});
+	if (this.page["speech"]) {
+	    speechSynthesis.speak(
+		new SpeechSynthesisUtterance(this.page["speech"]["text"])
+	    );
+	}
     }
     
     back(duration) { 
