@@ -216,6 +216,11 @@ class SwipeElement {
 		flashName: 'flashmediaelement.swf',
 		loop: true,
             });
+	}
+	if (this.isText()) {
+	    // text layout
+	    // todo position font color etc....
+	    $("#" + this.css_id + "-body").css({top: "200px", position: "relative"})
 	    
 	}
     }
@@ -334,7 +339,9 @@ class SwipeElement {
 	if (this.isImage()) {
 	    return "<img src='" + this.info.img + "' class='image_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' />";
 	} else if (this.isText()) {
-	    return  "<div class='element text_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + this.parseText(this.info.text) + "</div>";
+	    return  "<div class='element text_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" +
+		"<div class='text_body' id='" + this.css_id + "-body'>" + this.parseText(this.info.text) + "</div>" +
+		"</div>";
 	} else if (this.isVideo()) {
 	    return  "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' ></div>";
 	} else if (this.type() == "div") {
