@@ -57,10 +57,14 @@ class SwipePage {
 	this.elements.forEach(function(element, elem_index){
 	    element.show(duration);
 	});
-	if (this.page["speech"]) {
-	    speechSynthesis.speak(
-		new SpeechSynthesisUtterance(this.page["speech"]["text"])
-	    );
+	var userAgent = window.navigator.userAgent.toLowerCase();
+
+	if ((userAgent.indexOf('chrome') != -1) || (userAgent.indexOf('safari') != -1)){
+	    if (this.page["speech"]) {
+		speechSynthesis.speak(
+		    new SpeechSynthesisUtterance(this.page["speech"]["text"])
+		);
+	    }
 	}
     }
 
@@ -68,10 +72,14 @@ class SwipePage {
 	this.elements.forEach(function(element, elem_index){
 	    element.delayShow(duration);
 	});
-	if (this.page["speech"]) {
-	    speechSynthesis.speak(
-		new SpeechSynthesisUtterance(this.page["speech"]["text"])
-	    );
+	var userAgent = window.navigator.userAgent.toLowerCase();
+
+	if ((userAgent.indexOf('chrome') != -1) || (userAgent.indexOf('safari') != -1)){
+	    if (this.page["speech"]) {
+		speechSynthesis.speak(
+		    new SpeechSynthesisUtterance(this.page["speech"]["text"])
+		);
+	    }
 	}
     }
     
