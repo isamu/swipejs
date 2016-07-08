@@ -3,8 +3,12 @@ class SwipeParser {
     constructor (_handlers = {}) {
     }
 
-    static parseColor(){
-	// not implement
+    static parseColor(info, defaultColor){
+	
+	if (info && info["color"]) {
+	    return info["color"];
+	}
+	return defaultColor;
     }
 
     static transformedPath() {
@@ -74,6 +78,39 @@ class SwipeParser {
 	return "";
     }
 
+    static parseFontSize(value, full, defaultValue, markdown) {
+        let key = markdown ? "size" : "fontSize";
+
+	if (value[key]) {
+	    if (Number.isInteger(value[key])) {
+		return value[key];
+	    } else {
+                return SwipeParser.parsePercent(value[key], full, defaultValue);
+            }
+	}
+        return defaultValue
+    }
+    static parsePercent(value, full, defaultValue) {
+	// todo 
+        //let num = regexPercent.numberOfMatchesInString(value, options: NSMatchingOptions(), range: NSMakeRange(0, value.characters.count))
+        //if num == 1 {
+//            return CGFloat((value as NSString).floatValue / 100.0) * full
+//        }
+        return defaultValue
+    }
+    static parseFontName(value, markdown) {
+        let key = markdown ? "name" : "fontName";
+	if (value) {
+	    let name = value[key];
+	    if (jQuery.type(name) === "string") {
+		return name;
+	    } else if (jQuery.type(name) === "array") {
+		return name.join(",");
+            }
+	}
+        return "sans-serif, Helvetica"
+        // return [];
+    }
     
     static clone(obj) {
 	var copy;
