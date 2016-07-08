@@ -202,6 +202,7 @@ class SwipeElement {
     }
     getPrevPos() {
 	var data = this.getOriginalPrevPos();
+	data = this.setScale(data, this.info);
 	data = this.getScreenPosition(data);
 	return this.convCssPos(data);
     }
@@ -209,12 +210,16 @@ class SwipeElement {
 	$("#" + this.css_id).css(this.getPrevPos());
 	if (this.isVideo()) {
 	    var data = this.getOriginalPrevPos();
+	    data = this.setScale(data, this.info);
 	    data = this.getScreenPosition(data);
 	    $("#" + this.css_id).html("<video id='" + this.css_id + "-video' width='"+ data[2] + "' height='" + data[3] + "'><source type='video/mp4' src='" + this.info.video + "'  /></video>");
 
 	    $('video').mediaelementplayer({
 		flashName: 'flashmediaelement.swf',
 		loop: true,
+		success: function (mediaElement, domObject) { 
+		    // mediaElement.play();
+		}
             });
 	}
 	if (this.isText()) {
@@ -292,6 +297,7 @@ class SwipeElement {
 	    data = this.updatePosition(data, to);
 	}
 
+	data = this.setScale(data, this.info);
 	data = this.getScreenPosition(data);
 	return this.convCssPos(data);
     }
@@ -341,6 +347,30 @@ class SwipeElement {
 	    data[4],
 	    data[5]
 	];
+    }
+    setScale(data, info) {
+	let scale;
+	if (info["scale"]) {
+	    if (SwipeParser.is("Array", info["scale"]) && info["scale"].length > 1){
+		scale = info["scale"];
+	    } else if (SwipeParser.is("Number", info["scale"])){
+		scale = [info["scale"], info["scale"]];
+	    } else if (SwipeParser.is("String", info["scale"])){
+		scale = [Number(info["scale"]), Number(info["scale"])];
+	    }
+	}
+	if (scale && scale.length == 2){
+	    var new_w = data[2] * scale[0];
+	    var new_h = data[3] * scale[1];
+	    var new_x = data[0] - ( (new_w - data[2]) / 2);
+	    var new_y = data[1] - ( (new_h - data[3]) / 2);
+	    data[0] = new_x;
+	    data[1] = new_y;
+	    data[2] = new_w;
+	    data[3] = new_h;
+	    console.log(scale);
+	}
+	return data;
     }
     convCssPos(data) {
 	var ret = {
@@ -462,7 +492,6 @@ class SwipeElement {
 	repeat --;
 	var end_duration = this.timing[2];
 
-	
         setTimeout(function(){
 
 	    if (repeat > 0) {
