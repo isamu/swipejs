@@ -164,7 +164,9 @@ class SwipeLoader {
 		this.pages[nextStep].delayShow(duration);
 	    }
 	} else { // in case back
+	    console.log("back");
 	    if (same_scene) {
+		
 		this.pages[currentStep].back(duration);
 		// todo more smooth.
 		setTimeout(function(){
@@ -173,11 +175,8 @@ class SwipeLoader {
 		}, duration);
 	    } else {
 		$("#page_" + nextStep).css({"opacity": 1});
-		
+	
 		this.pageSlide("out", currentStep, duration);
-		setTimeout(function(){
-		    $("#page_" + currentStep ).css({"opacity": 0});
-		}, duration);
 	    }
 	}
 	
@@ -264,31 +263,31 @@ class SwipeLoader {
 		});
 	    }
 	} else {
+	    let option = {
+		duration: duration,
+		complete: function(){
+		    $("#page_" + step ).css({"opacity": 0});
+		}
+	    };
 	    if (this.paging == "vertical") {
 		$("#page_" + step ).css("top", 0);
 		$("#page_" + step ).animate({
 		    "top": SwipeScreen.virtualheight(),
-		}, {
-		    duration: duration
-		});
+		}, option);
 	    } else if (this.paging == "leftToRight"){
 		$("#page_" + step ).css("left", 0);
 		$("#page_" + step ).css("opacity", 1);
 		$("#page_" + step ).animate({
 		    "left": SwipeScreen.virtualwidth(),
 		    "opacity": 1
-		}, {
-		    duration: duration
-		});
+		}, option);
 	    } else {
 		$("#page_" + step ).css("left", 0);
 		$("#page_" + step ).css("opacity", 1);
 		$("#page_" + step ).animate({
 		    "left": - SwipeScreen.virtualwidth(),
 		    "opacity": 1
-		}, {
-		    duration: duration
-		});
+		}, option);
 	    }
 
 	}
