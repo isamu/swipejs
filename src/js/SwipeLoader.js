@@ -68,17 +68,6 @@ class SwipeLoader {
 	    height: SwipeScreen.virtualheight(),
 	    width: SwipeScreen.virtualwidth()
 	});
-	// rename class name and move to css file
-	$(".right").css({
-	    position: "absolute",
-	    top: 0,
-	    left: SwipeScreen.virtualwidth(),
-	    height: SwipeScreen.virtualheight(),
-	    width:  $(window).width(),
-	    display: "inline-block",
-	    "z-index": 100,
-	    "background-color": "white"
-	});
     }
     
     resize() {
@@ -91,19 +80,19 @@ class SwipeLoader {
 	var instance = this;
 	this.pages.forEach((page, page_index) => {
 	    page.loadElement();
-	    
-	    // todo snbinder
-	    var page_html = "<div id='page_" + page_index + "' class='page'>" + page.getHtml() + "</div>";
-	    
-	    pages.push(page_html);
+	    pages.push(page.getHtml());
 	});
 	
 	$(".swipe").html(pages.join(""));
 
 	for (var i = 0; i < this.pages.length; i++) {
+	    $("#page_" + i).css({
+		"overflow": "hidden",
+		"height": SwipeScreen.virtualheight(),
+		"width": SwipeScreen.virtualwidth()
+	    });
 	    if (this.step != i) {
 		$("#page_" + i ).css("opacity", 0);
-	    }else{
 	    }
 	}	
 	this.pages[this.step].active();

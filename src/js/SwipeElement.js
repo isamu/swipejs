@@ -71,7 +71,7 @@ class SwipeElement {
 	}
 	this.setSize();
 	this.setPosition();
-	this.setOpacity();
+	this.setOption();
 
 	$("#" + this.css_id).attr("__x", this.x);
 	$("#" + this.css_id).attr("__y", this.y);
@@ -82,12 +82,17 @@ class SwipeElement {
     }
 
 
-    setOpacity() {
+    setOption() {
 	this.opacity = 1.0;
 
 	if (this.info["opacity"] != null) {
 	    this.opacity = this.info["opacity"];
 	}
+
+	if(this.info["clip"] && this.info["clip"] === true) {
+	    $("#" + this.css_id).css("overflow", "hidden");
+	}
+
     }	
     
     setSize() {

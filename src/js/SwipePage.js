@@ -41,7 +41,8 @@ class SwipePage {
 	this.elements.forEach(function(element, elem_index){
 	    elems.push(element.html());
 	});
-	return elems.join("");
+	// todo snbinder
+	return "<div id='page_" + this.index + "' class='page'>" + elems.join("") + "</div>";
     }
 
     initElement(index) {
