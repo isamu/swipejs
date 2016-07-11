@@ -16,7 +16,8 @@ class SwipeElement {
 	this.y = 0;
 	this.angle = 0;
 	this.scale = [1, 1];
-	
+	this.no_size = false;
+
 	this.elements = [];
 	var instance = this;
 
@@ -108,6 +109,7 @@ class SwipeElement {
 		    this.w = $("#" + this.css_id).attr("__default_width");
 		} else {
 		    this.w = this.parentWidth();
+		    this.no_size = true;
 		}
 	    }
 	    if (this.info["h"]){
@@ -117,6 +119,7 @@ class SwipeElement {
 		    this.h = $("#" + this.css_id).attr("__default_height");
 		} else {
 		    this.h =  this.parentHeight();
+		    this.no_size = true;
 		}
 	    }
 	}
@@ -494,6 +497,9 @@ class SwipeElement {
 	    this.elements.forEach(function(element, elem_index){
 		element.justShow();
 	    });
+	}
+	if (this.no_size) {
+	    this.setSize();
 	}
 	this.setFinPos();
     }
