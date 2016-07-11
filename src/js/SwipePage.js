@@ -54,6 +54,11 @@ class SwipePage {
 	}
     }
 
+    justShow() {
+	this.elements.forEach(function(element, elem_index){
+	    element.justShow();
+	});
+    }
     show(duration){
 	this.elements.forEach(function(element, elem_index){
 	    element.show(duration);

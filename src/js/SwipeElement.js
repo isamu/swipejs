@@ -259,7 +259,7 @@ class SwipeElement {
 	}
 
 	var fontname = SwipeParser.parseFontName(info, false);
-	
+
 	var fontSize = function(info, scale) {
 	    var defaultSize = 20 / 480 * SwipeScreen.swipeheight();
             let size = SwipeParser.parseFontSize(info, SwipeScreen.swipeheight(), defaultSize, false);
@@ -278,8 +278,10 @@ class SwipeElement {
 
 	return {
 	    position: "relative",
-	    top: String(top) + "px",
-	    "font-size": String(fontSize) + "px",
+	    top: String(SwipeScreen.virtualY(top)) + "px",
+	    // height: String(SwipeScreen.virtualY(fontSize)) + "px",
+	    "font-size": String(SwipeScreen.virtualY(fontSize)) + "px",
+	    "line-height" : String(SwipeScreen.virtualY(fontSize)) + "px",
 	    "font-family": fontname,
 	    "textAlign": textAlign,
 	    "color": SwipeParser.parseColor(info, "#000")
@@ -294,7 +296,6 @@ class SwipeElement {
 	$("#" + this.css_id).animate(this.convCssPos(data), {
 		duration: duration
 	});
-	console.log("back1");
 	if (this.isText() && this.info["to"]) {
 	    console.log("back2");
 	    var text_css = this.textLayout(this.info, data);
@@ -321,9 +322,7 @@ class SwipeElement {
 	    var info = this.merge(this.info, to);
 	}
 	var text_css = this.textLayout(info, data);
-	console.log(css);
 	return text_css;
-	// $("#" + this.css_id + "-body").css(css);
     }
 
     setFinPos() {
@@ -483,6 +482,15 @@ class SwipeElement {
 	}
     }
 
+    justShow(){
+	console.log("justShow");
+	if (this.elements) {
+	    this.elements.forEach(function(element, elem_index){
+		element.justShow();
+	    });
+	}
+	this.setFinPos();
+    }
     show(duration){
 	console.log("show");
 	if (this.elements) {

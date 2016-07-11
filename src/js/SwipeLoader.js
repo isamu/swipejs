@@ -72,9 +72,19 @@ class SwipeLoader {
     
     resize() {
 	this.setScreen();
-	this.show(this.step);
+	for (var i = 0; i < this.pages.length; i++) {
+	    this.justShow(i);
+	}
+	this.setPageSize();
     }
-    
+
+    setPageSize(){
+	$(".page").css({
+	    "overflow": "hidden",
+	    "height": SwipeScreen.virtualheight(),
+	    "width": SwipeScreen.virtualwidth()
+	});
+    }
     domLoad() {
 	var pages = [];
 	var instance = this;
@@ -85,16 +95,10 @@ class SwipeLoader {
 	
 	$(".swipe").html(pages.join(""));
 
-	for (var i = 0; i < this.pages.length; i++) {
-	    $("#page_" + i).css({
-		"overflow": "hidden",
-		"height": SwipeScreen.virtualheight(),
-		"width": SwipeScreen.virtualwidth()
-	    });
-	    if (this.step != i) {
-		$("#page_" + i ).css("opacity", 0);
-	    }
-	}	
+	this.setPageSize();
+	$(".page").css("opacity", 0);
+	$("#page_" + this.step).css("opacity", 1);
+
 	this.pages[this.step].active();
 
 	$(".image_element").load(function() {
@@ -135,7 +139,11 @@ class SwipeLoader {
 	    this.show(this.step + 1);
 	}
     }
-    
+
+    justShow(step) {
+	this.pages[step].justShow();
+    }	
+
     show(nextStep){
 	var currentStep =  this.step;
 	var mode = (nextStep >= currentStep) ? "forward" : "back";
@@ -175,7 +183,7 @@ class SwipeLoader {
 		}, duration);
 	    } else {
 		$("#page_" + nextStep).css({"opacity": 1});
-	
+		this.pages[currentStep].back(duration);
 		this.pageSlide("out", currentStep, duration);
 	    }
 	}
