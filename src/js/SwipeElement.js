@@ -213,21 +213,21 @@ class SwipeElement {
 	var data = this.getOriginalPrevPos();
 	return this.getScreenPosition(data);
     }
+    setVideo(data) {
+	$("#" + this.css_id).html("<video id='" + this.css_id + "-video' width='"+ data[2] + "' height='" + data[3] + "'><source type='video/mp4' src='" + this.info.video + "'  /></video>");
+	$('#' + this.css_id + "-video").mediaelementplayer({
+	    flashName: 'flashmediaelement.swf',
+	    loop: true,
+	    success: function (mediaElement, domObject) { 
+		// mediaElement.play();
+	    }
+        });
+    }
     setPrevPos(){
 	var data = this.getPrevPos();
 	$("#" + this.css_id).css(this.convCssPos(data));
 	if (this.isVideo()) {
-	    var data = this.getOriginalPrevPos();
-	    data = this.getScreenPosition(data);
-	    $("#" + this.css_id).html("<video id='" + this.css_id + "-video' width='"+ data[2] + "' height='" + data[3] + "'><source type='video/mp4' src='" + this.info.video + "'  /></video>");
-
-	    $('video').mediaelementplayer({
-		flashName: 'flashmediaelement.swf',
-		loop: true,
-		success: function (mediaElement, domObject) { 
-		    // mediaElement.play();
-		}
-            });
+	    this.setVideo(data);
 	}
 	if (this.isText()) {
 	    var css = this.textLayout(this.info, data);
@@ -279,7 +279,6 @@ class SwipeElement {
 	return {
 	    position: "relative",
 	    top: String(SwipeScreen.virtualY(top)) + "px",
-	    // height: String(SwipeScreen.virtualY(fontSize)) + "px",
 	    "font-size": String(SwipeScreen.virtualY(fontSize)) + "px",
 	    "line-height" : String(SwipeScreen.virtualY(fontSize)) + "px",
 	    "font-family": fontname,
@@ -306,13 +305,16 @@ class SwipeElement {
     }
 
     getFinPos() {
-	var data = this.getInitPos();
-
 	var to = this.info["to"];
 	if (to) {
+	    console.log(to);
+	    var data = this.getInitPos();
+	    to = this.merge(this.info, to);
 	    data = this.updatePosition(data, to);
+	} else {
+	    var data = this.getOriginalPrevPos();
 	}
-
+	
 	return this.getScreenPosition(data);
     }
 
@@ -328,7 +330,11 @@ class SwipeElement {
     setFinPos() {
 	var data = this.getFinPos();
 	$("#" + this.css_id).css(this.convCssPos(data));
+	if (this.isVideo()) {
+	    this.setVideo(data);
+	}
 	if (this.isText()) {
+	    console.log("AAAA");
 	    var text_css = this.textLayout(this.info, data);
 	    $("#" + this.css_id + "-body").css(text_css);
 	}
