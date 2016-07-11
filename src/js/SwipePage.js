@@ -95,6 +95,11 @@ class SwipePage {
 	    element.finShow();
 	});
     }
+    play() {
+	this.elements.forEach(function(element, elem_index){
+	    element.play();
+	});
+    }
     getScene() {
 	return this.scene;
     }

@@ -10,6 +10,8 @@ class SwipeElement {
 	this.parent = parent;
 
 	this.isActive = false;
+	this.isPlay = false;
+	this.videoElement = null;
 	this.isRepeat = Boolean(info["repeat"]);
 	    
 	this.x = 0;
@@ -217,12 +219,16 @@ class SwipeElement {
 	return this.getScreenPosition(data);
     }
     setVideo(data) {
+	var instance = this;
 	$("#" + this.css_id).html("<video id='" + this.css_id + "-video' width='"+ data[2] + "' height='" + data[3] + "'><source type='video/mp4' src='" + this.info.video + "'  /></video>");
 	$('#' + this.css_id + "-video").mediaelementplayer({
+
 	    flashName: 'flashmediaelement.swf',
 	    loop: true,
 	    success: function (mediaElement, domObject) { 
-		// mediaElement.play();
+		instance.isPlay = false;
+		instance.videoElement = mediaElement;
+		console.log("calleddddd");
 	    }
         });
     }
@@ -728,7 +734,16 @@ class SwipeElement {
 	}
 	this.setFinPos();
     }
-
+    play() {
+	if (this.elements) {
+	    this.elements.forEach(function(element, elem_index){
+		element.play();
+	    });
+	}
+	if (this.videoElement){
+	    this.videoElement.play();
+	}
+    }
     inactive(duration){
 	if (this.elements) {
 	    this.elements.forEach(function(element, elem_index){

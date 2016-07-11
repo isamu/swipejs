@@ -160,6 +160,7 @@ class SwipeLoader {
 	if (mode == "forward") {
 	    if (same_scene) {
 		this.pages[nextStep].show(duration);
+		this.pages[nextStep].play();
 		$("#page_" + currentStep ).css("opacity", 0);
 		$("#page_" + nextStep ).css("opacity", 1);
 	    } else {
