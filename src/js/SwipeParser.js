@@ -78,19 +78,15 @@ class SwipeParser {
 	return "";
     }
 
-    static parseFontSize(value, full, defaultValue, markdown) {
-	if(value["font"]){
-	    let info = value["font"]
-            let key = markdown ? "size" : "fontSize";
+    static parseFontSize(info, full, defaultValue, markdown) {
+        let key = markdown ? "size" : "fontSize";
 	    
-	    console.log(info[key]);
-	    if (info[key]) {
-		if (Number.isInteger(info[key])) {
+	if (info[key]) {
+	    if (Number.isInteger(info[key])) {
 		    
-		    return info[key];
-		} else {
-                    return SwipeParser.parsePercent(info[key], full, defaultValue);
-		}
+		return info[key];
+	    } else {
+                return SwipeParser.parsePercent(info[key], full, defaultValue);
 	    }
 	}
         return defaultValue

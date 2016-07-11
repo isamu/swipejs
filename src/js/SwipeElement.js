@@ -15,6 +15,7 @@ class SwipeElement {
 	this.x = 0;
 	this.y = 0;
 	this.angle = 0;
+	this.scale = [1, 1];
 	
 	this.elements = [];
 	var instance = this;
@@ -150,6 +151,7 @@ class SwipeElement {
 	if (this.info["rotate"]) {
 	    this.angle = this.info["rotate"];
 	}
+	this.scale = this.getScale(this.info);
     }
     
     getWidth() {
@@ -203,19 +205,19 @@ class SwipeElement {
 	if (this.info["translate"]) {
 	    data = this.updatePosition(data, this.info);
 	}
+	data = this.applyScale(data);
+
 	return data;
     }
     getPrevPos() {
 	var data = this.getOriginalPrevPos();
-	data = this.setScale(data, this.info);
-	data = this.getScreenPosition(data);
-	return this.convCssPos(data);
+	return this.getScreenPosition(data);
     }
     setPrevPos(){
-	$("#" + this.css_id).css(this.getPrevPos());
+	var data = this.getPrevPos();
+	$("#" + this.css_id).css(this.convCssPos(data));
 	if (this.isVideo()) {
 	    var data = this.getOriginalPrevPos();
-	    data = this.setScale(data, this.info);
 	    data = this.getScreenPosition(data);
 	    $("#" + this.css_id).html("<video id='" + this.css_id + "-video' width='"+ data[2] + "' height='" + data[3] + "'><source type='video/mp4' src='" + this.info.video + "'  /></video>");
 
@@ -228,18 +230,19 @@ class SwipeElement {
             });
 	}
 	if (this.isText()) {
-	    // text layout
-	    this.textLayout();
-    
+	    var css = this.textLayout(this.info, data);
+	    $("#" + this.css_id + "-body").css(css);
 	}
     }
 
-    textLayout(){
+
+    // scale and container height(is my height)
+    textLayout(info, data){
 	var x = "center";
 	var textAlign = "center";
 	
-	if (this.info["textAlign"]) {
-	    switch(this.info["textAlign"]){
+	if (info["textAlign"]) {
+	    switch(info["textAlign"]){
 	    case "left":
 		textAlign = "left";
 		break;
@@ -255,27 +258,16 @@ class SwipeElement {
 	    }
 	}
 
-	var fontname = SwipeParser.parseFontName(this.info["font"], false);
+	var fontname = SwipeParser.parseFontName(info, false);
 	
-	var fontSize = function(info) {
+	var fontSize = function(info, scale) {
 	    var defaultSize = 20 / 480 * SwipeScreen.swipeheight();
             let size = SwipeParser.parseFontSize(info, SwipeScreen.swipeheight(), defaultSize, false);
-	    // todo scale
-	    // return round(size * scale.height)
-            return Math.round(size);
-	}(this.info);
-
-	var css = {
-	    position: "relative",
-	    "font-size": String(fontSize) + "px",
-	    "font-family": fontname,
-	    "textAlign": textAlign,
-	    "color": SwipeParser.parseColor(this.info["font"], "#000")
-	};
+            return Math.round(size * scale[1]);
+	}(info, data[6]);
 	
-	$("#" + this.css_id + "-body").css(css);
-	var containerHeight = $("#" + this.css_id + "-body").height();
-	var divHeight =  $("#" + this.css_id).height();
+	var containerHeight = fontSize;
+	var divHeight = data[3];
 	var top = 0;
 
 	if (x == "bottom") {
@@ -283,15 +275,33 @@ class SwipeElement {
 	} else if ( x == "center") {
 	    top = (divHeight - containerHeight) / 2;
 	}
-	$("#" + this.css_id + "-body").css({top: String(top) + "px"});
+
+	return {
+	    position: "relative",
+	    top: String(top) + "px",
+	    "font-size": String(fontSize) + "px",
+	    "font-family": fontname,
+	    "textAlign": textAlign,
+	    "color": SwipeParser.parseColor(info, "#000")
+	};
 	
+
     }
 
     animatePrevPos(duration){
-	console.log("animate");
-	$("#" + this.css_id).animate(this.getPrevPos(), {
+	console.log("animate prev");
+	var data = this.getPrevPos();
+	$("#" + this.css_id).animate(this.convCssPos(data), {
 		duration: duration
 	});
+	console.log("back1");
+	if (this.isText() && this.info["to"]) {
+	    console.log("back2");
+	    var text_css = this.textLayout(this.info, data);
+	    $("#" + this.css_id + "-body").animate(text_css, {
+		duration: duration
+	    });
+	}
     }
 
     getFinPos() {
@@ -302,12 +312,27 @@ class SwipeElement {
 	    data = this.updatePosition(data, to);
 	}
 
-	data = this.setScale(data, this.info);
-	data = this.getScreenPosition(data);
-	return this.convCssPos(data);
+	return this.getScreenPosition(data);
     }
+
+    getFinTextCss(data) {
+	var to = this.info["to"];
+	if (to) {
+	    var info = this.merge(this.info, to);
+	}
+	var text_css = this.textLayout(info, data);
+	console.log(css);
+	return text_css;
+	// $("#" + this.css_id + "-body").css(css);
+    }
+
     setFinPos() {
-	$("#" + this.css_id).css(this.getFinPos());
+	var data = this.getFinPos();
+	$("#" + this.css_id).css(this.convCssPos(data));
+	if (this.isText()) {
+	    var text_css = this.textLayout(this.info, data);
+	    $("#" + this.css_id + "-body").css(text_css);
+	}
     }
 
     animateFinPos(duration){
@@ -315,19 +340,27 @@ class SwipeElement {
 	    this.setTiming(this.info["to"], duration);
 	    var start_duration = this.timing[0];
 	    var do_duration = this.timing[1];
+	    var info = this.merge(this.info, this.info["to"]);
 	    
 	    var instance = this;
 	    setTimeout(function(){
-		$("#" + instance.css_id).animate(instance.getFinPos(), {
+		var data = instance.getFinPos();
+		$("#" + instance.css_id).animate(instance.convCssPos(data), {
 		    duration: do_duration
 		});
+		if (instance.isText()) {
+		    var text_css = instance.textLayout(info, data);
+		    $("#" + instance.css_id + "-body").animate(text_css, {
+			duration: do_duration
+                    });
+		}
 	    }, start_duration);
 	}
     }
 
     // calculate position
     getInitPos() {
-	return [Number(this.x), Number(this.y), Number(this.w), Number(this.h), Number(this.angle), Number(this.opacity)];
+	return [Number(this.x), Number(this.y), Number(this.w), Number(this.h), Number(this.angle), Number(this.opacity), this.scale];
     }
 
     updatePosition(data, to){
@@ -340,6 +373,10 @@ class SwipeElement {
 	    data[0] = data[0] + Number(translate[0]);
 	    data[1] = data[1] + Number(translate[1]);
 	}
+	if(to["scale"]) {
+	    data[6] = this.getScale(to);
+	    data = this.applyScale(data);
+	}
 	return data;
     }
 
@@ -350,13 +387,13 @@ class SwipeElement {
 	    SwipeScreen.virtualX(data[2]),
 	    SwipeScreen.virtualY(data[3]),
 	    data[4],
-	    data[5]
+	    data[5],
+	    data[6]
 	];
     }
-    setScale(data, info) {
-	let scale;
+    getScale(info, scale=[1.0, 1.0]){
 	if (info["scale"]) {
-	    if (SwipeParser.is("Array", info["scale"]) && info["scale"].length > 1){
+	    if (SwipeParser.is("Array", info["scale"]) && info["scale"].length == 2){
 		scale = info["scale"];
 	    } else if (SwipeParser.is("Number", info["scale"])){
 		scale = [info["scale"], info["scale"]];
@@ -364,7 +401,12 @@ class SwipeElement {
 		scale = [Number(info["scale"]), Number(info["scale"])];
 	    }
 	}
-	if (scale && scale.length == 2){
+	return scale;
+    }
+    applyScale(data) {
+	let scale = data[6];
+	if (scale && scale.length == 2 && scale[0] != 1 && scale[1] != 1){
+	    console.log("scale");
 	    var new_w = data[2] * scale[0];
 	    var new_h = data[3] * scale[1];
 	    var new_x = data[0] - ( (new_w - data[2]) / 2);
@@ -373,7 +415,6 @@ class SwipeElement {
 	    data[1] = new_y;
 	    data[2] = new_w;
 	    data[3] = new_h;
-	    console.log(scale);
 	}
 	return data;
     }
@@ -686,6 +727,18 @@ class SwipeElement {
 	this.isActive = true;
     }
 
+    merge(object1, object2) {
+	var newObject = {};
+	var keys = Object.keys(object1);
+	for (var i = 0; i < keys.length; i++) {
+	    newObject[keys[i]] = object1[keys[i]];
+	}
+	keys = Object.keys(object2);
+	for (i = 0; i < keys.length; i++) {
+	    newObject[keys[i]] = object2[keys[i]];
+	}
+	return newObject;
+    }
 }
 
 class SwipeCounter {
