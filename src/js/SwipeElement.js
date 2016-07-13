@@ -10,7 +10,6 @@ class SwipeElement {
 	this.parent = parent;
 
 	this.isActive = false;
-	this.isPlay = false;
 	this.videoElement = null;
 	this.isRepeat = Boolean(info["repeat"]);
 	    
@@ -226,9 +225,7 @@ class SwipeElement {
 	    flashName: 'flashmediaelement.swf',
 	    loop: true,
 	    success: function (mediaElement, domObject) { 
-		instance.isPlay = false;
 		instance.videoElement = mediaElement;
-		console.log("calleddddd");
 	    }
         });
     }
@@ -299,13 +296,11 @@ class SwipeElement {
     }
 
     animatePrevPos(duration){
-	console.log("animate prev");
 	var data = this.getPrevPos();
 	$("#" + this.css_id).animate(this.convCssPos(data), {
 		duration: duration
 	});
 	if (this.isText() && this.info["to"]) {
-	    console.log("back2");
 	    var text_css = this.textLayout(this.info, data);
 	    $("#" + this.css_id + "-body").animate(text_css, {
 		duration: duration
@@ -316,7 +311,6 @@ class SwipeElement {
     getFinPos() {
 	var to = this.info["to"];
 	if (to) {
-	    console.log(to);
 	    var data = this.getInitPos();
 	    to = this.merge(this.info, to);
 	    data = this.updatePosition(data, to);
@@ -343,7 +337,6 @@ class SwipeElement {
 	    this.setVideo(data);
 	}
 	if (this.isText()) {
-	    console.log("AAAA");
 	    var text_css = this.textLayout(this.info, data);
 	    $("#" + this.css_id + "-body").css(text_css);
 	}
@@ -420,7 +413,6 @@ class SwipeElement {
     applyScale(data) {
 	let scale = data[6];
 	if (scale && scale.length == 2 && scale[0] != 1 && scale[1] != 1){
-	    console.log("scale");
 	    var new_w = data[2] * scale[0];
 	    var new_h = data[3] * scale[1];
 	    var new_x = data[0] - ( (new_w - data[2]) / 2);
