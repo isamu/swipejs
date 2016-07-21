@@ -11,7 +11,8 @@ class SwipeLoader {
 	this.step = defaultPage;
 	this.data = data;
 	this.pages = [];
-
+	this.title = "Swipe";
+	
 	SwipeLoader.setTemplateElements(this.getTemplateElements());
 	this.templatePages = this.getTemplatePages();
 	this.setScreen();
@@ -37,6 +38,10 @@ class SwipeLoader {
 
 	    this.pages.push(pageInstance);
 	});
+	if (this.data["title"]) {
+	    this.title = this.data["title"];
+	    document.title = this.title;
+	}
     }
 
     getTemplatePages() {
@@ -100,7 +105,7 @@ class SwipeLoader {
 	});
 	
 	$(".swipe").html(pages.join(""));
-
+	
 	this.setPageSize();
 	$(".page").css("opacity", 0);
 	$("#page_" + this.step).css("opacity", 1);
