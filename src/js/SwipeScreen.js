@@ -17,8 +17,16 @@ class SwipeScreen {
     // todo
     //  set vertical and horizontal mode
     static setVirtualSize() {
-	this.virtual_height = $(window).height();
-	this.virtual_width = this.width / this.height * this.virtual_height;
+	var real_ration = this.window_width / this.window_height;
+	var virtual_ration = this.width / this.height;
+
+	if (real_ration / virtual_ration >= 1) {
+	    this.virtual_height = $(window).height();
+	    this.virtual_width = this.width / this.height * this.virtual_height;
+	} else {
+	    this.virtual_width = $(window).width();
+	    this.virtual_height = this.height / this.width * this.virtual_width;
+	}
     }
 
     static swipewidth() {
