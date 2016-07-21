@@ -7,6 +7,7 @@ class SwipePage {
 	this.scene = scene;
 	this.index = index;
 	this.elements = [];
+	this.bc = this.page["bc"] ? this.page["bc"] : "#ffffff";
     }
 
     loadElement(){
@@ -42,9 +43,13 @@ class SwipePage {
 	    elems.push(element.html());
 	});
 	// todo snbinder
-	return "<div id='page_" + this.index + "' class='page'>" + elems.join("") + "</div>";
+	return "<div id='page_" + this.index + "' class='page' __page_id='" + this.index + "'>" + elems.join("") + "</div>";
     }
 
+    getBc(){
+	return this.bc;
+    }
+    
     initElement(index) {
 	var indexes = index.split("-");
 	if (indexes.length == 1) {

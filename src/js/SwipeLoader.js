@@ -23,6 +23,7 @@ class SwipeLoader {
     setScreen() {
 	this.dimension = (this.data.dimension) ? this.data.dimension : [ $(window).width(),  $(window).height() ];
 	SwipeScreen.init(this.dimension[0], this.dimension[1]);
+	this.bc = this.data.bc ? this.data.bc : "#a9a9a9";
 	this.setSwipeCss();
     }
     
@@ -66,7 +67,12 @@ class SwipeLoader {
     setSwipeCss() {
 	$(".swipe").css({
 	    height: SwipeScreen.virtualheight(),
-	    width: SwipeScreen.virtualwidth()
+	    width: SwipeScreen.virtualwidth(),
+	});
+	$(".back").css({
+	    "background-color": this.bc,
+	    "height": "100vh",
+	    "width": "100vw"
 	});
     }
     
@@ -120,7 +126,11 @@ class SwipeLoader {
 		instance.loadFinish();
 	    }
 	});
-
+	this.pages.forEach((page, page_index) => {
+	    var bc = page.getBc();
+	    console.log(bc);
+	    $("#page_" + page_index).css({"background-color": bc});
+	});
 	$(".page").css({"position": "absolute"});
 	$(".image_element").css({"position": "absolute"});
 	$(".video_element").css({"position": "absolute"});

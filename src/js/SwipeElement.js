@@ -22,6 +22,10 @@ class SwipeElement {
 	this.elements = [];
 	var instance = this;
 
+	this.bc = null;
+	if (this.info["bc"]) {
+	    this.bc = this.info["bc"];
+	}
 	if (this.info["elements"]) {
 	    this.info["elements"].forEach(function(element, elem_index){
 		var e_id = element_id + "-" + elem_index;
@@ -80,7 +84,9 @@ class SwipeElement {
 	$("#" + this.css_id).attr("__y", this.y);
 	$("#" + this.css_id).attr("__w", this.w);
 	$("#" + this.css_id).attr("__h", this.h);
-
+	if (this.bc) {
+	    $("#" + this.css_id).css({"background-color": this.bc});
+	}
 	this.setPrevPos();
     }
 
