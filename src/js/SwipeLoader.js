@@ -133,7 +133,6 @@ class SwipeLoader {
 	});
 	this.pages.forEach((page, page_index) => {
 	    var bc = page.getBc();
-	    console.log(bc);
 	    $("#page_" + page_index).css({"background-color": bc});
 	});
 	$(".page").css({"position": "absolute"});
@@ -171,7 +170,9 @@ class SwipeLoader {
 	    this.pages[currentStep].inactive(duration)
 	    this.pages[nextStep].active();
 	}
+	var transition = this.pages[Math.max(currentStep, nextStep)].getTransition();
 
+	
 	if (mode == "forward") {
 	    if (same_scene) {
 		this.pages[nextStep].show(duration);
@@ -179,28 +180,53 @@ class SwipeLoader {
 		$("#page_" + currentStep ).css("opacity", 0);
 		$("#page_" + nextStep ).css("opacity", 1);
 	    } else {
-		setTimeout(function(){
-		    $("#page_" + currentStep ).css({
-			"opacity": 0
+		// transition 
+		if (transition == "fadeIn") {
+		    this.pages[nextStep].finShow();
+		    $("#page_" + nextStep ).animate({ "opacity": 1 }, {
+			duration: duration
 		    });
-		}, duration);
-		this.pageSlide("in", nextStep, duration);
-		this.pages[nextStep].delayShow(duration);
+		}else if (transition == "replace") {
+		    $("#page_" + currentStep ).css({ "opacity": 0 });
+		    $("#page_" + nextStep ).css({ "opacity": 1 });
+		    this.pages[nextStep].finShow();
+		}else if (transition == "scroll") {
+		    setTimeout(function(){
+			$("#page_" + currentStep ).css({
+			    "opacity": 0
+			});
+		    }, duration);
+		    this.pageSlide("in", nextStep, duration);
+		    this.pages[nextStep].delayShow(duration);
+		} else {
+		    
+		}
 	    }
 	} else { // in case back
 	    console.log("back");
 	    if (same_scene) {
-		
 		this.pages[currentStep].back(duration);
-		// todo more smooth.
 		setTimeout(function(){
 		    $("#page_" + currentStep ).css({"opacity": 0});
 		    $("#page_" + nextStep).css({"opacity": 1});
 		}, duration);
 	    } else {
-		$("#page_" + nextStep).css({"opacity": 1});
-		this.pages[currentStep].back(duration);
-		this.pageSlide("out", currentStep, duration);
+		// transition 
+		if (transition == "fadeIn") {
+		    this.pages[nextStep].finShow();
+		    $("#page_" + currentStep ).animate({ "opacity": 0 }, {
+			duration: duration
+		    });
+		    
+		}else if (transition == "replace") {
+		    $("#page_" + currentStep ).css({ "opacity": 0 });
+		    $("#page_" + nextStep ).css({ "opacity": 1 });
+		    this.pages[nextStep].finShow();
+		}else if (transition == "scroll") {
+		    $("#page_" + nextStep).css({"opacity": 1});
+		    this.pages[currentStep].back(duration);
+		    this.pageSlide("out", currentStep, duration);
+		}
 	    }
 	}
 	

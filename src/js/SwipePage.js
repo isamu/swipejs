@@ -7,7 +7,8 @@ class SwipePage {
 	this.scene = scene;
 	this.index = index;
 	this.elements = [];
-	this.bc = this.page["bc"] ? this.page["bc"] : "#ffffff";
+	this.bc = this.page["bc"] || "#ffffff";
+	this.transition = this.page["transition"] || "scroll";
     }
 
     loadElement(){
@@ -48,6 +49,10 @@ class SwipePage {
 
     getBc(){
 	return this.bc;
+    }
+
+    getTransition() {
+	return this.transition;
     }
     
     initElement(index) {
