@@ -24,7 +24,7 @@ class SwipeLoader {
     setScreen() {
 	this.dimension = (this.data.dimension) ? this.data.dimension : [ $(window).width(),  $(window).height() ];
 	SwipeScreen.init(this.dimension[0], this.dimension[1]);
-	this.bc = this.data.bc ? this.data.bc : "#a9a9a9";
+	this.bc = this.data.bc || "#a9a9a9";
 	this.setSwipeCss();
     }
     
@@ -70,9 +70,12 @@ class SwipeLoader {
     }
     
     setSwipeCss() {
+	var x = ($(window).width() -  SwipeScreen.virtualwidth()) / 2.0;
 	$(".swipe").css({
 	    height: SwipeScreen.virtualheight(),
 	    width: SwipeScreen.virtualwidth(),
+	    position: "absolute",
+	    left: x
 	});
 	$(".back").css({
 	    "background-color": this.bc,
