@@ -37,7 +37,7 @@ class SwipeElement {
     mergeTemplate(info){
 	// template
 	if (info["element"]) {
-	    var elementTemplate = SwipeLoader.getTemplateElements();
+	    var elementTemplate = SwipeBook.getTemplateElements();
 	    var elem;
 	    if (elem = elementTemplate[info["element"]]) {
 		info = SwipeParser.inheritProperties(info, elem );
@@ -455,6 +455,8 @@ class SwipeElement {
 	    return "video";
 	} else if (this.info.text) {
 	    return "text";
+	} else if (this.info.markdown) {
+	    return "markdown";
 	} else {
 	    return "div";
 	}
@@ -468,6 +470,9 @@ class SwipeElement {
     }
     isText() {
 	return this.type() == "text";
+    }
+    isMarkdown() {
+	return this.type() == "markdown";
     }
     isDiv() {
 	return this.type() == "div";

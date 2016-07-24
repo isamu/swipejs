@@ -33,22 +33,22 @@ function callback(data){
  	default_page = Number(location.hash.substr(1));
     }
     
-    var swipe_loader = new SwipeLoader(data, default_page);
+    var swipe_book = new SwipeBook(data, default_page);
     
     $(".swipe").on("click", function(){
-	swipe_loader.next();
+	swipe_book.next();
     });
     
     $(window).on('hashchange', function(){
-	if( ("#" + swipe_loader.getStep()) != location.hash) {
-	    swipe_loader.show(Number(location.hash.substr(1)));
+	if( ("#" + swipe_book.getStep()) != location.hash) {
+	    swipe_book.show(Number(location.hash.substr(1)));
 	}
     });
 
     $(window).resize(function() {
 	clearTimeout(window.resizedFinished);
 	window.resizedFinished = setTimeout(function(){
-	    swipe_loader.resize();
+	    swipe_book.resize();
 	}, 250);
     });
     

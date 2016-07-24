@@ -1,4 +1,4 @@
-class SwipeLoader {
+class SwipeBook {
     static setTemplateElements(template) {
 	this.templateElements = template;
     }
@@ -13,7 +13,7 @@ class SwipeLoader {
 	this.pages = [];
 	this.title = "Swipe";
 	
-	SwipeLoader.setTemplateElements(this.getTemplateElements());
+	SwipeBook.setTemplateElements(this.getTemplateElements());
 	this.templatePages = this.getTemplatePages();
 	this.setScreen();
 	this.paging = this.getPaging();
