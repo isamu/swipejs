@@ -83,21 +83,20 @@ class SwipeParser {
 	    
 	if (info[key]) {
 	    if (Number.isInteger(info[key])) {
-		    
 		return info[key];
 	    } else {
                 return SwipeParser.parsePercent(info[key], full, defaultValue);
 	    }
 	}
-        return defaultValue
+        return defaultValue;
     }
     static parsePercent(value, full, defaultValue) {
-	// todo 
-        //let num = regexPercent.numberOfMatchesInString(value, options: NSMatchingOptions(), range: NSMakeRange(0, value.characters.count))
-        //if num == 1 {
-//            return CGFloat((value as NSString).floatValue / 100.0) * full
-//        }
-        return defaultValue
+	let reg = /^([0-9][0-9\\.]*)%$/;
+	let match = value.match(reg);
+	if (match) {
+	    return Math.floor(match[1]) / 100 * full;
+	}
+        return defaultValue;
     }
     static parseFontName(value, markdown) {
         let key = markdown ? "name" : "fontName";

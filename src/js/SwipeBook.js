@@ -8,6 +8,9 @@ class SwipeBook {
     static setMarkdown(markdown) {
 	this.markdown = markdown;
     }
+    static getMarkdown() {
+	return this.markdown;
+    }
     constructor (data, defaultPage = 0) {
         $('head').prepend('<meta name="viewport" content="width = 640,user-scalable=no">');
 

@@ -61,7 +61,9 @@ class SwipeElement {
     }
 
     parseMarkdown(element) {
-	let parser = new SwipeMarkdown();
+	let info = SwipeBook.getMarkdown();
+	let parser = new SwipeMarkdown(info);
+	
 	return parser.parse(element, this.css_id);
     }
     
@@ -329,7 +331,7 @@ class SwipeElement {
 	var to = this.info["to"];
 	if (to) {
 	    var data = this.getInitPos();
-	    to = this.merge(this.info, to);
+	    to = SwipeElement.merge(this.info, to);
 	    data = this.updatePosition(data, to);
 	} else {
 	    var data = this.getOriginalPrevPos();
@@ -341,7 +343,7 @@ class SwipeElement {
     getFinTextCss(data) {
 	var to = this.info["to"];
 	if (to) {
-	    var info = this.merge(this.info, to);
+	    var info = SwipeElement.merge(this.info, to);
 	}
 	var text_css = this.textLayout(info, data);
 	return text_css;
@@ -364,7 +366,7 @@ class SwipeElement {
 	    this.setTiming(this.info["to"], duration);
 	    var start_duration = this.timing[0];
 	    var do_duration = this.timing[1];
-	    var info = this.merge(this.info, this.info["to"]);
+	    var info = SwipeElement.merge(this.info, this.info["to"]);
 	    
 	    var instance = this;
 	    setTimeout(function(){
@@ -502,7 +504,7 @@ class SwipeElement {
 	} else if (this.isMarkdown()){
 	    let md_array = this.parseMarkdown(this.info.markdown);
 	    this.md_css = md_array[1];
-	    console.log(this.md_css);
+	    // console.log(this.md_css);
 	    return  "<div class='element markdown_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + md_array[0] + "</div>";
 	} else if (this.isVideo()) {
 	    return  "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' ></div>";
@@ -781,7 +783,7 @@ class SwipeElement {
 	this.isActive = true;
     }
 
-    merge(object1, object2) {
+    static merge(object1, object2) {
 	var newObject = {};
 	var keys = Object.keys(object1);
 	for (var i = 0; i < keys.length; i++) {
