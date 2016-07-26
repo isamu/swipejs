@@ -5,6 +5,9 @@ class SwipeBook {
     static getTemplateElements() {
 	return this.templateElements;
     }
+    static setMarkdown(markdown) {
+	this.markdown = markdown;
+    }
     constructor (data, defaultPage = 0) {
         $('head').prepend('<meta name="viewport" content="width = 640,user-scalable=no">');
 
@@ -14,6 +17,7 @@ class SwipeBook {
 	this.title = "Swipe";
 	
 	SwipeBook.setTemplateElements(this.getTemplateElements());
+	SwipeBook.setMarkdown(this.getMarkdown());
 	this.templatePages = this.getTemplatePages();
 	this.setScreen();
 	this.paging = this.getPaging();
@@ -58,6 +62,13 @@ class SwipeBook {
 	    return this.data["templates"]["elements"];
 	} else if (this.data["elements"]){
 	    return this.data["elements"];
+	}
+	return {};
+    }
+
+    getMarkdown() {
+	if (this.data["markdown"]) {
+	    return this.data["markdown"];
 	}
 	return {};
     }

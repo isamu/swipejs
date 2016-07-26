@@ -102,7 +102,7 @@ When the user opens this document with a Swipe viewer, the user will see only th
 - **paths** ({Name:Path}): Named **Paths** dictionary
 - **markdown** ({Name:Style}): Named **Markdown** style
 - **voices** ({Name:VoiceInfo}): Named **Voice** style
-- **pages** ([Page,...]): Collection of **Pages**  (support) 
+- **pages** ([Page,...]): Collection of **Pages**  (supported) 
 - **resources** ([String,...]): Resource keys for on-demand resources
 - **viewstate** (Bool): Indicate if we need to save&restore view state. The default is true. 
 - **languages** ({"id":LangId, "title":String},...): Languages to display via the "Lang." button in the Swipe viewer.
@@ -140,7 +140,7 @@ Here is a **Document** with a **Page**, which has two **Elements**.
 - **audio** (URL): Specifies the sound effect to be played in sync with the animation
 - **speech** (SpeechInfo): Specifies the text-to-speech to be played in sync with the animation
 - **vibrate** (Bool): Specifies the vibration in sync with the animation, the default is false
-- **elements** ([Element+]): Collection of Elements
+- **elements** ([Element+]): Collection of Elements (supported)
 - **eyePosition** (Float): Eye position (z-height) for the perspective relative to width, default is 1.0 (not supported)
 - **strings** ([StringId:[LangId:String]]): String resources
  

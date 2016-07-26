@@ -59,6 +59,11 @@ class SwipeElement {
 	}
 	return "";
     }
+
+    parseMarkdown(element) {
+	let parser = new SwipeMarkdown();
+	return parser.parse(element, this.css_id);
+    }
     
     initData(index) {
 	if (index !== undefined) {
@@ -236,6 +241,7 @@ class SwipeElement {
         });
     }
     setPrevPos(){
+	var instance = this;
 	var data = this.getPrevPos();
 	$("#" + this.css_id).css(this.convCssPos(data));
 	if (this.isVideo()) {
@@ -244,6 +250,11 @@ class SwipeElement {
 	if (this.isText()) {
 	    var css = this.textLayout(this.info, data);
 	    $("#" + this.css_id + "-body").css(css);
+	}
+	if (this.isMarkdown()) {
+	    this.md_css.forEach(function(element, elem_index){
+		$("#" + instance.css_id + "-" + elem_index).css(element);
+	    });
 	}
     }
 
@@ -488,6 +499,11 @@ class SwipeElement {
 	    return  "<div class='element text_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" +
 		"<div class='text_body' id='" + this.css_id + "-body'>" + this.parseText(this.info.text) + "</div>" +
 		"</div>";
+	} else if (this.isMarkdown()){
+	    let md_array = this.parseMarkdown(this.info.markdown);
+	    this.md_css = md_array[1];
+	    console.log(this.md_css);
+	    return  "<div class='element markdown_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + md_array[0] + "</div>";
 	} else if (this.isVideo()) {
 	    return  "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' ></div>";
 	} else if (this.type() == "div") {
