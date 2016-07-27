@@ -36,10 +36,10 @@ class SwipeElement {
 
     mergeTemplate(info){
 	// template
-	if (info["element"]) {
+	if (info["element"] || info["template"]) {
 	    var elementTemplate = SwipeBook.getTemplateElements();
 	    var elem;
-	    if (elem = elementTemplate[info["element"]]) {
+	    if (elem = elementTemplate[info["element"] || info["template"]]) {
 		info = SwipeParser.inheritProperties(info, elem );
 	    }
 	}
@@ -117,7 +117,7 @@ class SwipeElement {
 	    this.h = this.info["size"][1];
 	} else {
 	    if (this.info["w"]){
-		this.w = this.info["w"];
+		this.w = SwipeParser.parseSize(this.info["w"], SwipeScreen.swipewidth(), SwipeScreen.swipewidth());
 	    } else {
 		if (this.info.img) {
 		    this.w = $("#" + this.css_id).attr("__default_width");
@@ -127,7 +127,7 @@ class SwipeElement {
 		}
 	    }
 	    if (this.info["h"]){
-		this.h = this.info["h"];
+		this.h = SwipeParser.parseSize(this.info["h"], SwipeScreen.swipeheight(), SwipeScreen.swipeheight());
 	    } else {
 		if (this.info.img) {
 		    this.h = $("#" + this.css_id).attr("__default_height");
@@ -152,7 +152,7 @@ class SwipeElement {
 	    } else if (this.info["x"] == "center"){
 		this.x = (this.parentWidth() - this.w) / 2.0;
 	    } else if (this.info["x"]){
-		this.x = this.info["x"];
+		this.x = SwipeParser.parseSize(this.info["x"], this.parentWidth(), 0);
 	    }
 
 	    if (this.info["y"] == "bottom"){
@@ -162,7 +162,7 @@ class SwipeElement {
 	    } else if (this.info["y"] == "center"){
 		this.y = (this.parentHeight() - this.h) / 2.0;
 	    } else if (this.info["y"]){
-		this.y = this.info["y"];
+		this.y = SwipeParser.parseSize(this.info["y"], this.parentHeight(), 0);
 	    }
 	}
 	if (this.info["rotate"]) {

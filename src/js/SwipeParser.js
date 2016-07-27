@@ -80,15 +80,17 @@ class SwipeParser {
 
     static parseFontSize(info, full, defaultValue, markdown) {
         let key = markdown ? "size" : "fontSize";
-	    
+
 	if (info[key]) {
-	    if (Number.isInteger(info[key])) {
-		return info[key];
-	    } else {
-                return SwipeParser.parsePercent(info[key], full, defaultValue);
-	    }
+            return SwipeParser.parseSize(info[key], full, defaultValue);
 	}
         return defaultValue;
+    }
+    static parseSize(value, full, defaultValue) {
+	if (Number.isInteger(value)) {
+	    return value;
+	}
+        return SwipeParser.parsePercent(value, full, defaultValue);
     }
     static parsePercent(value, full, defaultValue) {
 	let reg = /^([0-9][0-9\\.]*)%$/;
