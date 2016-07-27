@@ -5,7 +5,7 @@ class SwipeMarkdown {
 	this.setMdStyle()
 	if (this.info["styles"]) {
 	    // not well
-	    this.md_style = SwipeElement.merge(this.md_style, this.info["styles"]);
+	    this.md_style = $.extend(true, this.md_style, this.info["styles"]);
 	}
     }
 
@@ -38,26 +38,32 @@ class SwipeMarkdown {
 	return [htmls.join(""), csses];
     }
     conv_html(body, css_prefix, index) {
-	return "<div class='markdown_line' id='" + css_prefix + "-" + index + "'>" + body + "</div>";
+	let text = body.replace(/\s/g, '&nbsp;');
+	return "<div class='markdown_line' id='" + css_prefix + "-" + index + "'>" + text + "</div>";
     }
     conv_css(style) {
 	let my_style = this.md_style[style];
 	let fontSize = 10;
+	let lineHeight = 10;
 	let fontname = "";
 	let textAlign = "left";
 	let info = {};
 	
 	if (my_style) {
 	    if (my_style["font"]){
-		if (my_style["font"] && my_style["font"]["name"]) {
+		if (my_style["font"]["name"]) {
 		    fontname = SwipeParser.parseFontName(my_style["font"], true);
 		}
-		if (my_style["font"] && my_style["font"]["size"]) {
+		if (my_style["font"]["size"]) {
 		    fontSize = SwipeParser.parseFontSize(my_style["font"], SwipeScreen.swipeheight(), 10, true);
+		    lineHeight = fontSize;
 		}
 	    }
-	    if (my_style && my_style["alignment"]) {
+	    if (my_style["alignment"]) {
 		textAlign = my_style["alignment"];
+	    }
+	    if (my_style["spacing"]) {
+		lineHeight = lineHeight + SwipeParser.parseSize(my_style["spacing"], SwipeScreen.swipeheight(), 0);
 	    }
 	}
 
@@ -65,7 +71,7 @@ class SwipeMarkdown {
 	return {
 	    position: "relative",
 	    "font-size": String(SwipeScreen.virtualY(fontSize)) + "px",
-	    "line-height" : String(SwipeScreen.virtualY(fontSize)) + "px",
+	    "line-height" : String(SwipeScreen.virtualY(lineHeight)) + "px",
 	    "font-family": fontname,
 	    "textAlign": textAlign,
 	    "color": SwipeParser.parseColor(my_style, "#000")

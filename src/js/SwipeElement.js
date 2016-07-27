@@ -95,8 +95,10 @@ class SwipeElement {
 	    $("#" + this.css_id).css({"background-color": this.bc});
 	}
 	this.setPrevPos();
-    }
 
+	// set md wrap
+	this.markdown_position();
+    }
 
     setOption() {
 	this.opacity = 1.0;
@@ -327,6 +329,13 @@ class SwipeElement {
 	}
     }
 
+    markdown_position() {
+	if(this.isMarkdown()){
+	    let x = ($("#" + this.css_id).height() - $("#md_" + this.css_id).height()) / 2;
+	    $("#md_" + this.css_id).css({top: x, position: "absolute"});
+	}
+    }
+    
     getFinPos() {
 	var to = this.info["to"];
 	if (to) {
@@ -504,8 +513,8 @@ class SwipeElement {
 	} else if (this.isMarkdown()){
 	    let md_array = this.parseMarkdown(this.info.markdown);
 	    this.md_css = md_array[1];
-	    // console.log(this.md_css);
-	    return  "<div class='element markdown_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + md_array[0] + "</div>";
+	    return  "<div class='element markdown_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" +
+		"<div class='markdown_wrap' id='md_" + this.css_id + "'>" + md_array[0] + "</div></div>";
 	} else if (this.isVideo()) {
 	    return  "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' ></div>";
 	} else if (this.type() == "div") {
