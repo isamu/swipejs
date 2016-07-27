@@ -7,6 +7,9 @@ class SwipeMarkdown {
 	    // not well
 	    this.md_style = $.extend(true, this.md_style, this.info["styles"]);
 	}
+	if (this.info["shadow"]) {
+            this.shadow = this.info["shadow"];
+	}
     }
 
 
@@ -43,11 +46,10 @@ class SwipeMarkdown {
     }
     conv_css(style) {
 	let my_style = this.md_style[style];
-	let fontSize = 10;
-	let lineHeight = 10;
-	let fontname = "";
+	let fontSize = 20;
+	let lineHeight = 30;
+	let fontname = ""; // todo default font
 	let textAlign = "left";
-	let info = {};
 	
 	if (my_style) {
 	    if (my_style["font"]){
@@ -63,12 +65,13 @@ class SwipeMarkdown {
 		textAlign = my_style["alignment"];
 	    }
 	    if (my_style["spacing"]) {
-		lineHeight = lineHeight + SwipeParser.parseSize(my_style["spacing"], SwipeScreen.swipeheight(), 0);
+		lineHeight = lineHeight + SwipeParser.parseSize(my_style["spacing"], SwipeScreen.swipeheight(), 10);
+	    } else {
+		lineHeight = lineHeight + 10;
 	    }
 	}
 
-
-	return {
+	let css = {
 	    position: "relative",
 	    "font-size": String(SwipeScreen.virtualY(fontSize)) + "px",
 	    "line-height" : String(SwipeScreen.virtualY(lineHeight)) + "px",
@@ -76,6 +79,14 @@ class SwipeMarkdown {
 	    "textAlign": textAlign,
 	    "color": SwipeParser.parseColor(my_style, "#000")
 	};
+	if (this.shadow) {
+	    css["text-shadow"] = SwipeParser.parseShadow(this.shadow);
+	    console.log( css["text-shadow"]);
+	    //"2px  2px 1px blue";//"        "shadow":{ "color":"blue", "offset":[-2,2] },
+	}
+
+	
+	return css;
 	
     }
 

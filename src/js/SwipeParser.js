@@ -114,6 +114,17 @@ class SwipeParser {
         // return [];
     }
     
+    static parseShadow(info, scale = 1) {
+	let x = SwipeParser.parseSize((info["offset"]||[])[0], SwipeScreen.swipeheight(),  1) * scale;
+	x = SwipeScreen.virtualX(x);
+	let y = SwipeParser.parseSize((info["offset"]||[])[1], SwipeScreen.swipewidth(), 1) * scale;
+	y = SwipeScreen.virtualY(y);
+
+	let color = info["color"] || "black";
+	
+	return x + "px " + y + "px 3px "+ color;
+    }
+
     static clone(obj) {
 	var copy;
 	
