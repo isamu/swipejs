@@ -78,7 +78,7 @@ class SwipeElement {
 	    return;
 	}
 	
-	if (this.isDiv()) {
+	if (this.isDiv() || this.isMarkdown()) {
 	    if (!this.parent) {
 		$("#" + this.css_id).css("position", "absolute");
 	    }
