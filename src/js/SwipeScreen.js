@@ -4,6 +4,13 @@ class SwipeScreen {
 	this.width = width;
 	this.height = height;
 
+	if (this.width == 0) {
+	    this.width = this.height * $(window).width() / $(window).height();
+	}
+	if (this.height == 0) {
+	    this.height =  this.width * $(window).height() /  $(window).width();
+	}
+	
 	SwipeScreen.setOriginalSize();
 	SwipeScreen.setVirtualSize();
 	

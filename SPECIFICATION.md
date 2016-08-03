@@ -100,7 +100,7 @@ When the user opens this document with a Swipe viewer, the user will see only th
  - **pages** ({Name:PageTemplate}): **PageTemplate** dictionary (supported)
  - **elements** ({Name:ElementTemplate}):	 **ElementTemplate** dictionary (supported)
 - **paths** ({Name:Path}): Named **Paths** dictionary
-- **markdown** ({Name:Style}): Named **Markdown** style
+- **markdown** ({Name:Style}): Named **Markdown** style (supported)
 - **voices** ({Name:VoiceInfo}): Named **Voice** style
 - **pages** ([Page,...]): Collection of **Pages**  (supported) 
 - **resources** ([String,...]): Resource keys for on-demand resources
