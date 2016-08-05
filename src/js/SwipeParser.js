@@ -90,6 +90,9 @@ class SwipeParser {
 	if (Number.isInteger(value)) {
 	    return value;
 	}
+	if (isFinite(value)) {
+            return value;
+        }
         return SwipeParser.parsePercent(value, full, defaultValue);
     }
     static parsePercent(value, full, defaultValue) {
