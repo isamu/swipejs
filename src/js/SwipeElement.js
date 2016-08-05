@@ -28,9 +28,6 @@ class SwipeElement {
 	}
 	if (this.info["elements"]) {
 	    this.info["elements"].forEach(function(element, elem_index){
-		if (!element["template"] && instance.info["template"]) {
-		    element["template"] = instance.info["template"];
-		}
 		var e_id = element_id + "-" + elem_index;
 		instance.elements.push(new SwipeElement(element, page_id, e_id, instance));
 	    });
@@ -526,7 +523,11 @@ class SwipeElement {
 	} else if (this.isVideo()) {
 	    return  "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' ></div>";
 	} else if (this.isPath()) {
-	    return '<svg class="element" ' + this.page_id + '" id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id +  '" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">' + "<path d='" + this.info.path +"' stroke='black' fill='none' />" + "</svg>";
+	    let line = 1;
+	    if (this.info.lineWidth) {
+		line = this.info.lineWidth;
+	    }
+	    return '<svg class="element svg_element" ' + this.page_id + '" id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id +  '" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">' + "<path d='" + this.info.path +"' stroke='black' fill='none' stroke-width='" + line +"' />" + "</svg>";
 	} else if (this.isDiv()) {
 	    var html = this.elements.map(function(element, key){
 		return element.html();

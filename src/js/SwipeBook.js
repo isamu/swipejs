@@ -156,6 +156,7 @@ class SwipeBook {
 	$(".image_element").css({"position": "absolute"});
 	$(".video_element").css({"position": "absolute"});
 	$(".text_element").css({"position": "absolute"});
+	$(".svg_element").css({"position": "absolute"});
     }
 
     loadFinish(){
