@@ -336,7 +336,7 @@ class SwipeElement {
 	}
     }
     
-    getFinPos() {
+    getOriginalFinPos() {
 	var to = this.info["to"];
 	if (to) {
 	    var data = this.getInitPos();
@@ -345,8 +345,10 @@ class SwipeElement {
 	} else {
 	    var data = this.getOriginalPrevPos();
 	}
-	
-	return this.getScreenPosition(data);
+	return data;
+    }
+    getFinPos() {
+	return this.getScreenPosition(this.getOriginalFinPos());
     }
 
     getFinTextCss(data) {
@@ -637,7 +639,7 @@ class SwipeElement {
 	    switch(data["style"]){
 	    case "vibrate" :
 		var delta = instance.valueFrom(data, "delta", 10);
-		var orgPos = instance.getOriginalPrevPos();
+		var orgPos = instance.getOriginalFinPos();
 		var timing = duration / repeat / 4
 		$("#" + instance.css_id).animate({
 		    left: parseInt(SwipeScreen.virtualX(orgPos[0] - delta)) + "px", top: SwipeScreen.virtualY(orgPos[1]) + "px"
@@ -666,7 +668,7 @@ class SwipeElement {
 
             case "shift":
 		var dir;
-		var orgPos = instance.getOriginalPrevPos();
+		var orgPos = instance.getOriginalFinPos();
 		switch(data["direction"]){
 		case "n" :
 		    dir = { left: parseInt(SwipeScreen.virtualX(data[0])) + "px", top: SwipeScreen.virtualY(data[1] - instance.h) + "px" }; break;
