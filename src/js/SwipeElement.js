@@ -561,13 +561,24 @@ class SwipeElement {
 	}
 	this.setPrevPos();
 	this.animateFinPos(duration);
-	if ( this.info["loop"]) {
-	    var duration =  this.valueFrom(this.info["loop"], "duration", 50);
-	    this.setTiming(this.info["loop"], duration);
-	    this.loop(this);
-	}
+	this.loopProcess(duration);
     }
 
+    loopProcess(duration){
+	if ( this.info["loop"]) {
+	    var loop_duration =  this.valueFrom(this.info["loop"], "duration", 50);
+	    this.setTiming(this.info["loop"], loop_duration);
+	    if (this.info["to"]) {
+		var instance = this;
+		setTimeout(function(){
+		    instance.loop(instance);
+		}, duration);
+	    } else {
+		this.loop(this);
+	    }
+	}
+    }
+    
     delayShow(duration){
 	console.log("delayShow");
 	var du = duration;
@@ -580,11 +591,7 @@ class SwipeElement {
 	var instance = this;
 	setTimeout(function(){
 	    instance.animateFinPos(du);
-	    if ( instance.info["loop"]) {
-		var loop_duration =  instance.valueFrom(instance.info["loop"], "duration", 50);
-		instance.setTiming(instance.info["loop"], loop_duration);
-		instance.loop(instance);
-	    }
+	    instance.loopProcess(duration);
 	}, du);
     }
 
