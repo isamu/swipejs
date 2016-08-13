@@ -182,7 +182,7 @@ class SwipeBook {
 	var loaded = (nextStep == currentStep);
 	var same_scene = (this.pages[currentStep].getScene()) && (this.pages[nextStep]) &&
 	    (this.pages[nextStep].getScene() == this.pages[currentStep].getScene());
-	var duration = 500;
+	var duration = 200;
 	
 	if (!loaded) {
 	    this.pages[currentStep].inactive(duration)

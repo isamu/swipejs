@@ -570,6 +570,9 @@ class SwipeElement {
 
     loopProcess(duration){
 	var loop_duration = duration;
+	if ( this.transition_timing && this.transition_timing[2] > 0) {
+	    loop_duration = this.transition_timing[2];
+	}
 	if ( this.info["loop"]) {
 	    var loop_duration =  this.valueFrom(this.info["loop"], "duration", duration);
 	    this.loop_timing = this.getTiming(this.info["loop"], loop_duration);
@@ -578,7 +581,7 @@ class SwipeElement {
 		this.loop(this);
 	    } else if (this.play_style == "auto" || this.play_style == "always") {
 		if (this.transition_timing) {
-		    duration = this.transition_timing[2];
+		    duration = duration - this.transition_timing[2];
 		}
 		var instance = this;
 		// todo use timing to duration
@@ -593,16 +596,17 @@ class SwipeElement {
     
     delayShow(duration){
 	console.log("delayShow");
-	var du = duration;
+	// var du = duration;
+	var du = 400;
 	if (this.elements) {
 	    this.elements.forEach(function(element, elem_index){
-		element.delayShow(du);
+		element.delayShow(duration);
 	    });
 	}
 	this.setPrevPos();
 	var instance = this;
 	setTimeout(function(){
-	    instance.animateFinPos(du);
+	    instance.animateFinPos(duration);
 	    instance.loopProcess(duration);
 	}, du);
     }
@@ -643,7 +647,7 @@ class SwipeElement {
 	// todo fix timing.
 	var start_duration = this.loop_timing[0];
 	var duration = this.loop_timing[1];
-	
+
 	var defaultRepeat;
 	if (data["repeat"]) {
 	    defaultRepeat = data["repeat"];
@@ -656,12 +660,14 @@ class SwipeElement {
 	    repeat = defaultRepeat;
 	}
 
+	console.log(data["style"]);
+	// todo timing is not good
 	setTimeout(function(){
 	    switch(data["style"]){
 	    case "vibrate" :
 		var delta = instance.valueFrom(data, "delta", 10);
 		var orgPos = instance.getOriginalFinPos();
-		var timing = duration / defaultRepeat / 4
+		var timing = duration / defaultRepeat / 4;
 		$("#" + instance.css_id).animate({
 		    left: parseInt(SwipeScreen.virtualX(orgPos[0] - delta)) + "px", top: SwipeScreen.virtualY(orgPos[1]) + "px"
 		}, { duration: timing });
