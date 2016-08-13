@@ -566,10 +566,12 @@ class SwipeElement {
 
     loopProcess(duration){
 	if ( this.info["loop"]) {
-	    var loop_duration =  this.valueFrom(this.info["loop"], "duration", 50);
+	    var loop_duration =  this.valueFrom(this.info["loop"], "duration", duration);
 	    this.setTiming(this.info["loop"], loop_duration);
 	    if (this.info["to"]) {
+		// if play is scroll, not wait. if play is auto, wait after scroll. 
 		var instance = this;
+		// todo use timing to duration
 		setTimeout(function(){
 		    instance.loop(instance);
 		}, duration);
@@ -628,13 +630,15 @@ class SwipeElement {
 	console.log("loop");
 	var data = instance.info["loop"];
 
+	// todo fix timing.
 	var start_duration = this.timing[0];
 	var duration = this.timing[1];
-
 	
 	var defaultRepeat;
 	if (data["repeat"]) {
 	    defaultRepeat = data["repeat"];
+	} else if (data["count"]) {
+	    defaultRepeat = data["count"];
 	} else {
 	    defaultRepeat = 1;
 	}
@@ -647,7 +651,7 @@ class SwipeElement {
 	    case "vibrate" :
 		var delta = instance.valueFrom(data, "delta", 10);
 		var orgPos = instance.getOriginalFinPos();
-		var timing = duration / repeat / 4
+		var timing = duration / defaultRepeat / 4
 		$("#" + instance.css_id).animate({
 		    left: parseInt(SwipeScreen.virtualX(orgPos[0] - delta)) + "px", top: SwipeScreen.virtualY(orgPos[1]) + "px"
 		}, { duration: timing });
@@ -686,7 +690,7 @@ class SwipeElement {
 		default :
 		    dir = { left: parseInt(SwipeScreen.virtualX(data[0])) + "px", top: SwipeScreen.virtualY(data[1] - instance.h) + "px" }; break;
 		}
-		var timing = duration / repeat;
+		var timing = duration / defaultRepeat;
 
 		instance.setPrevPos();
 
@@ -734,14 +738,15 @@ class SwipeElement {
 	    case "wiggle" :
 		console.log("wiggle");
 		var angle = instance.valueFrom(data, "delta", 15);
+		var timing = duration / defaultRepeat / 4
 		$("#" + instance.css_id).rotate({
-		    angle:0, animateTo: angle, duration: duration,
+		    angle:0, animateTo: angle, duration: timing,
 		    callback: function(){
 			$("#" + instance.css_id).rotate({
-			    angle:angle, animateTo: -angle, duration: duration * 2,
+			    angle:angle, animateTo: -angle, duration: timing * 2,
 			    callback: function(){
 				$("#" + instance.css_id).rotate({
-				    angle:-angle, animateTo: 0, duration: duration,
+				    angle:-angle, animateTo: 0, duration: timing,
 				    callback: function(){
 					instance.moreloop(instance, repeat, defaultRepeat);
 				    }});

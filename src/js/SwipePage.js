@@ -7,6 +7,7 @@ class SwipePage {
 	this.scene = scene;
 	this.index = index;
 	this.elements = [];
+	this.duration = this.page["duration"] ? this.page["duration"] * 1000 : 500;
 	this.bc = this.page["bc"] || "#ffffff";
 	this.transition = this.page["transition"] || "scroll";
     }
@@ -70,39 +71,40 @@ class SwipePage {
 	});
     }
     show(duration){
+	let instance = this;
 	this.elements.forEach(function(element, elem_index){
-	    element.show(duration);
+	    element.show(instance.duration);
 	});
 
-	let instance = this;
 	setTimeout(function(){
 	    instance.speech(instance);
-	}, duration);
+	}, this.duration);
 	
     }
 
     delayShow(duration){
-	this.elements.forEach(function(element, elem_index){
-	    element.delayShow(duration);
-	});
 	let instance = this;
+	this.elements.forEach(function(element, elem_index){
+	    element.delayShow(instance.duration);
+	});
 	setTimeout(function(){
 	    instance.speech(instance);
-	}, duration);
+	}, this.duration);
     }
 
     back(duration) { 
-	this.elements.forEach(function(element, elem_index){
-	    element.back(duration);
-	});
 	let instance = this;
+	this.elements.forEach(function(element, elem_index){
+	    element.back(instance.duration);
+	});
 	setTimeout(function(){
 	    instance.speech(instance);
-	}, duration);
+	}, this.duration);
     }
     finShow(duration) {
+	let instance = this;
 	this.elements.forEach(function(element, elem_index){
-	    element.finShow(duration);
+	    element.finShow(instance.duration);
 	});
     }
     play() {
@@ -131,8 +133,9 @@ class SwipePage {
 	});
     }
     inactive(duration) {
+	let instance = this;
 	this.elements.forEach(function(element, elem_index){
-	    element.inactive(duration);
+	    element.inactive(instance.duration);
 	});
     }
     
