@@ -775,14 +775,15 @@ class SwipeElement {
 	this.animatePrevPos(duration);
     }
 
-    finShow(){
+    finShow(duration){
 	console.log("finShow");
 	if (this.elements) {
 	    this.elements.forEach(function(element, elem_index){
-		element.finShow();
+		element.finShow(duration);
 	    });
 	}
 	this.setFinPos();
+	this.loopProcess(duration);
     }
     play() {
 	if (this.elements) {

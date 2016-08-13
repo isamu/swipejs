@@ -100,9 +100,9 @@ class SwipePage {
 	    instance.speech(instance);
 	}, duration);
     }
-    finShow() {
+    finShow(duration) {
 	this.elements.forEach(function(element, elem_index){
-	    element.finShow();
+	    element.finShow(duration);
 	});
     }
     play() {

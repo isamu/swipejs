@@ -231,19 +231,19 @@ class SwipeBook {
 	    } else {
 		// transition 
 		if (transition == "fadeIn") {
-		    this.pages[nextStep].finShow();
+		    this.pages[nextStep].finShow(duration);
 		    $("#page_" + currentStep ).animate({ "opacity": 0 }, {
 			duration: duration
 		    });
-		    
 		}else if (transition == "replace") {
 		    $("#page_" + currentStep ).css({ "opacity": 0 });
 		    $("#page_" + nextStep ).css({ "opacity": 1 });
-		    this.pages[nextStep].finShow();
+		    this.pages[nextStep].finShow(duration);
 		}else if (transition == "scroll") {
 		    $("#page_" + nextStep).css({"opacity": 1});
 		    this.pages[currentStep].back(duration);
 		    this.pageSlide("out", currentStep, duration);
+		    this.pages[nextStep].finShow(duration);
 		}
 	    }
 	}
