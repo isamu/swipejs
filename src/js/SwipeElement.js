@@ -1,12 +1,13 @@
 class SwipeElement {
 
-    constructor (info, page_id, element_id, parent=null) {
+    constructor (info, page_id, element_id, play, parent=null) {
 	var css_id = "element-" + page_id + "-" + element_id;
 
 	this.info = this.mergeTemplate(info);
 	this.css_id = css_id;
 	this.page_id = page_id;
 	this.element_id = element_id;
+	this.play_style = play;
 	this.parent = parent;
 
 	this.isActive = false;
@@ -19,6 +20,9 @@ class SwipeElement {
 	this.scale = [1, 1];
 	this.no_size = false;
 
+	this.transition_timing = null;
+	this.loop_timing = null;
+	
 	this.elements = [];
 	var instance = this;
 
@@ -29,7 +33,7 @@ class SwipeElement {
 	if (this.info["elements"]) {
 	    this.info["elements"].forEach(function(element, elem_index){
 		var e_id = element_id + "-" + elem_index;
-		instance.elements.push(new SwipeElement(element, page_id, e_id, instance));
+		instance.elements.push(new SwipeElement(element, page_id, e_id, play, instance));
 	    });
 	}
     }
@@ -374,9 +378,9 @@ class SwipeElement {
 
     animateFinPos(duration){
 	if (this.info["to"]) {
-	    this.setTiming(this.info["to"], duration);
-	    var start_duration = this.timing[0];
-	    var do_duration = this.timing[1];
+	    this.transition_timing = this.getTiming(this.info["to"], duration);
+	    var start_duration = this.transition_timing[0];
+	    var do_duration = this.transition_timing[1];
 	    var info = SwipeElement.merge(this.info, this.info["to"]);
 	    
 	    var instance = this;
@@ -565,18 +569,24 @@ class SwipeElement {
     }
 
     loopProcess(duration){
+	var loop_duration = duration;
 	if ( this.info["loop"]) {
 	    var loop_duration =  this.valueFrom(this.info["loop"], "duration", duration);
-	    this.setTiming(this.info["loop"], loop_duration);
-	    if (this.info["to"]) {
-		// if play is scroll, not wait. if play is auto, wait after scroll. 
+	    this.loop_timing = this.getTiming(this.info["loop"], loop_duration);
+	    
+	    if (this.play_style == "scroll" || !this.info["to"]) {
+		this.loop(this);
+	    } else if (this.play_style == "auto" || this.play_style == "always") {
+		if (this.transition_timing) {
+		    duration = this.transition_timing[2];
+		}
 		var instance = this;
 		// todo use timing to duration
 		setTimeout(function(){
 		    instance.loop(instance);
 		}, duration);
 	    } else {
-		this.loop(this);
+		console.log("not animate because " + this.play);
 	    }
 	}
     }
@@ -597,7 +607,7 @@ class SwipeElement {
 	}, du);
     }
 
-    setTiming(element, duration){
+    getTiming(element, duration){
 	var timing = function(element) {
 	    if (element["timing"]) {
 		var timing = element["timing"];
@@ -607,14 +617,14 @@ class SwipeElement {
 	    }
 	    return [0, 1];
 	}(element);
-	this.timing = [timing[0], (timing[1] - timing[0]), (1 - timing[1])].map(function(a){
+	return [timing[0], (timing[1] - timing[0]), (1 - timing[1])].map(function(a){
 	    return a * duration;
 	});
 
     }
     moreloop(instance, repeat, defaultRepeat){
 	repeat --;
-	var end_duration = this.timing[2];
+	var end_duration = this.loop_timing[2];
 
         setTimeout(function(){
 
@@ -631,8 +641,8 @@ class SwipeElement {
 	var data = instance.info["loop"];
 
 	// todo fix timing.
-	var start_duration = this.timing[0];
-	var duration = this.timing[1];
+	var start_duration = this.loop_timing[0];
+	var duration = this.loop_timing[1];
 	
 	var defaultRepeat;
 	if (data["repeat"]) {

@@ -9,14 +9,15 @@ class SwipePage {
 	this.elements = [];
 	this.duration = this.page["duration"] ? this.page["duration"] * 1000 : 500;
 	this.bc = this.page["bc"] || "#ffffff";
-	this.transition = this.page["transition"] || "scroll";
+	this.play_style = this.page["play"] || "auto";
+	this.transition = this.page["transition"] || (this.play_style == "scroll" ? "replace" : "scroll");
     }
 
     loadElement(){
 	var instance = this;
 	var elems = []
 	this.page["elements"].forEach(function(element, elem_index){
-	    instance.elements.push(new SwipeElement(element, instance.index, elem_index));
+	    instance.elements.push(new SwipeElement(element, instance.index, elem_index, instance.play_style));
 	});
     }
 
