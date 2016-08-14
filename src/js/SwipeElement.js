@@ -224,13 +224,7 @@ class SwipeElement {
     // set or animate position
     getOriginalPrevPos(){
 	var data = this.getInitPos();
-
-	if (this.info["translate"]) {
-	    data = this.updatePosition(data, this.info);
-	}
-	data = this.applyScale(data);
-
-	return data;
+	return  this.updatePosition(data, this.info);
     }
     getPrevPos() {
 	var data = this.getOriginalPrevPos();
