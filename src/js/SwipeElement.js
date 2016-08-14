@@ -568,36 +568,8 @@ class SwipeElement {
 	this.loopProcess(duration);
     }
 
-    loopProcess(duration){
-	var loop_duration = duration;
-	if ( this.transition_timing && this.transition_timing[2] > 0) {
-	    loop_duration = this.transition_timing[2];
-	}
-	if ( this.info["loop"]) {
-	    var loop_duration =  this.valueFrom(this.info["loop"], "duration", duration);
-	    this.loop_timing = this.getTiming(this.info["loop"], loop_duration);
-	    
-	    if (this.play_style == "scroll" || !this.info["to"]) {
-		this.loop(this);
-	    } else if (this.play_style == "auto" || this.play_style == "always") {
-		if (this.transition_timing) {
-		    duration = duration - this.transition_timing[2];
-		}
-		var instance = this;
-		// todo use timing to duration
-		setTimeout(function(){
-		    instance.loop(instance);
-		}, duration);
-	    } else {
-		console.log("not animate because " + this.play);
-	    }
-	}
-    }
-    
     delayShow(duration){
 	console.log("delayShow");
-	// var du = duration;
-	var du = 400;
 	if (this.elements) {
 	    this.elements.forEach(function(element, elem_index){
 		element.delayShow(duration);
@@ -608,7 +580,7 @@ class SwipeElement {
 	setTimeout(function(){
 	    instance.animateFinPos(duration);
 	    instance.loopProcess(duration);
-	}, du);
+	}, SwipeBook.pageInDuration());
     }
 
     getTiming(element, duration){
@@ -626,6 +598,38 @@ class SwipeElement {
 	});
 
     }
+    getLoopDuration(duration){
+	var loop_duration = duration;
+	if ( this.transition_timing) {
+	    if(this.transition_timing[2] == 0) {
+		loop_duration = 200;
+	    } else {
+		loop_duration = this.transition_timing[2];
+	    }
+	}
+	return this.valueFrom(this.info["loop"], "duration", loop_duration);
+    }
+    loopProcess(duration){
+	if ( this.info["loop"]) {
+	    var loop_duration = this.getLoopDuration(duration);
+	    this.loop_timing = this.getTiming(this.info["loop"], loop_duration);
+	    
+	    if (this.play_style == "scroll" || !this.info["to"]) {
+		this.loop(this);
+	    } else if (this.play_style == "auto" || this.play_style == "always") {
+		if (this.transition_timing) {
+		    duration = duration - this.transition_timing[2];
+		}
+		var instance = this;
+		setTimeout(function(){
+		    instance.loop(instance);
+		}, duration);
+	    } else {
+		console.log("not animate because " + this.play);
+	    }
+	}
+    }
+    
     moreloop(instance, repeat, defaultRepeat){
 	repeat --;
 	var end_duration = this.loop_timing[2];
@@ -644,10 +648,9 @@ class SwipeElement {
 	console.log("loop");
 	var data = instance.info["loop"];
 
-	// todo fix timing.
-	var start_duration = this.loop_timing[0];
-	var duration = this.loop_timing[1];
-
+        var start_duration = this.loop_timing[0];
+        var duration = this.loop_timing[1];
+	
 	var defaultRepeat;
 	if (data["repeat"]) {
 	    defaultRepeat = data["repeat"];
@@ -660,8 +663,6 @@ class SwipeElement {
 	    repeat = defaultRepeat;
 	}
 
-	console.log(data["style"]);
-	// todo timing is not good
 	setTimeout(function(){
 	    switch(data["style"]){
 	    case "vibrate" :
@@ -710,26 +711,25 @@ class SwipeElement {
 
 		instance.setPrevPos();
 
-		setTimeout(function(){
-		    $("#" + instance.css_id).animate(
-			dir,
-			{ duration: timing,
-			  complete: function(){
-			      $("#" + instance.css_id).animate(
-				  instance.convCssPos(orgPos, 1),
-				  { duration: 10,
-				    complete: function(){
-					instance.moreloop(instance, repeat, defaultRepeat);
-				    }
-				  }
-			      );  
-			  }
-			});
-		}, 50);
+		$("#" + instance.css_id).animate(
+		    dir,
+		    { duration: timing,
+		      complete: function(){
+			  $("#" + instance.css_id).animate(
+			      instance.convCssPos(orgPos, 1),
+			      { duration: 0,
+				complete: function(){
+				    instance.moreloop(instance, repeat, defaultRepeat);
+				}
+			      }
+			  );  
+		      }
+		    });
 		break;
             case "blink":
 		console.log("blink");
-		var timing = duration / defaultRepeat;
+
+		var timing = duration / defaultRepeat / 4;
 		$("#" + instance.css_id).css({opacity: 1});
 		setTimeout(function(){
 		    $("#" + instance.css_id).css({opacity: 0});

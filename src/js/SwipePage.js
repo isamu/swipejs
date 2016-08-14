@@ -7,7 +7,7 @@ class SwipePage {
 	this.scene = scene;
 	this.index = index;
 	this.elements = [];
-	this.duration = this.page["duration"] ? this.page["duration"] * 1000 : 500;
+	this.duration = this.page["duration"] ? this.page["duration"] * 1000 : 200;
 	this.bc = this.page["bc"] || "#ffffff";
 	this.play_style = this.page["play"] || "auto";
 	this.transition = this.page["transition"] || (this.play_style == "scroll" ? "replace" : "scroll");
@@ -71,7 +71,7 @@ class SwipePage {
 	    element.justShow();
 	});
     }
-    show(duration){
+    show(){
 	let instance = this;
 	this.elements.forEach(function(element, elem_index){
 	    element.show(instance.duration);
@@ -83,7 +83,7 @@ class SwipePage {
 	
     }
 
-    delayShow(duration){
+    delayShow(){
 	let instance = this;
 	this.elements.forEach(function(element, elem_index){
 	    element.delayShow(instance.duration);
@@ -93,7 +93,7 @@ class SwipePage {
 	}, this.duration);
     }
 
-    back(duration) { 
+    back() { 
 	let instance = this;
 	this.elements.forEach(function(element, elem_index){
 	    element.back(instance.duration);
@@ -102,7 +102,7 @@ class SwipePage {
 	    instance.speech(instance);
 	}, this.duration);
     }
-    finShow(duration) {
+    finShow() {
 	let instance = this;
 	this.elements.forEach(function(element, elem_index){
 	    element.finShow(instance.duration);
@@ -133,7 +133,7 @@ class SwipePage {
 	    element.active();
 	});
     }
-    inactive(duration) {
+    inactive() {
 	let instance = this;
 	this.elements.forEach(function(element, elem_index){
 	    element.inactive(instance.duration);

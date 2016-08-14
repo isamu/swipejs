@@ -11,6 +11,9 @@ class SwipeBook {
     static getMarkdown() {
 	return this.markdown;
     }
+    static pageInDuration(){
+	return 400;
+    }
     constructor (data, defaultPage = 0) {
         $('head').prepend('<meta name="viewport" content="width = 640,user-scalable=no">');
 
@@ -182,10 +185,9 @@ class SwipeBook {
 	var loaded = (nextStep == currentStep);
 	var same_scene = (this.pages[currentStep].getScene()) && (this.pages[nextStep]) &&
 	    (this.pages[nextStep].getScene() == this.pages[currentStep].getScene());
-	var duration = 200;
 	
 	if (!loaded) {
-	    this.pages[currentStep].inactive(duration)
+	    this.pages[currentStep].inactive()
 	    this.pages[nextStep].active();
 	}
 	var transition = this.pages[Math.max(currentStep, nextStep)].getTransition();
@@ -193,7 +195,7 @@ class SwipeBook {
 	
 	if (mode == "forward") {
 	    if (same_scene) {
-		this.pages[nextStep].show(duration);
+		this.pages[nextStep].show();
 		this.pages[nextStep].play();
 		$("#page_" + currentStep ).css("opacity", 0);
 		$("#page_" + nextStep ).css("opacity", 1);
@@ -202,7 +204,7 @@ class SwipeBook {
 		if (transition == "fadeIn") {
 		    this.pages[nextStep].finShow();
 		    $("#page_" + nextStep ).animate({ "opacity": 1 }, {
-			duration: duration
+			duration: SwipeBook.pageInDuration()
 		    });
 		}else if (transition == "replace") {
 		    $("#page_" + currentStep ).css({ "opacity": 0 });
@@ -213,9 +215,9 @@ class SwipeBook {
 			$("#page_" + currentStep ).css({
 			    "opacity": 0
 			});
-		    }, duration);
-		    this.pageSlide("in", nextStep, duration);
-		    this.pages[nextStep].delayShow(duration);
+		    }, SwipeBook.pageInDuration());
+		    this.pageSlide("in", nextStep);
+		    this.pages[nextStep].delayShow();
 		} else {
 		    
 		}
@@ -223,27 +225,27 @@ class SwipeBook {
 	} else { // in case back
 	    console.log("back");
 	    if (same_scene) {
-		this.pages[currentStep].back(duration);
+		this.pages[currentStep].back();
 		setTimeout(function(){
 		    $("#page_" + currentStep ).css({"opacity": 0});
 		    $("#page_" + nextStep).css({"opacity": 1});
-		}, duration);
+		}, SwipeBook.pageInDuration());
 	    } else {
 		// transition 
 		if (transition == "fadeIn") {
-		    this.pages[nextStep].finShow(duration);
+		    this.pages[nextStep].finShow();
 		    $("#page_" + currentStep ).animate({ "opacity": 0 }, {
-			duration: duration
+			duration: SwipeBook.pageInDuration()
 		    });
 		}else if (transition == "replace") {
 		    $("#page_" + currentStep ).css({ "opacity": 0 });
 		    $("#page_" + nextStep ).css({ "opacity": 1 });
-		    this.pages[nextStep].finShow(duration);
+		    this.pages[nextStep].finShow();
 		}else if (transition == "scroll") {
 		    $("#page_" + nextStep).css({"opacity": 1});
-		    this.pages[currentStep].back(duration);
-		    this.pageSlide("out", currentStep, duration);
-		    this.pages[nextStep].finShow(duration);
+		    this.pages[currentStep].back();
+		    this.pageSlide("out", currentStep);
+		    this.pages[nextStep].finShow();
 		}
 	    }
 	}
@@ -256,7 +258,7 @@ class SwipeBook {
 	return this.step;
     }
     
-    pageSlide(mode, step, duration) {
+    pageSlide(mode, step) {
 	$(".boxelement-" + step).each(function(index, element) {
 	    console.log("box");
 	    
@@ -289,14 +291,14 @@ class SwipeBook {
 		$(element).animate({
 		    "top": orgTop
 		}, {
-		    duration: duration
+		    duration: SwipeBook.pageInDuration()
 		});
 	    } else {
 		$(element).css("left", fromLeft);
 		$(element).animate({
 		    "left": orgLeft
 		}, {
-		    duration: duration
+		    duration: SwipeBook.pageInDuration()
 		});
 	    }
 	});
@@ -309,7 +311,7 @@ class SwipeBook {
 		    "top": 0,
 		    "opacity": 1
 		}, {
-		    duration: duration
+		    duration: SwipeBook.pageInDuration()
 		});
 	    } else if (this.paging == "leftToRight"){
 		$("#page_" + step ).css("left", SwipeScreen.virtualwidth());
@@ -318,7 +320,7 @@ class SwipeBook {
 		    "left": 0,
 		    "opacity": 1
 		}, {
-		    duration: duration
+		    duration: SwipeBook.pageInDuration()
 		});
 	    } else {
 		$("#page_" + step ).css("left", - SwipeScreen.virtualwidth());
@@ -327,12 +329,12 @@ class SwipeBook {
 		    "left": 0,
 		    "opacity": 1
 		}, {
-		    duration: duration
+		    duration: SwipeBook.pageInDuration()
 		});
 	    }
 	} else {
 	    let option = {
-		duration: duration,
+		duration: SwipeBook.pageInDuration(),
 		complete: function(){
 		    $("#page_" + step ).css({"opacity": 0});
 		}
