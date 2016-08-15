@@ -1,6 +1,6 @@
 class SwipeElement {
 
-    constructor (info, page_id, element_id, play, parent=null) {
+    constructor (info, page_id, element_id, play, duration, parent=null) {
 	var css_id = "element-" + page_id + "-" + element_id;
 
 	this.info = this.mergeTemplate(info);
@@ -8,6 +8,7 @@ class SwipeElement {
 	this.page_id = page_id;
 	this.element_id = element_id;
 	this.play_style = play;
+	this.duration = duration;
 	this.parent = parent;
 
 	this.isActive = false;
@@ -33,7 +34,7 @@ class SwipeElement {
 	if (this.info["elements"]) {
 	    this.info["elements"].forEach(function(element, elem_index){
 		var e_id = element_id + "-" + elem_index;
-		instance.elements.push(new SwipeElement(element, page_id, e_id, play, instance));
+		instance.elements.push(new SwipeElement(element, page_id, e_id, play, duration, instance));
 	    });
 	}
     }
@@ -107,9 +108,9 @@ class SwipeElement {
     }
 
     initAllData(){
-	// this.initPosData = [Number(this.x), Number(this.y), Number(this.w), Number(this.h), Number(this.angle), Number(this.opacity), this.scale];
+	this.initPosData = [Number(this.x), Number(this.y), Number(this.w), Number(this.h), Number(this.angle), Number(this.opacity), this.scale];
 	
-    	this.originalPrevPos = this.getOriginalPrevPos();
+    	this.originalPrevPos = this.updatePosition(this.initPosData, this.info);
 	this.prevPos = this.getScreenPosition(this.originalPrevPos);
 
 	this.originalFinPos = this.getOriginalFinPos();
@@ -118,6 +119,13 @@ class SwipeElement {
 	    this.prevText = this.textLayout(this.info, this.prevPos);
 	    this.finText = this.textLayout(this.info, this.finPos);
 
+	}
+    }
+    getOriginalFinPos() {
+	if (this.info["to"]) {
+	    return this.updatePosition(this.initPosData, SwipeElement.merge(this.info, this.info["to"]));
+	} else {
+	    return this.originalPrevPos;
 	}
     }
     
@@ -239,11 +247,6 @@ class SwipeElement {
     // end of data parse 
 
     // set or animate position
-    getOriginalPrevPos(){
-	var data = this.getInitPos();
-	return this.updatePosition(data, this.info);
-    }
-
     setVideo(data) {
 	var instance = this;
 	$("#" + this.css_id).html("<video id='" + this.css_id + "-video' width='"+ data[2] + "' height='" + data[3] + "'><source type='video/mp4' src='" + this.info.video + "'  /></video>");
@@ -326,13 +329,13 @@ class SwipeElement {
 
     }
 
-    animatePrevPos(duration){
+    animatePrevPos(){
 	$("#" + this.css_id).animate(this.convCssPos(this.prevPos), {
-		duration: duration
+		duration: this.duration
 	});
-	if (this.isText() && this.info["to"]) {
+	if (this.isText() && this.hasTo()) {
 	    $("#" + this.css_id + "-body").animate(this.prevText, {
-		duration: duration
+		duration: this.duration
 	    });
 	}
     }
@@ -344,14 +347,6 @@ class SwipeElement {
 	}
     }
     
-    getOriginalFinPos() {
-	if (this.info["to"]) {
-	    return this.updatePosition(this.getInitPos(), SwipeElement.merge(this.info, this.info["to"]));
-	} else {
-	    return this.originalPrevPos;
-	}
-    }
-
     setFinPos() {
 	$("#" + this.css_id).css(this.convCssPos(this.finPos));
 	if (this.isVideo()) {
@@ -363,12 +358,11 @@ class SwipeElement {
 	}
     }
 
-    animateFinPos(duration){
-	if (this.info["to"]) {
-	    this.transition_timing = this.getTiming(this.info["to"], duration);
+    animateFinPos(){
+	if (this.hasTo()) {
+	    this.transition_timing = this.getTiming(this.info["to"], this.duration);
 	    var start_duration = this.transition_timing[0];
 	    var do_duration = this.transition_timing[1];
-	    var info = SwipeElement.merge(this.info, this.info["to"]);
 	    
 	    var instance = this;
 	    setTimeout(function(){
@@ -385,25 +379,22 @@ class SwipeElement {
     }
 
     // calculate position
-    getInitPos() {
-	return [Number(this.x), Number(this.y), Number(this.w), Number(this.h), Number(this.angle), Number(this.opacity), this.scale];
-    }
-
     updatePosition(data, to){
+	var ret = Object.assign({}, data);
 	if(to["opacity"] != null) {
-	    data[5] = Number(to["opacity"]);
+	    ret[5] = Number(to["opacity"]);
 	}
 
 	if(to["translate"]) {
 	    var translate = to["translate"];
-	    data[0] = data[0] + Number(translate[0]);
-	    data[1] = data[1] + Number(translate[1]);
+	    ret[0] = ret[0] + Number(translate[0]);
+	    ret[1] = ret[1] + Number(translate[1]);
 	}
 	if(to["scale"]) {
-	    data[6] = this.getScale(to);
-	    data = this.applyScale(data);
+	    ret[6] = this.getScale(to);
+	    ret = this.applyScale(ret);
 	}
-	return data;
+	return ret;
     }
 
     getScreenPosition(data) {
@@ -495,6 +486,10 @@ class SwipeElement {
     isDiv() {
 	return this.type() == "div";
     }
+    hasTo() {
+	return !!this.info["to"];
+    }
+
     
     html() {
 	if (this.type()){
@@ -541,30 +536,30 @@ class SwipeElement {
 	}
 	this.setFinPos();
     }
-    show(duration){
+    show(){
 	console.log("show");
 	if (this.elements) {
 	    this.elements.forEach(function(element, elem_index){
-		element.show(duration);
+		element.show();
 	    });
 	}
 	this.setPrevPos();
-	this.animateFinPos(duration);
-	this.loopProcess(duration);
+	this.animateFinPos();
+	this.loopProcess();
     }
 
-    delayShow(duration){
+    delayShow(){
 	console.log("delayShow");
 	if (this.elements) {
 	    this.elements.forEach(function(element, elem_index){
-		element.delayShow(duration);
+		element.delayShow();
 	    });
 	}
 	this.setPrevPos();
 	var instance = this;
 	setTimeout(function(){
-	    instance.animateFinPos(duration);
-	    instance.loopProcess(duration);
+	    instance.animateFinPos();
+	    instance.loopProcess();
 	}, SwipeBook.pageInDuration());
     }
 
@@ -594,14 +589,15 @@ class SwipeElement {
 	}
 	return this.valueFrom(this.info["loop"], "duration", loop_duration);
     }
-    loopProcess(duration){
+    loopProcess(){
 	if ( this.info["loop"]) {
-	    var loop_duration = this.getLoopDuration(duration);
+	    var loop_duration = this.getLoopDuration(this.duration);
 	    this.loop_timing = this.getTiming(this.info["loop"], loop_duration);
 	    
-	    if (this.play_style == "scroll" || !this.info["to"]) {
+	    if (this.play_style == "scroll" || !this.hasTo()) {
 		this.loop(this);
 	    } else if (this.play_style == "auto" || this.play_style == "always") {
+		var duration = this.duration;
 		if (this.transition_timing) {
 		    duration = duration - this.transition_timing[2];
 		}
@@ -637,9 +633,7 @@ class SwipeElement {
         var duration = this.loop_timing[1];
 	
 	var defaultRepeat;
-	if (data["repeat"]) {
-	    defaultRepeat = data["repeat"];
-	} else if (data["count"]) {
+	if (data["count"]) {
 	    defaultRepeat = data["count"];
 	} else {
 	    defaultRepeat = 1;
@@ -764,32 +758,31 @@ class SwipeElement {
     }
 
     valueFrom(data, key, defaultValue){
-	var ret = defaultValue;
 	if (data[key]){
-	    ret = data[key];
+	    return data[key];
 	}
-	return ret;
+	return defaultValue;
     }
-    back(duration){
+    back(){
 	console.log("back");
 	if (this.elements) {
 	    this.elements.forEach(function(element, elem_index){
-		element.back(duration);
+		element.back();
 	    });
 	}
 	this.setFinPos();
-	this.animatePrevPos(duration);
+	this.animatePrevPos();
     }
 
-    finShow(duration){
+    finShow(){
 	console.log("finShow");
 	if (this.elements) {
 	    this.elements.forEach(function(element, elem_index){
-		element.finShow(duration);
+		element.finShow();
 	    });
 	}
 	this.setFinPos();
-	this.loopProcess(duration);
+	this.loopProcess();
     }
     play() {
 	if (this.elements) {
@@ -801,10 +794,10 @@ class SwipeElement {
 	    this.videoElement.play();
 	}
     }
-    inactive(duration){
+    inactive(){
 	if (this.elements) {
 	    this.elements.forEach(function(element, elem_index){
-		element.inactive(duration);
+		element.inactive();
 	    });
 	}
 	this.isActive = false;

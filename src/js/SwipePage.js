@@ -17,7 +17,7 @@ class SwipePage {
 	var instance = this;
 	var elems = []
 	this.page["elements"].forEach(function(element, elem_index){
-	    instance.elements.push(new SwipeElement(element, instance.index, elem_index, instance.play_style));
+	    instance.elements.push(new SwipeElement(element, instance.index, elem_index, instance.play_style, instance.duration));
 	});
     }
 
@@ -74,7 +74,7 @@ class SwipePage {
     show(){
 	let instance = this;
 	this.elements.forEach(function(element, elem_index){
-	    element.show(instance.duration);
+	    element.show();
 	});
 
 	setTimeout(function(){
@@ -86,7 +86,7 @@ class SwipePage {
     delayShow(){
 	let instance = this;
 	this.elements.forEach(function(element, elem_index){
-	    element.delayShow(instance.duration);
+	    element.delayShow();
 	});
 	setTimeout(function(){
 	    instance.speech(instance);
@@ -96,7 +96,7 @@ class SwipePage {
     back() { 
 	let instance = this;
 	this.elements.forEach(function(element, elem_index){
-	    element.back(instance.duration);
+	    element.back();
 	});
 	setTimeout(function(){
 	    instance.speech(instance);
@@ -105,7 +105,7 @@ class SwipePage {
     finShow() {
 	let instance = this;
 	this.elements.forEach(function(element, elem_index){
-	    element.finShow(instance.duration);
+	    element.finShow();
 	});
     }
     play() {
@@ -136,7 +136,7 @@ class SwipePage {
     inactive() {
 	let instance = this;
 	this.elements.forEach(function(element, elem_index){
-	    element.inactive(instance.duration);
+	    element.inactive();
 	});
     }
     
