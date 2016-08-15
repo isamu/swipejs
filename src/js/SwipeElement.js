@@ -99,16 +99,26 @@ class SwipeElement {
 	    $("#" + this.css_id).css({"background-color": this.bc});
 	}
 
-	this.originalPrevPos = this.getOriginalPrevPos();
-	this.prevPos = this.getPrevPos();
-	this.originalFinPos = this.getOriginalFinPos();
-
+	this.initAllData();
+	
 	this.setPrevPos();
 
 	// set md wrap
 	this.markdown_position();
     }
 
+    initAllData(){
+    	this.originalPrevPos = this.getOriginalPrevPos();
+	this.prevPos = this.getPrevPos();
+	this.originalFinPos = this.getOriginalFinPos();
+	this.finPos = this.getFinPos();
+	if (this.isText()) {
+	    this.prevText = this.textLayout(this.info, this.prevPos);
+	    this.finText = this.textLayout(this.info, this.finPos);
+
+	}
+    }
+    
     setOption() {
 	this.opacity = 1.0;
 
@@ -254,8 +264,7 @@ class SwipeElement {
 	    this.setVideo(this.prevPos);
 	}
 	if (this.isText()) {
-	    var css = this.textLayout(this.info, this.prevPos);
-	    $("#" + this.css_id + "-body").css(css);
+	    $("#" + this.css_id + "-body").css(this.prevText);
 	}
 	if (this.isMarkdown()) {
 	    this.md_css.forEach(function(element, elem_index){
@@ -323,8 +332,7 @@ class SwipeElement {
 		duration: duration
 	});
 	if (this.isText() && this.info["to"]) {
-	    var text_css = this.textLayout(this.info, this.prevPos);
-	    $("#" + this.css_id + "-body").animate(text_css, {
+	    $("#" + this.css_id + "-body").animate(this.prevText, {
 		duration: duration
 	    });
 	}
@@ -349,13 +357,12 @@ class SwipeElement {
     }
 
     setFinPos() {
-	var data = this.getFinPos();
-	$("#" + this.css_id).css(this.convCssPos(data));
+	$("#" + this.css_id).css(this.convCssPos(this.finPos));
 	if (this.isVideo()) {
-	    this.setVideo(data);
+	    this.setVideo(this.finPos);
 	}
 	if (this.isText()) {
-	    var text_css = this.textLayout(this.info, data);
+	    var text_css = this.textLayout(this.info, this.finPos);
 	    $("#" + this.css_id + "-body").css(text_css);
 	}
     }
@@ -369,13 +376,11 @@ class SwipeElement {
 	    
 	    var instance = this;
 	    setTimeout(function(){
-		var data = instance.getFinPos();
-		$("#" + instance.css_id).animate(instance.convCssPos(data), {
+		$("#" + instance.css_id).animate(instance.convCssPos(instance.finPos), {
 		    duration: do_duration
 		});
 		if (instance.isText()) {
-		    var text_css = instance.textLayout(info, data);
-		    $("#" + instance.css_id + "-body").animate(text_css, {
+		    $("#" + instance.css_id + "-body").animate(instance.finText, {
 			duration: do_duration
                     });
 		}
