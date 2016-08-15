@@ -98,6 +98,11 @@ class SwipeElement {
 	if (this.bc) {
 	    $("#" + this.css_id).css({"background-color": this.bc});
 	}
+
+	this.originalPrevPos = this.getOriginalPrevPos();
+	this.prevPos = this.getPrevPos();
+	this.originalFinPos = this.getOriginalFinPos();
+
 	this.setPrevPos();
 
 	// set md wrap
@@ -224,10 +229,10 @@ class SwipeElement {
     // set or animate position
     getOriginalPrevPos(){
 	var data = this.getInitPos();
-	return  this.updatePosition(data, this.info);
+	return this.updatePosition(data, this.info);
     }
     getPrevPos() {
-	var data = this.getOriginalPrevPos();
+	var data = this.originalPrevPos;
 	return this.getScreenPosition(data);
     }
     setVideo(data) {
@@ -244,13 +249,12 @@ class SwipeElement {
     }
     setPrevPos(){
 	var instance = this;
-	var data = this.getPrevPos();
-	$("#" + this.css_id).css(this.convCssPos(data));
+	$("#" + this.css_id).css(this.convCssPos(this.prevPos));
 	if (this.isVideo()) {
-	    this.setVideo(data);
+	    this.setVideo(this.prevPos);
 	}
 	if (this.isText()) {
-	    var css = this.textLayout(this.info, data);
+	    var css = this.textLayout(this.info, this.prevPos);
 	    $("#" + this.css_id + "-body").css(css);
 	}
 	if (this.isMarkdown()) {
@@ -315,12 +319,11 @@ class SwipeElement {
     }
 
     animatePrevPos(duration){
-	var data = this.getPrevPos();
-	$("#" + this.css_id).animate(this.convCssPos(data), {
+	$("#" + this.css_id).animate(this.convCssPos(this.prevPos), {
 		duration: duration
 	});
 	if (this.isText() && this.info["to"]) {
-	    var text_css = this.textLayout(this.info, data);
+	    var text_css = this.textLayout(this.info, this.prevPos);
 	    $("#" + this.css_id + "-body").animate(text_css, {
 		duration: duration
 	    });
@@ -335,27 +338,14 @@ class SwipeElement {
     }
     
     getOriginalFinPos() {
-	var to = this.info["to"];
-	if (to) {
-	    var data = this.getInitPos();
-	    to = SwipeElement.merge(this.info, to);
-	    data = this.updatePosition(data, to);
+	if (this.info["to"]) {
+	    return this.updatePosition(this.getInitPos(), SwipeElement.merge(this.info, this.info["to"]));
 	} else {
-	    var data = this.getOriginalPrevPos();
+	    return this.originalPrevPos;
 	}
-	return data;
     }
     getFinPos() {
-	return this.getScreenPosition(this.getOriginalFinPos());
-    }
-
-    getFinTextCss(data) {
-	var to = this.info["to"];
-	if (to) {
-	    var info = SwipeElement.merge(this.info, to);
-	}
-	var text_css = this.textLayout(info, data);
-	return text_css;
+	return this.getScreenPosition(this.originalFinPos);
     }
 
     setFinPos() {
@@ -661,7 +651,7 @@ class SwipeElement {
 	    switch(data["style"]){
 	    case "vibrate" :
 		var delta = instance.valueFrom(data, "delta", 10);
-		var orgPos = instance.getOriginalFinPos();
+		var orgPos = instance.originalFinPos;
 		var timing = duration / defaultRepeat / 4;
 		$("#" + instance.css_id).animate({
 		    left: parseInt(SwipeScreen.virtualX(orgPos[0] - delta)) + "px", top: SwipeScreen.virtualY(orgPos[1]) + "px"
@@ -690,7 +680,7 @@ class SwipeElement {
 
             case "shift":
 		var dir;
-		var orgPos = instance.getOriginalFinPos();
+		var orgPos = instance.originalFinPos;
 		switch(data["direction"]){
 		case "n" :
 		    dir = { left: parseInt(SwipeScreen.virtualX(data[0])) + "px", top: SwipeScreen.virtualY(data[1] - instance.h) + "px" }; break;
