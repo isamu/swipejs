@@ -100,7 +100,6 @@ class SwipeElement {
 	}
 
 	this.initAllData();
-	
 	this.setPrevPos();
 
 	// set md wrap
@@ -108,10 +107,13 @@ class SwipeElement {
     }
 
     initAllData(){
+	// this.initPosData = [Number(this.x), Number(this.y), Number(this.w), Number(this.h), Number(this.angle), Number(this.opacity), this.scale];
+	
     	this.originalPrevPos = this.getOriginalPrevPos();
-	this.prevPos = this.getPrevPos();
+	this.prevPos = this.getScreenPosition(this.originalPrevPos);
+
 	this.originalFinPos = this.getOriginalFinPos();
-	this.finPos = this.getFinPos();
+	this.finPos = this.getScreenPosition(this.originalFinPos);
 	if (this.isText()) {
 	    this.prevText = this.textLayout(this.info, this.prevPos);
 	    this.finText = this.textLayout(this.info, this.finPos);
@@ -241,10 +243,7 @@ class SwipeElement {
 	var data = this.getInitPos();
 	return this.updatePosition(data, this.info);
     }
-    getPrevPos() {
-	var data = this.originalPrevPos;
-	return this.getScreenPosition(data);
-    }
+
     setVideo(data) {
 	var instance = this;
 	$("#" + this.css_id).html("<video id='" + this.css_id + "-video' width='"+ data[2] + "' height='" + data[3] + "'><source type='video/mp4' src='" + this.info.video + "'  /></video>");
@@ -351,9 +350,6 @@ class SwipeElement {
 	} else {
 	    return this.originalPrevPos;
 	}
-    }
-    getFinPos() {
-	return this.getScreenPosition(this.originalFinPos);
     }
 
     setFinPos() {
