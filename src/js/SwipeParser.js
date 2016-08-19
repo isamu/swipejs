@@ -34,23 +34,29 @@ class SwipeParser {
 
 		if (ret[keyString] == null){
 		    ret[keyString] = ret_val;
-		} else if(ret[keyString] && ( SwipeParser.is("Array", ret[keyString]) || SwipeParser.is("object", ret[keyString])) ) {
-		    idMap = {};
-
-                    $.each(ret_val, (index, tempItem) => {
-			if (SwipeParser.is("String", tempItem["id"])) {
-			    idMap[tempItem["id"]] = index;
-			}
-		    });
-		    ret[keyString].forEach((objItem, key) => {
-			if ((SwipeParser.is("String", objItem["id"]) && ((key = idMap[objItem["id"]]) != null))) {
-			    
-			    ret_val[key] = SwipeParser.inheritProperties(objItem, ret_val[key]);
+		} else {
+		    if ( SwipeParser.is("Array", ret[keyString]) || SwipeParser.is("object", ret[keyString])) {
+			if (SwipeParser.is("Number", ret_val) || SwipeParser.is("String", ret_val)){
+			    ret[keyString] = ret_val;
 			} else {
-			    ret_val.push(objItem);
+			    idMap = {};
+
+			    $.each(ret_val, (index, tempItem) => {
+				if (SwipeParser.is("String", tempItem["id"])) {
+				    idMap[tempItem["id"]] = index;
+				}
+			    });
+			    ret[keyString].forEach((objItem, key) => {
+				if ((SwipeParser.is("String", objItem["id"]) && ((key = idMap[objItem["id"]]) != null))) {
+				    
+				    ret_val[key] = SwipeParser.inheritProperties(objItem, ret_val[key]);
+				} else {
+				    ret_val.push(objItem);
+				}
+			    });
+			    ret[keyString] = ret_val;
 			}
-		    });
-		    ret[keyString] = ret_val;
+		    }
 		}
 	    });
 	}
