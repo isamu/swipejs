@@ -123,7 +123,7 @@ class SwipeElement {
     }
     getOriginalFinPos() {
 	if (this.info["to"]) {
-	    return this.updatePosition(this.initPosData, SwipeElement.merge(this.info, this.info["to"]));
+	    return this.updatePosition(this.initPosData, SwipeUtil.merge(this.info, this.info["to"]));
 	} else {
 	    return this.originalPrevPos;
 	}
@@ -812,43 +812,5 @@ class SwipeElement {
 	}
 	this.isActive = true;
     }
-
-    static merge(object1, object2) {
-	var newObject = {};
-	var keys = Object.keys(object1);
-	for (var i = 0; i < keys.length; i++) {
-	    newObject[keys[i]] = object1[keys[i]];
-	}
-	keys = Object.keys(object2);
-	for (i = 0; i < keys.length; i++) {
-	    newObject[keys[i]] = object2[keys[i]];
-	}
-	return newObject;
-    }
 }
 
-class SwipeCounter {
-    
-    static increase(){
-	if(this.counter === undefined){
-	    this.counter = 1;
-	} else {
-	    this.counter ++;
-	}
-	return this.counter;
-    }
-
-    static decrease(){
-	if(this.counter === undefined){
-	    this.counter = -1;
-	} else {
-	    this.counter --;
-	}
-	return this.counter;
-    }
-
-    static getCounter(){
-	return this.counter;
-    }
-    
-}

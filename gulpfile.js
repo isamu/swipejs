@@ -7,9 +7,12 @@ var concat = require('gulp-concat');
 var version = "0.0.1";
 
 gulp.task("babel", function () {
-    return gulp.src("src/js/*.js")
+    gulp.src("src/js/*.js")
         .pipe(babel())
         .pipe(gulp.dest("lib/"));
+    gulp.src("src/js/misc/*.js")
+        .pipe(babel())
+        .pipe(gulp.dest("lib/misc/"));
 });
 
 gulp.task('watch', function() {
@@ -29,6 +32,12 @@ gulp.task('concat', function(){
         .pipe(gulp.dest('publish/')) ;
     gulp.src('lib/*.js')
         .pipe(concat('swipe-' + version +'.js'))
+        .pipe(gulp.dest('publish/')) ;
+    gulp.src('tmp/*.js')
+        .pipe(concat('swipe.min.js'))
+        .pipe(gulp.dest('publish/')) ;
+    gulp.src('lib/*.js')
+        .pipe(concat('swipe.js'))
         .pipe(gulp.dest('publish/')) ;
 });
 

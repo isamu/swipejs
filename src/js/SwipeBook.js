@@ -14,13 +14,15 @@ class SwipeBook {
     static pageInDuration(){
 	return 400;
     }
-    constructor (data, defaultPage = 0) {
+    constructor (data, defaultPage = 0, base_css_id, back_css_id) {
         $('head').prepend('<meta name="viewport" content="width = 640,user-scalable=no">');
 
 	this.step = defaultPage;
 	this.data = data;
 	this.pages = [];
 	this.title = "Swipe";
+	this.base_css_id = base_css_id;
+	this.back_css_id = back_css_id;
 	
 	SwipeBook.setTemplateElements(this.getTemplateElements());
 	SwipeBook.setMarkdown(this.getMarkdown());
@@ -88,13 +90,13 @@ class SwipeBook {
     
     setSwipeCss() {
 	var x = ($(window).width() -  SwipeScreen.virtualwidth()) / 2.0;
-	$(".swipe").css({
+	$(this.base_css_id).css({
 	    height: SwipeScreen.virtualheight(),
 	    width: SwipeScreen.virtualwidth(),
 	    position: "absolute",
 	    left: x
 	});
-	$(".back").css({
+	$(this.back_css_id).css({
 	    "background-color": this.bc,
 	    "height": "100vh",
 	    "width": "100vw"
@@ -124,7 +126,7 @@ class SwipeBook {
 	    pages.push(page.getHtml());
 	});
 	
-	$(".swipe").html(pages.join(""));
+	$(this.base_css_id).html(pages.join(""));
 	
 	this.setPageSize();
 	$(".page").css("opacity", 0);

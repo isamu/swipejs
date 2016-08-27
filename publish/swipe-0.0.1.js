@@ -34,6 +34,8 @@ var SwipeBook = function () {
 
 			function SwipeBook(data) {
 						var defaultPage = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+						var base_css_id = arguments[2];
+						var back_css_id = arguments[3];
 
 						_classCallCheck(this, SwipeBook);
 
@@ -43,6 +45,8 @@ var SwipeBook = function () {
 						this.data = data;
 						this.pages = [];
 						this.title = "Swipe";
+						this.base_css_id = base_css_id;
+						this.back_css_id = back_css_id;
 
 						SwipeBook.setTemplateElements(this.getTemplateElements());
 						SwipeBook.setMarkdown(this.getMarkdown());
@@ -120,13 +124,13 @@ var SwipeBook = function () {
 						key: 'setSwipeCss',
 						value: function setSwipeCss() {
 									var x = ($(window).width() - SwipeScreen.virtualwidth()) / 2.0;
-									$(".swipe").css({
+									$(this.base_css_id).css({
 												height: SwipeScreen.virtualheight(),
 												width: SwipeScreen.virtualwidth(),
 												position: "absolute",
 												left: x
 									});
-									$(".back").css({
+									$(this.back_css_id).css({
 												"background-color": this.bc,
 												"height": "100vh",
 												"width": "100vw"
@@ -160,7 +164,7 @@ var SwipeBook = function () {
 												pages.push(page.getHtml());
 									});
 
-									$(".swipe").html(pages.join(""));
+									$(this.base_css_id).html(pages.join(""));
 
 									this.setPageSize();
 									$(".page").css("opacity", 0);
@@ -408,6 +412,46 @@ var SwipeBook = function () {
 }();
 "use strict";
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var SwipeCounter = function () {
+			function SwipeCounter() {
+						_classCallCheck(this, SwipeCounter);
+			}
+
+			_createClass(SwipeCounter, null, [{
+						key: "increase",
+						value: function increase() {
+									if (this.counter === undefined) {
+												this.counter = 1;
+									} else {
+												this.counter++;
+									}
+									return this.counter;
+						}
+			}, {
+						key: "decrease",
+						value: function decrease() {
+									if (this.counter === undefined) {
+												this.counter = -1;
+									} else {
+												this.counter--;
+									}
+									return this.counter;
+						}
+			}, {
+						key: "getCounter",
+						value: function getCounter() {
+									return this.counter;
+						}
+			}]);
+
+			return SwipeCounter;
+}();
+"use strict";
+
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -549,7 +593,7 @@ var SwipeElement = function () {
 		key: "getOriginalFinPos",
 		value: function getOriginalFinPos() {
 			if (this.info["to"]) {
-				return this.updatePosition(this.initPosData, SwipeElement.merge(this.info, this.info["to"]));
+				return this.updatePosition(this.initPosData, SwipeUtil.merge(this.info, this.info["to"]));
 			} else {
 				return this.originalPrevPos;
 			}
@@ -960,22 +1004,19 @@ var SwipeElement = function () {
 			if (this.isImage()) {
 				return "<img src='" + this.info.img + "' class='image_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</img>";
 			} else if (this.isText()) {
-				// todo child
-				return "<div class='element text_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + "<div class='text_body' id='" + this.css_id + "-body'>" + this.parseText(this.info.text) + "</div>" + "</div>";
+				return "<div class='element text_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + "<div class='text_body' id='" + this.css_id + "-body'>" + this.parseText(this.info.text) + child_html + "</div>" + "</div>";
 			} else if (this.isMarkdown()) {
-				// todo child
 				var md_array = this.parseMarkdown(this.info.markdown);
 				this.md_css = md_array[1];
-				return "<div class='element markdown_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + "<div class='markdown_wrap' id='md_" + this.css_id + "'>" + md_array[0] + "</div></div>";
+				return "<div class='element markdown_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + "<div class='markdown_wrap' id='md_" + this.css_id + "'>" + md_array[0] + child_html + "</div></div>";
 			} else if (this.isVideo()) {
-				// todo child
 				return "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>";
 			} else if (this.isPath()) {
 				var line = 1;
 				if (this.info.lineWidth) {
 					line = this.info.lineWidth;
 				}
-				return '<svg class="element svg_element" ' + this.page_id + '" id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id + '" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">' + "<path d='" + this.info.path + "' stroke='black' fill='none' stroke-width='" + line + "' />" + child_html + "</svg>";
+				return '<svg class="element svg_element" id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id + '" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">' + "<path d='" + this.info.path + "' stroke='black' fill='none' stroke-width='" + line + "'>" + child_html + "</path></svg>";
 			} else if (this.isDiv()) {
 				return "<div class='element boxelement-" + this.page_id + "' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>";
 			} else {
@@ -1286,112 +1327,10 @@ var SwipeElement = function () {
 			}
 			this.isActive = true;
 		}
-	}], [{
-		key: "merge",
-		value: function merge(object1, object2) {
-			var newObject = {};
-			var keys = Object.keys(object1);
-			for (var i = 0; i < keys.length; i++) {
-				newObject[keys[i]] = object1[keys[i]];
-			}
-			keys = Object.keys(object2);
-			for (i = 0; i < keys.length; i++) {
-				newObject[keys[i]] = object2[keys[i]];
-			}
-			return newObject;
-		}
 	}]);
 
 	return SwipeElement;
 }();
-
-var SwipeCounter = function () {
-	function SwipeCounter() {
-		_classCallCheck(this, SwipeCounter);
-	}
-
-	_createClass(SwipeCounter, null, [{
-		key: "increase",
-		value: function increase() {
-			if (this.counter === undefined) {
-				this.counter = 1;
-			} else {
-				this.counter++;
-			}
-			return this.counter;
-		}
-	}, {
-		key: "decrease",
-		value: function decrease() {
-			if (this.counter === undefined) {
-				this.counter = -1;
-			} else {
-				this.counter--;
-			}
-			return this.counter;
-		}
-	}, {
-		key: "getCounter",
-		value: function getCounter() {
-			return this.counter;
-		}
-	}]);
-
-	return SwipeCounter;
-}();
-"use strict";
-
-$(document).ready(function () {
-   $(".swipe").html("<div class='test'><h1>swipe</h1></div>");
-   $(".test").width("100%");
-   $(".test").height($(window).innerHeight());
-   $(".test").css({ position: "fixed" });
-
-   var script = document.createElement('script');
-   if (getParameterByName("file")) {
-      script.src = getParameterByName("file");
-   } else {
-      script.src = './hirano.js';
-   }
-   document.body.appendChild(script);
-});
-
-function getParameterByName(name, url) {
-   if (!url) url = window.location.href;
-   name = name.replace(/[\[\]]/g, "\\$&");
-   var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-       results = regex.exec(url);
-   if (!results) return null;
-   if (!results[2]) return '';
-   return decodeURIComponent(results[2].replace(/\+/g, " "));
-}
-
-function callback(data) {
-   var default_page = 0;
-
-   if (location.hash) {
-      default_page = Number(location.hash.substr(1));
-   }
-
-   var swipe_book = new SwipeBook(data, default_page);
-
-   $(".swipe").on("click", function () {
-      swipe_book.next();
-   });
-
-   $(window).on('hashchange', function () {
-      if ("#" + swipe_book.getStep() != location.hash) {
-         swipe_book.show(Number(location.hash.substr(1)));
-      }
-   });
-
-   $(window).resize(function () {
-      clearTimeout(window.resizedFinished);
-      window.resizedFinished = setTimeout(function () {
-         swipe_book.resize();
-      }, 250);
-   });
-};
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2037,119 +1976,45 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var SwipeScroll = function () {
-			function SwipeScroll() {
-						_classCallCheck(this, SwipeScroll);
-			}
+var SwipeUtil = function () {
+	function SwipeUtil() {
+		_classCallCheck(this, SwipeUtil);
+	}
 
-			_createClass(SwipeScroll, null, [{
-						key: "init",
-						value: function init(size) {
-									this.size = size;
-									this.functions = [];
-									this.step = 0;
-									this.step_next = 0;
+	_createClass(SwipeUtil, null, [{
+		key: "getParameterByName",
+		value: function getParameterByName(name, url) {
+			if (!url) url = window.location.href;
+			name = name.replace(/[\[\]]/g, "\\$&");
+			var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+			    results = regex.exec(url);
+			if (!results) return null;
+			if (!results[2]) return '';
+			return decodeURIComponent(results[2].replace(/\+/g, " "));
+		}
+	}, {
+		key: "initSwipe",
+		value: function initSwipe(data, default_page, css_id) {
+			var swipe_book = new SwipeBook(data, default_page, css_id);
 
-									$(".swipe").width("100%");
-									$(".swipe").height($(window).innerHeight());
-									$(".swipe").css({ position: "fixed" });
-									$(".back").height($(".swipe").innerHeight() * size + "px");
-						}
-			}, {
-						key: "callback",
-						value: function callback(func) {
-									this.functions.push(func);
-						}
-			}, {
-						key: "call_callback",
-						value: function call_callback(index, delta, status) {
-									this.functions.forEach(function (obj, idx) {
-												obj(index, delta, status);
-									});
-						}
-			}, {
-						key: "scrollStart",
-						value: function scrollStart() {}
-			}, {
-						key: "scrollStop",
-						value: function scrollStop(e) {
-									if (this.step == this.step_next) {
-												if (!SwipeScroll.near()) {
-															if ($(window).scrollTop() > $(window).innerHeight() * this.step) {
-																		this.step_next = this.step_next + 1;
-															} else {
-																		this.step_next = this.step_next - 1;
-															}
-															if (this.step_next < 0) {
-																		this.step_next = 0;
-															}
-															if (this.step_next >= this.size) {
-																		this.step_next = this.size - 1;
-															}
-															SwipeScroll.near_or_move();
-												}
-									} else {
-												SwipeScroll.near_or_move();
-									}
-									$(".swipe").html(this.step);
-						}
-			}, {
-						key: "near_or_move",
-						value: function near_or_move() {
-									if (SwipeScroll.near()) {
-												this.step = this.step_next;
-									} else {
-												$(window).scrollTop(this.step_next * $(window).innerHeight());
-									}
-						}
-			}, {
-						key: "near",
-						value: function near() {
-									if ($(window).scrollTop() < this.step_next * $(window).innerHeight() + 5 && $(window).scrollTop() > this.step_next * $(window).innerHeight() - 5) {
-												return true;
-									}
-									return false;
-						}
-			}, {
-						key: "scroll",
-						value: function scroll(e) {}
-			}, {
-						key: "getStep",
-						value: function getStep() {
-									return this.step;
-						}
-			}, {
-						key: "watch",
-						value: function watch() {
-									$(window).on("scrollstart", function () {
-												console.log('scrollstart');
-												SwipeScroll.scrollStart();
-												SwipeScroll.call_callback(SwipeScroll.getStep(), 0, "start");
-									}).on("scrollstop", function (e) {
-												console.log('scrollstop');
-												SwipeScroll.scrollStop(e);
-												SwipeScroll.call_callback(SwipeScroll.getStep(), 0, "stop");
-									}).on("scroll", function (e) {
-												console.log('scroll');
-												SwipeScroll.scroll();
-												SwipeScroll.call_callback(SwipeScroll.getStep(), 0, "scroll");
-									});
-						}
-			}]);
+			$(css_id).on("click", function () {
+				swipe_book.next();
+			});
 
-			return SwipeScroll;
+			$(window).on('hashchange', function () {
+				if ("#" + swipe_book.getStep() != location.hash) {
+					swipe_book.show(Number(location.hash.substr(1)));
+				}
+			});
+
+			$(window).resize(function () {
+				clearTimeout(window.resizedFinished);
+				window.resizedFinished = setTimeout(function () {
+					swipe_book.resize();
+				}, 250);
+			});
+		}
+	}]);
+
+	return SwipeUtil;
 }();
-"use strict";
-
-$(document).ready(function () {
-    $(".swipe").html("<div class='test'><h1>swipe</h1></div>");
-    $(".test").width("100%");
-    $(".test").height($(window).innerHeight());
-    $(".test").css({ position: "fixed" });
-    SwipeScroll.init(5);
-    SwipeScroll.callback(function (index, delta, status) {
-        $(".swipe").html("<div class='test'><h1>" + index + "/" + status + "</h1></div>");
-        console.log(index);
-    });
-    SwipeScroll.watch();
-});
