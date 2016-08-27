@@ -495,30 +495,34 @@ class SwipeElement {
 	if (this.type()){
 	    SwipeCounter.increase();
 	}
+	var child_html = this.elements.map(function(element, key){
+	    return element.html();
+	}).join("");
 	if (this.isImage()) {
-	    return "<img src='" + this.info.img + "' class='image_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' />";
+	    return "<img src='" + this.info.img + "' class='image_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" +
+		child_html + "</img>";
 	} else if (this.isText()) {
+	    // todo child
 	    return  "<div class='element text_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" +
 		"<div class='text_body' id='" + this.css_id + "-body'>" + this.parseText(this.info.text) + "</div>" +
 		"</div>";
 	} else if (this.isMarkdown()){
+	    // todo child
 	    let md_array = this.parseMarkdown(this.info.markdown);
 	    this.md_css = md_array[1];
 	    return  "<div class='element markdown_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" +
 		"<div class='markdown_wrap' id='md_" + this.css_id + "'>" + md_array[0] + "</div></div>";
 	} else if (this.isVideo()) {
-	    return  "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' ></div>";
+	    // todo child
+	    return  "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>";
 	} else if (this.isPath()) {
 	    let line = 1;
 	    if (this.info.lineWidth) {
 		line = this.info.lineWidth;
 	    }
-	    return '<svg class="element svg_element" ' + this.page_id + '" id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id +  '" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">' + "<path d='" + this.info.path +"' stroke='black' fill='none' stroke-width='" + line +"' />" + "</svg>";
+	    return '<svg class="element svg_element" ' + this.page_id + '" id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id +  '" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">' + "<path d='" + this.info.path +"' stroke='black' fill='none' stroke-width='" + line +"' />" + child_html + "</svg>";
 	} else if (this.isDiv()) {
-	    var html = this.elements.map(function(element, key){
-		return element.html();
-	    });
-	    return "<div class='element boxelement-" + this.page_id + "' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + html.join("") + "</div>" ;
+	    return "<div class='element boxelement-" + this.page_id + "' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>" ;
 	} else {
 	    return "";
 	}
