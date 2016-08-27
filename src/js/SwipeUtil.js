@@ -9,8 +9,14 @@ class SwipeUtil {
 	return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
 
-    static initSwipe(data, default_page, css_id) {
-	var swipe_book = new SwipeBook(data, default_page, css_id);
+    static initSwipe(data, css_id, back_css_id) {
+	var default_page = 0;
+	
+	if (location.hash) {
+      	    default_page = Number(location.hash.substr(1));
+	}
+
+	var swipe_book = new SwipeBook(data, default_page, css_id, back_css_id);
 	
 	$(css_id).on("click", function(){
 	    swipe_book.next();

@@ -9,12 +9,6 @@ $(document).ready(function() {
 });
 
 function callback(data){
-    var default_page = 0;
-    
-    if (location.hash) {
- 	default_page = Number(location.hash.substr(1));
-    }
-    
-    SwipeUtil.initSwipe(data, default_page, "#swipe", "#swipe_back");
+    SwipeUtil.initSwipe(data, "#swipe", "#swipe_back");
 }
 
