@@ -10,6 +10,9 @@ class SwipeUtil {
     }
 
     static initSwipe(data, css_id, back_css_id) {
+	$(document.body).css({"margin":0, "padding": 0, "background-color": "#fff", "font-size": "26px"})
+	$('div').css({"margin":0, "padding": 0, "background-color": "#fff", "font-size": "26px"})
+	
 	var default_page = 0;
 	
 	if (location.hash) {
