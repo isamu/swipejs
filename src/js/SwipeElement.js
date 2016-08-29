@@ -31,6 +31,9 @@ class SwipeElement {
 	if (this.info["bc"]) {
 	    this.bc = this.info["bc"];
 	}
+	if (this.isPath()){
+	    this.prevPath = this.parsePath();
+	}
 	if (this.info["elements"]) {
 	    this.info["elements"].forEach(function(element, elem_index){
 		var e_id = element_id + "-" + elem_index;
@@ -118,7 +121,6 @@ class SwipeElement {
 	if (this.isText()) {
 	    this.prevText = this.textLayout(this.info, this.prevPos);
 	    this.finText = this.textLayout(this.info, this.finPos);
-
 	}
     }
     getOriginalFinPos() {
@@ -325,10 +327,29 @@ class SwipeElement {
 	    "textAlign": textAlign,
 	    "color": SwipeParser.parseColor(info, "#000")
 	};
-	
-
     }
 
+    conv_rgba2rgb(color){
+	let match;
+	if (match = color.match(/^(#\w{6})(\w{2})$/)) {
+	    return match[1];
+	    console.log(match);
+	}
+	return color;
+    }
+    parsePath() {
+	let line = this.info.lineWidth ? this.info.lineWidth : 1;
+	let strokeColor = this.info.strokeColor ? this.info.strokeColor : "black";
+	let fillColor = this.info.fillColor ? this.info.fillColor : "none";
+
+	return {
+	    d: this.info.path,
+	    strole: this.conv_rgba2rgb(strokeColor),
+	    fill: this.conv_rgba2rgb(fillColor),
+	    line: line
+	}
+    }
+    
     animatePrevPos(){
 	$("#" + this.css_id).animate(this.convCssPos(this.prevPos), {
 		duration: this.duration
@@ -513,11 +534,9 @@ class SwipeElement {
 	} else if (this.isVideo()) {
 	    return  "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>";
 	} else if (this.isPath()) {
-	    let line = 1;
-	    if (this.info.lineWidth) {
-		line = this.info.lineWidth;
-	    }
-	    return  '<svg class="element svg_element" id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id +  '" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">' + "<path d='" + this.info.path +"' stroke='black' fill='none' stroke-width='" + line +"'>" + child_html + "</path></svg>";
+	    console.log(this.prevPath);
+	    return  '<svg class="element svg_element" id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id +  '" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">' +
+		"<path d='" + this.prevPath.d +"' stroke='" +  this.prevPath.strole + "' fill='" + this.prevPath.fill + "' stroke-width='" + this.prevPath.line +"'>" + child_html + "</path></svg>";
 	} else if (this.isDiv()) {
 	    return "<div class='element boxelement-" + this.page_id + "' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>" ;
 	} else {
