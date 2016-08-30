@@ -33,6 +33,7 @@ class SwipeElement {
 	}
 	if (this.isPath()){
 	    this.prevPath = this.parsePath();
+	    this.finPath = this.parseFinPath();
 	}
 	if (this.info["elements"]) {
 	    this.info["elements"].forEach(function(element, elem_index){
@@ -91,6 +92,11 @@ class SwipeElement {
 		$("#" + this.css_id).css("position", "absolute");
 	    }
 	}
+	if (this.isPath()){
+	    this.snap = Snap("#" + this.css_id);
+	    this.path = this.snap.path();
+	}
+
 	this.setSize();
 	this.setPosition();
 	this.setOption();
@@ -124,7 +130,7 @@ class SwipeElement {
 	}
     }
     getOriginalFinPos() {
-	if (this.info["to"]) {
+	if (this.hasTo()) {
 	    return this.updatePosition(this.initPosData, SwipeUtil.merge(this.info, this.info["to"]));
 	} else {
 	    return this.originalPrevPos;
@@ -270,6 +276,14 @@ class SwipeElement {
 	if (this.isText()) {
 	    $("#" + this.css_id + "-body").css(this.prevText);
 	}
+	if (this.isPath()) {
+	    this.path.attr({
+		d: this.prevPath.d,
+		fill: this.prevPath.fill,
+		stroke: this.prevPath.stroke, 
+		strokeWidth: this.prevPath.strokeWidth,
+	    });
+	}
 	if (this.isMarkdown()) {
 	    this.md_css.forEach(function(element, elem_index){
 		$("#" + instance.css_id + "-" + elem_index).css(element);
@@ -333,7 +347,6 @@ class SwipeElement {
 	let match;
 	if (match = color.match(/^(#\w{6})(\w{2})$/)) {
 	    return match[1];
-	    console.log(match);
 	}
 	return color;
     }
@@ -344,9 +357,27 @@ class SwipeElement {
 
 	return {
 	    d: this.info.path,
-	    strole: this.conv_rgba2rgb(strokeColor),
+	    stroke: this.conv_rgba2rgb(strokeColor),
 	    fill: this.conv_rgba2rgb(fillColor),
-	    line: line
+	    strokeWidth: line
+	}
+    }
+
+    parseFinPath() {
+	if (!this.hasTo()) {
+	    return this.prevPath;
+	}
+	let info = SwipeUtil.merge(this.info, this.info["to"]);
+
+	let line = info.lineWidth ? info.lineWidth : 1;
+	let strokeColor = info.strokeColor ? info.strokeColor : "black";
+	let fillColor = info.fillColor ? info.fillColor : "none";
+
+	return {
+	    d: info.path,
+	    stroke: this.conv_rgba2rgb(strokeColor),
+	    fill: this.conv_rgba2rgb(fillColor),
+	    strokeWidth: line
 	}
     }
     
@@ -354,10 +385,17 @@ class SwipeElement {
 	$("#" + this.css_id).animate(this.convCssPos(this.prevPos), {
 		duration: this.duration
 	});
-	if (this.isText() && this.hasTo()) {
-	    $("#" + this.css_id + "-body").animate(this.prevText, {
-		duration: this.duration
-	    });
+	if (this.hasTo()) {
+	    if (this.isText()) {
+		$("#" + this.css_id + "-body").animate(this.prevText, {
+		    duration: this.duration
+		});
+	    }
+	    if (this.isPath()) {
+		let path =  SwipeParser.clone(this.prevPath);
+		delete path.stroke;
+		this.path.animate(path, this.duration);
+	    }
 	}
     }
 
@@ -394,6 +432,12 @@ class SwipeElement {
 		    $("#" + instance.css_id + "-body").animate(instance.finText, {
 			duration: do_duration
                     });
+		}
+		if (instance.isPath()) {
+		    let path =  SwipeParser.clone(instance.finPath);
+		    delete path.stroke;
+		    instance.path.animate(path, do_duration);
+
 		}
 	    }, start_duration);
 	}
@@ -534,9 +578,7 @@ class SwipeElement {
 	} else if (this.isVideo()) {
 	    return  "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>";
 	} else if (this.isPath()) {
-	    console.log(this.prevPath);
-	    return  '<svg class="element svg_element" id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id +  '" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">' +
-		"<path d='" + this.prevPath.d +"' stroke='" +  this.prevPath.strole + "' fill='" + this.prevPath.fill + "' stroke-width='" + this.prevPath.line +"'>" + child_html + "</path></svg>";
+	    return  '<svg class="element svg_element" id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id +  '" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"></svg>';
 	} else if (this.isDiv()) {
 	    return "<div class='element boxelement-" + this.page_id + "' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>" ;
 	} else {

@@ -494,6 +494,10 @@ var SwipeElement = function () {
 		if (this.info["bc"]) {
 			this.bc = this.info["bc"];
 		}
+		if (this.isPath()) {
+			this.prevPath = this.parsePath();
+			this.finPath = this.parseFinPath();
+		}
 		if (this.info["elements"]) {
 			this.info["elements"].forEach(function (element, elem_index) {
 				var e_id = element_id + "-" + elem_index;
@@ -592,7 +596,7 @@ var SwipeElement = function () {
 	}, {
 		key: "getOriginalFinPos",
 		value: function getOriginalFinPos() {
-			if (this.info["to"]) {
+			if (this.hasTo()) {
 				return this.updatePosition(this.initPosData, SwipeUtil.merge(this.info, this.info["to"]));
 			} else {
 				return this.originalPrevPos;
@@ -810,6 +814,30 @@ var SwipeElement = function () {
 			};
 		}
 	}, {
+		key: "conv_rgba2rgb",
+		value: function conv_rgba2rgb(color) {
+			var match = void 0;
+			if (match = color.match(/^(#\w{6})(\w{2})$/)) {
+				return match[1];
+				console.log(match);
+			}
+			return color;
+		}
+	}, {
+		key: "parsePath",
+		value: function parsePath() {
+			var line = this.info.lineWidth ? this.info.lineWidth : 1;
+			var strokeColor = this.info.strokeColor ? this.info.strokeColor : "black";
+			var fillColor = this.info.fillColor ? this.info.fillColor : "none";
+
+			return {
+				d: this.info.path,
+				strole: this.conv_rgba2rgb(strokeColor),
+				fill: this.conv_rgba2rgb(fillColor),
+				line: line
+			};
+		}
+	}, {
 		key: "animatePrevPos",
 		value: function animatePrevPos() {
 			$("#" + this.css_id).animate(this.convCssPos(this.prevPos), {
@@ -1012,11 +1040,8 @@ var SwipeElement = function () {
 			} else if (this.isVideo()) {
 				return "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>";
 			} else if (this.isPath()) {
-				var line = 1;
-				if (this.info.lineWidth) {
-					line = this.info.lineWidth;
-				}
-				return '<svg class="element svg_element" id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id + '" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">' + "<path d='" + this.info.path + "' stroke='black' fill='none' stroke-width='" + line + "'>" + child_html + "</path></svg>";
+				console.log(this.prevPath);
+				return '<svg class="element svg_element" id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id + '" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">' + "<path d='" + this.prevPath.d + "' stroke='" + this.prevPath.strole + "' fill='" + this.prevPath.fill + "' stroke-width='" + this.prevPath.line + "'>" + child_html + "</path></svg>";
 			} else if (this.isDiv()) {
 				return "<div class='element boxelement-" + this.page_id + "' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>";
 			} else {
@@ -1996,7 +2021,6 @@ var SwipeUtil = function () {
 						key: "initSwipe",
 						value: function initSwipe(data, css_id, back_css_id) {
 									$(document.body).css({ "margin": 0, "padding": 0, "background-color": "#fff", "font-size": "26px" });
-
 									$('div').css({ "margin": 0, "padding": 0, "background-color": "#fff", "font-size": "26px" });
 
 									var default_page = 0;
