@@ -148,6 +148,7 @@ var SwipeBook = function () {
 			}, {
 						key: 'setPageSize',
 						value: function setPageSize() {
+									$("svg").css("overflow", "visible");
 									$(".page").css({
 												"overflow": "hidden",
 												"height": SwipeScreen.virtualheight(),
@@ -762,6 +763,7 @@ var SwipeElement = function () {
 				this.path.attr({
 					d: this.prevPath.d,
 					fill: this.prevPath.fill,
+					transform: this.prevPath.transform,
 					stroke: this.prevPath.stroke,
 					strokeWidth: this.prevPath.strokeWidth
 				});
@@ -841,10 +843,11 @@ var SwipeElement = function () {
 			var line = this.info.lineWidth ? this.info.lineWidth : 1;
 			var strokeColor = this.info.strokeColor ? this.info.strokeColor : "black";
 			var fillColor = this.info.fillColor ? this.info.fillColor : "none";
-
+			var r = this.info.rotate ? [this.info.rotate[2], this.info.rotate[0], this.info.rotate[1]].join(",") : "0,0,0";
 			return {
 				d: this.info.path,
 				stroke: this.conv_rgba2rgb(strokeColor),
+				transform: "r" + r,
 				fill: this.conv_rgba2rgb(fillColor),
 				strokeWidth: line
 			};
@@ -864,6 +867,7 @@ var SwipeElement = function () {
 			return {
 				d: info.path,
 				stroke: this.conv_rgba2rgb(strokeColor),
+				transform: "r30,50,50",
 				fill: this.conv_rgba2rgb(fillColor),
 				strokeWidth: line
 			};
@@ -874,15 +878,17 @@ var SwipeElement = function () {
 			$("#" + this.css_id).animate(this.convCssPos(this.prevPos), {
 				duration: this.duration
 			});
-			if (this.isText() && this.hasTo()) {
-				$("#" + this.css_id + "-body").animate(this.prevText, {
-					duration: this.duration
-				});
-			}
-			if (this.isPath() && this.hasTo()) {
-				var path = SwipeParser.clone(this.prevPath);
-				delete path.stroke;
-				this.path.animate(path, this.duration);
+			if (this.hasTo()) {
+				if (this.isText()) {
+					$("#" + this.css_id + "-body").animate(this.prevText, {
+						duration: this.duration
+					});
+				}
+				if (this.isPath()) {
+					var path = SwipeParser.clone(this.prevPath);
+					delete path.stroke;
+					this.path.animate(path, this.duration);
+				}
 			}
 		}
 	}, {

@@ -280,6 +280,7 @@ class SwipeElement {
 	    this.path.attr({
 		d: this.prevPath.d,
 		fill: this.prevPath.fill,
+		transform: this.prevPath.transform,
 		stroke: this.prevPath.stroke, 
 		strokeWidth: this.prevPath.strokeWidth,
 	    });
@@ -354,10 +355,11 @@ class SwipeElement {
 	let line = this.info.lineWidth ? this.info.lineWidth : 1;
 	let strokeColor = this.info.strokeColor ? this.info.strokeColor : "black";
 	let fillColor = this.info.fillColor ? this.info.fillColor : "none";
-
+	let r = this.info.rotate ? [this.info.rotate[2], this.info.rotate[0], this.info.rotate[1]].join(",") : "0,0,0";
 	return {
 	    d: this.info.path,
 	    stroke: this.conv_rgba2rgb(strokeColor),
+	    transform: "r" + r,
 	    fill: this.conv_rgba2rgb(fillColor),
 	    strokeWidth: line
 	}
@@ -372,10 +374,12 @@ class SwipeElement {
 	let line = info.lineWidth ? info.lineWidth : 1;
 	let strokeColor = info.strokeColor ? info.strokeColor : "black";
 	let fillColor = info.fillColor ? info.fillColor : "none";
+	let r = info.rotate ? [info.rotate[2], info.rotate[0], info.rotate[1]].join(",") : "0,0,0";
 
 	return {
 	    d: info.path,
 	    stroke: this.conv_rgba2rgb(strokeColor),
+	    transform: "r" + r,
 	    fill: this.conv_rgba2rgb(fillColor),
 	    strokeWidth: line
 	}
@@ -437,7 +441,6 @@ class SwipeElement {
 		    let path =  SwipeParser.clone(instance.finPath);
 		    delete path.stroke;
 		    instance.path.animate(path, do_duration);
-
 		}
 	    }, start_duration);
 	}
