@@ -31,10 +31,6 @@ class SwipeElement {
 	if (this.info["bc"]) {
 	    this.bc = this.info["bc"];
 	}
-	if (this.isPath()){
-	    this.prevPath = this.parsePath();
-	    this.finPath = this.parseFinPath();
-	}
 	if (this.info["elements"]) {
 	    this.info["elements"].forEach(function(element, elem_index){
 		var e_id = element_id + "-" + elem_index;
@@ -110,6 +106,11 @@ class SwipeElement {
 	}
 
 	this.initAllData();
+	if (this.isPath()){
+	    this.prevPath = this.parsePath();
+	    this.finPath = this.parseFinPath();
+	}
+
 	this.setPrevPos();
 
 	// set md wrap
@@ -131,12 +132,37 @@ class SwipeElement {
     }
     getOriginalFinPos() {
 	if (this.hasTo()) {
-	    return this.updatePosition(this.initPosData, SwipeUtil.merge(this.info, this.info["to"]));
+	    var pos = this.initPosData;
+	    console.log(pos);
+	    
+	    if (this.info["to"]["pos"] && this.info["to"]["pos"].match(/^M/) ) {
+		//let tmp_pos = this.path2pos(this.info["to"]["pos"]);
+		// pos[0] = pos[0] + tmp_pos[0];
+		// pos[1] = pos[1] + tmp_pos[1];
+	    }
+	    return this.updatePosition(pos, SwipeUtil.merge(this.info, this.info["to"]));
 	} else {
 	    return this.originalPrevPos;
 	}
     }
-    
+
+    path2pos(pos){
+	let res = [0,0];
+	let match = pos.match(/(\w[0-9\s\.,\-]+)/g);
+	$.each(match, (index, path) => {
+	    let cmd =  path.slice(0, 1);
+	    let p = path.slice(1).split(",");
+	    if (cmd == "M") {
+		res = [Number(p[0]), Number(p[1])];
+	    }
+	    if (cmd == "l") {
+		res = [Number(res[0]) + Number(p[0]),
+		       Number(res[1]) + Number(p[1])];
+	    }
+	});
+	console.log(res);
+	return res;
+    }
     setOption() {
 	this.opacity = 1.0;
 
@@ -374,8 +400,11 @@ class SwipeElement {
 	let line = info.lineWidth ? info.lineWidth : 1;
 	let strokeColor = info.strokeColor ? info.strokeColor : "black";
 	let fillColor = info.fillColor ? info.fillColor : "none";
-	let r = info.rotate ? [info.rotate[2], info.rotate[0], info.rotate[1]].join(",") : "0,0,0";
-
+	// let r = info.rotate ? [info.rotate[2], info.rotate[0], info.rotate[1]].join(",") : "0,0,0";
+	
+	console.log(this.prevPos);
+	let r = info.rotate ? [info.rotate[2], (this.prevPos[2] / 2), (this.prevPos[3] / 2)  ].join(",") : "0,0,0";
+	
 	return {
 	    d: info.path,
 	    stroke: this.conv_rgba2rgb(strokeColor),
