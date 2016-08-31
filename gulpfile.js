@@ -26,16 +26,16 @@ gulp.task('uglify', function(){
 gulp.task('concat', function(){
     gulp.src('tmp/*.js')
         .pipe(concat('swipe-' + version + '.min.js'))
-        .pipe(gulp.dest('publish/js/')) ;
+        .pipe(gulp.dest('dist/js/')) ;
     gulp.src('lib/*.js')
         .pipe(concat('swipe-' + version +'.js'))
-        .pipe(gulp.dest('publish/js/')) ;
+        .pipe(gulp.dest('dist/js/')) ;
     gulp.src('tmp/*.js')
         .pipe(concat('swipe.min.js'))
-        .pipe(gulp.dest('publish/js/')) ;
+        .pipe(gulp.dest('dist/js/')) ;
     gulp.src('lib/*.js')
         .pipe(concat('swipe.js'))
-        .pipe(gulp.dest('publish/js/')) ;
+        .pipe(gulp.dest('dist/js/')) ;
 });
 
 gulp.task('watch', function() {

@@ -133,7 +133,6 @@ class SwipeElement {
     getOriginalFinPos() {
 	if (this.hasTo()) {
 	    var pos = this.initPosData;
-	    console.log(pos);
 	    
 	    if (this.info["to"]["pos"] && this.info["to"]["pos"].match(/^M/) ) {
 		//let tmp_pos = this.path2pos(this.info["to"]["pos"]);
@@ -160,7 +159,6 @@ class SwipeElement {
 		       Number(res[1]) + Number(p[1])];
 	    }
 	});
-	console.log(res);
 	return res;
     }
     setOption() {
@@ -377,15 +375,31 @@ class SwipeElement {
 	}
 	return color;
     }
+    transform(info, scale) {
+	
+	let ret = []
+	let default_scale = [SwipeScreen.getRation(), SwipeScreen.getRation()];
+	if (scale) {
+	    default_scale = [default_scale[0] * scale[0], default_scale[1] * scale[1]];
+	}
+	let scale_array = [ default_scale[0] ,default_scale[1],  this.initPosData[2] / 2, this.initPosData[3] / 2];
+	ret.push("scale(" + scale_array.join(",") + ")");
+
+	let r = info.rotate ? [info.rotate[2], this.initPosData[2] / 2, this.initPosData[3] / 2 ].join(",") : "0,0,0";
+	ret.push("rotate(" + r + ")");
+
+	console.log(ret.join(" "));
+	return ret.join(" ");
+    }
     parsePath() {
 	let line = this.info.lineWidth ? this.info.lineWidth : 1;
 	let strokeColor = this.info.strokeColor ? this.info.strokeColor : "black";
 	let fillColor = this.info.fillColor ? this.info.fillColor : "none";
-	let r = this.info.rotate ? [this.info.rotate[2], this.info.rotate[0], this.info.rotate[1]].join(",") : "0,0,0";
+	
 	return {
 	    d: this.info.path,
 	    stroke: this.conv_rgba2rgb(strokeColor),
-	    transform: "r" + r,
+	    transform: this.transform(this.info, this.scale),
 	    fill: this.conv_rgba2rgb(fillColor),
 	    strokeWidth: line
 	}
@@ -400,15 +414,13 @@ class SwipeElement {
 	let line = info.lineWidth ? info.lineWidth : 1;
 	let strokeColor = info.strokeColor ? info.strokeColor : "black";
 	let fillColor = info.fillColor ? info.fillColor : "none";
-	// let r = info.rotate ? [info.rotate[2], info.rotate[0], info.rotate[1]].join(",") : "0,0,0";
-	
-	console.log(this.prevPos);
-	let r = info.rotate ? [info.rotate[2], (this.prevPos[2] / 2), (this.prevPos[3] / 2)  ].join(",") : "0,0,0";
+
+	var r = info.rotate ? [info.rotate[2], this.prevPos[2] / 2, this.prevPos[3] / 2].join(",") : "0,0,0";
 	
 	return {
 	    d: info.path,
 	    stroke: this.conv_rgba2rgb(strokeColor),
-	    transform: "r" + r,
+	    transform: this.transform(info, this.getScale(info)),
 	    fill: this.conv_rgba2rgb(fillColor),
 	    strokeWidth: line
 	}
@@ -487,9 +499,12 @@ class SwipeElement {
 	    ret[0] = ret[0] + Number(translate[0]);
 	    ret[1] = ret[1] + Number(translate[1]);
 	}
-	if(to["scale"]) {
-	    ret[6] = this.getScale(to);
-	    ret = this.applyScale(ret);
+	if (!this.isPath()) {
+	    if(to["scale"]) {
+		ret[6] = this.getScale(to);
+		// todo skip path!?
+		ret = this.applyScale(ret);
+	    }
 	}
 	return ret;
     }

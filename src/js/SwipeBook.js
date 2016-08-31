@@ -112,7 +112,9 @@ class SwipeBook {
     }
 
     setPageSize(){
-	$("svg").css("overflow", "visible")
+	$("svg").css("overflow", "visible");
+	$("svg:not(:root)".css({'cssText': "overflow: visible !important;"});
+	  
 	$(".page").css({
 	    "overflow": "hidden",
 	    "height": SwipeScreen.virtualheight(),
