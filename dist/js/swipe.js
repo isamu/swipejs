@@ -2261,24 +2261,29 @@ var SwipeUtil = function () {
 												default_page = Number(location.hash.substr(1));
 									}
 
-									var swipe_book = new SwipeBook(data, default_page, css_id, back_css_id);
+									this.swipe_book = new SwipeBook(data, default_page, css_id, back_css_id);
 
 									$(css_id).on("click", function () {
-												swipe_book.next();
+												this.swipe_book.next();
 									});
 
 									$(window).on('hashchange', function () {
-												if ("#" + swipe_book.getStep() != location.hash) {
-															swipe_book.show(Number(location.hash.substr(1)));
+												if ("#" + this.swipe_book.getStep() != location.hash) {
+															this.swipe_book.show(Number(location.hash.substr(1)));
 												}
 									});
 
 									$(window).resize(function () {
 												clearTimeout(window.resizedFinished);
 												window.resizedFinished = setTimeout(function () {
-															swipe_book.resize();
+															this.swipe_book.resize();
 												}, 250);
 									});
+						}
+			}, {
+						key: "getSwipeBook",
+						value: function getSwipeBook() {
+									return this.swipe_book;
 						}
 			}, {
 						key: "merge",

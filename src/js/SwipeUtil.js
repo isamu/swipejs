@@ -20,6 +20,7 @@ class SwipeUtil {
 	}
 
 	var swipe_book = new SwipeBook(data, default_page, css_id, back_css_id);
+	this.swipe_book = swipe_book;
 	
 	$(css_id).on("click", function(){
 	    swipe_book.next();
@@ -40,6 +41,10 @@ class SwipeUtil {
 	
     };
 
+    static getSwipeBook(){
+	return this.swipe_book;
+    }
+    
     static merge(object1, object2) {
 	var newObject = {};
 	var keys = Object.keys(object1);
