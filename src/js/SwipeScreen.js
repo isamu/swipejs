@@ -1,5 +1,7 @@
 class SwipeScreen {
-
+    static setSize(size){
+	this.size = size;
+    }
     static init(width, height){
 	this.width = width;
 	this.height = height;
@@ -34,6 +36,10 @@ class SwipeScreen {
 	} else {
 	    this.virtual_width = $(window).width();
 	    this.virtual_height = this.height / this.width * this.virtual_width;
+	}
+	if (this.size) {
+	    this.virtual_width  = this.virtual_width  * this.size / 100;
+	    this.virtual_height = this.virtual_height * this.size / 100;
 	}
 	this.ration = this.virtual_width / this.width;
     }

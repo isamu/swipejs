@@ -5,420 +5,411 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var SwipeBook = function () {
-	_createClass(SwipeBook, null, [{
-		key: 'setTemplateElements',
-		value: function setTemplateElements(template) {
-			this.templateElements = template;
-		}
-	}, {
-		key: 'getTemplateElements',
-		value: function getTemplateElements() {
-			return this.templateElements;
-		}
-	}, {
-		key: 'setMarkdown',
-		value: function setMarkdown(markdown) {
-			this.markdown = markdown;
-		}
-	}, {
-		key: 'getMarkdown',
-		value: function getMarkdown() {
-			return this.markdown;
-		}
-	}, {
-		key: 'pageInDuration',
-		value: function pageInDuration() {
-			return 400;
-		}
-	}]);
+			_createClass(SwipeBook, null, [{
+						key: 'setTemplateElements',
+						value: function setTemplateElements(template) {
+									this.templateElements = template;
+						}
+			}, {
+						key: 'getTemplateElements',
+						value: function getTemplateElements() {
+									return this.templateElements;
+						}
+			}, {
+						key: 'setMarkdown',
+						value: function setMarkdown(markdown) {
+									this.markdown = markdown;
+						}
+			}, {
+						key: 'getMarkdown',
+						value: function getMarkdown() {
+									return this.markdown;
+						}
+			}, {
+						key: 'pageInDuration',
+						value: function pageInDuration() {
+									return 400;
+						}
+			}]);
 
-	function SwipeBook(data) {
-		var defaultPage = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
-		var base_css_id = arguments[2];
-		var back_css_id = arguments[3];
+			function SwipeBook(data) {
+						var defaultPage = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+						var base_css_id = arguments[2];
+						var back_css_id = arguments[3];
 
-		_classCallCheck(this, SwipeBook);
+						_classCallCheck(this, SwipeBook);
 
-		$('head').prepend('<meta name="viewport" content="width = 640,user-scalable=no">');
+						$('head').prepend('<meta name="viewport" content="width = 640,user-scalable=no">');
 
-		this.step = defaultPage;
-		this.data = data;
-		this.pages = [];
-		this.title = "Swipe";
-		this.base_css_id = base_css_id;
-		this.back_css_id = back_css_id;
+						this.step = defaultPage;
+						this.data = data;
+						this.pages = [];
+						this.title = "Swipe";
+						this.base_css_id = base_css_id;
+						this.back_css_id = back_css_id;
 
-		SwipeBook.setTemplateElements(this.getTemplateElements());
-		SwipeBook.setMarkdown(this.getMarkdown());
-		this.templatePages = this.getTemplatePages();
-		this.setScreen();
-		this.paging = this.getPaging();
-		this.load();
-		this.domLoad();
-	}
-
-	_createClass(SwipeBook, [{
-		key: 'setScreen',
-		value: function setScreen() {
-			this.dimension = this.data.dimension ? this.data.dimension : [$(window).width(), $(window).height()];
-			SwipeScreen.init(this.dimension[0], this.dimension[1]);
-			this.bc = this.data.bc || "#a9a9a9";
-			this.setSwipeCss();
-		}
-	}, {
-		key: 'load',
-		value: function load() {
-			var _this = this;
-
-			$.each(this.data["pages"], function (index, page) {
-				var scene;
-				if (page["scene"] && (scene = _this.templatePages[page["scene"]])) {
-					scene = _this.templatePages[page["scene"]];
-				}
-				var pageInstance = new SwipePage(page, scene, index);
-
-				_this.pages.push(pageInstance);
-			});
-			if (this.data["title"]) {
-				this.title = this.data["title"];
-				document.title = this.title;
-			}
-		}
-	}, {
-		key: 'getTemplatePages',
-		value: function getTemplatePages() {
-			if (this.data["templates"] && this.data["templates"]["pages"]) {
-				return this.data["templates"]["pages"];
-			} else if (this.data["scenes"]) {
-				return this.data["scenes"];
-			}
-			return {};
-		}
-	}, {
-		key: 'getTemplateElements',
-		value: function getTemplateElements() {
-			if (this.data["templates"] && this.data["templates"]["elements"]) {
-				return this.data["templates"]["elements"];
-			} else if (this.data["elements"]) {
-				return this.data["elements"];
-			}
-			return {};
-		}
-	}, {
-		key: 'getMarkdown',
-		value: function getMarkdown() {
-			if (this.data["markdown"]) {
-				return this.data["markdown"];
-			}
-			return {};
-		}
-	}, {
-		key: 'getPaging',
-		value: function getPaging() {
-			if (this.data["paging"] == "leftToRight" || this.data["paging"] == "vertical" || this.data["paging"] == "rightToLeft") {
-				return this.data["paging"];
-			}
-			return "vertical";
-		}
-	}, {
-		key: 'setSwipeCss',
-		value: function setSwipeCss() {
-			var x = ($(window).width() - SwipeScreen.virtualwidth()) / 2.0;
-			$(this.base_css_id).css({
-				height: SwipeScreen.virtualheight(),
-				width: SwipeScreen.virtualwidth(),
-				position: "absolute",
-				left: x
-			});
-			$(this.back_css_id).css({
-				"background-color": this.bc,
-				"height": "100vh",
-				"width": "100vw"
-			});
-		}
-	}, {
-		key: 'resize',
-		value: function resize() {
-			this.setScreen();
-			for (var i = 0; i < this.pages.length; i++) {
-				this.justShow(i);
-			}
-			this.setPageSize();
-		}
-	}, {
-		key: 'setPageSize',
-		value: function setPageSize() {
-			$("svg").css("overflow", "visible");
-			/*
-   	$('svg').attr('style', function(i,s) {
-   	    console.log(s + ' overflow: visible !important;');
-   	    
-   	    return s + ' overflow: visible !important;'
-   	});
-   */
-			// $("svg:not(:root)").css({'cssText': "overflow: visible !important;"});
-
-			$(".page").css({
-				"overflow": "hidden",
-				"height": SwipeScreen.virtualheight(),
-				"width": SwipeScreen.virtualwidth()
-			});
-		}
-	}, {
-		key: 'domLoad',
-		value: function domLoad() {
-			var pages = [];
-			var instance = this;
-			this.pages.forEach(function (page, page_index) {
-				page.loadElement();
-				pages.push(page.getHtml());
-			});
-
-			$(this.base_css_id).html(pages.join(""));
-
-			this.setPageSize();
-			$(".page").css("opacity", 0);
-			$("#page_" + this.step).css("opacity", 1);
-
-			this.pages[this.step].active();
-
-			$(".image_element").load(function () {
-				$(this).attr("__default_width", $(this).width());
-				$(this).attr("__default_height", $(this).height());
-				instance.initData($(this).attr("__page_id"), $(this).attr("__element_id"));
-				SwipeCounter.decrease();
-
-				if (SwipeCounter.getCounter() == 0) {
-					instance.loadFinish();
-				}
-			});
-
-			$(".element").each(function (index, element) {
-				instance.initData($(element).attr("__page_id"), $(element).attr("__element_id"));
-
-				SwipeCounter.decrease();
-				if (SwipeCounter.getCounter() == 0) {
-					instance.loadFinish();
-				}
-			});
-			this.pages.forEach(function (page, page_index) {
-				var bc = page.getBc();
-				$("#page_" + page_index).css({ "background-color": bc });
-			});
-			$(".page").css({ "position": "absolute" });
-			$(".image_element").css({ "position": "absolute" });
-			$(".video_element").css({ "position": "absolute" });
-			$(".text_element").css({ "position": "absolute" });
-			$(".svg_element").css({ "position": "absolute" });
-		}
-	}, {
-		key: 'loadFinish',
-		value: function loadFinish() {
-			this.show(this.step);
-		}
-	}, {
-		key: 'initData',
-		value: function initData(page_id, element_id) {
-			this.pages[page_id].initElement(element_id);
-		}
-	}, {
-		key: 'next',
-		value: function next() {
-			if (this.step < this.pages.length - 1) {
-				this.show(this.step + 1);
-			}
-		}
-	}, {
-		key: 'justShow',
-		value: function justShow(step) {
-			this.pages[step].justShow();
-		}
-	}, {
-		key: 'show',
-		value: function show(nextStep) {
-			var currentStep = this.step;
-			var mode = nextStep >= currentStep ? "forward" : "back";
-			var loaded = nextStep == currentStep;
-			var same_scene = this.pages[currentStep].getScene() && this.pages[nextStep] && this.pages[nextStep].getScene() == this.pages[currentStep].getScene();
-
-			if (!loaded) {
-				this.pages[currentStep].inactive();
-				this.pages[nextStep].active();
-			}
-			var transition = this.pages[Math.max(currentStep, nextStep)].getTransition();
-
-			if (mode == "forward") {
-				if (same_scene) {
-					this.pages[nextStep].show();
-					this.pages[nextStep].play();
-					$("#page_" + currentStep).css("opacity", 0);
-					$("#page_" + nextStep).css("opacity", 1);
-				} else {
-					// transition
-					if (transition == "fadeIn") {
-						this.pages[nextStep].finShow();
-						$("#page_" + nextStep).animate({ "opacity": 1 }, {
-							duration: SwipeBook.pageInDuration()
-						});
-					} else if (transition == "replace") {
-						$("#page_" + currentStep).css({ "opacity": 0 });
-						$("#page_" + nextStep).css({ "opacity": 1 });
-						this.pages[nextStep].finShow();
-					} else if (transition == "scroll") {
-						setTimeout(function () {
-							$("#page_" + currentStep).css({
-								"opacity": 0
-							});
-						}, SwipeBook.pageInDuration());
-						this.pageSlide("in", nextStep);
-						this.pages[nextStep].delayShow();
-					} else {}
-				}
-			} else {
-				// in case back
-				console.log("back");
-				if (same_scene) {
-					this.pages[currentStep].back();
-					setTimeout(function () {
-						$("#page_" + currentStep).css({ "opacity": 0 });
-						$("#page_" + nextStep).css({ "opacity": 1 });
-					}, SwipeBook.pageInDuration());
-				} else {
-					// transition
-					if (transition == "fadeIn") {
-						this.pages[nextStep].finShow();
-						$("#page_" + currentStep).animate({ "opacity": 0 }, {
-							duration: SwipeBook.pageInDuration()
-						});
-					} else if (transition == "replace") {
-						$("#page_" + currentStep).css({ "opacity": 0 });
-						$("#page_" + nextStep).css({ "opacity": 1 });
-						this.pages[nextStep].finShow();
-					} else if (transition == "scroll") {
-						$("#page_" + nextStep).css({ "opacity": 1 });
-						this.pages[currentStep].back();
-						this.pageSlide("out", currentStep);
-						this.pages[nextStep].finShow();
-					}
-				}
+						SwipeBook.setTemplateElements(this.getTemplateElements());
+						SwipeBook.setMarkdown(this.getMarkdown());
+						this.templatePages = this.getTemplatePages();
+						this.setScreen();
+						this.paging = this.getPaging();
+						this.load();
+						this.domLoad();
 			}
 
-			this.step = nextStep;
-			location.hash = nextStep;
-		}
-	}, {
-		key: 'getStep',
-		value: function getStep() {
-			return this.step;
-		}
-	}, {
-		key: 'pageSlide',
-		value: function pageSlide(mode, step) {
-			$(".boxelement-" + step).each(function (index, element) {
-				console.log("box");
+			_createClass(SwipeBook, [{
+						key: 'setScreen',
+						value: function setScreen() {
+									this.dimension = this.data.dimension ? this.data.dimension : [$(window).width(), $(window).height()];
+									SwipeScreen.init(this.dimension[0], this.dimension[1]);
+									this.bc = this.data.bc || "#a9a9a9";
+									this.setSwipeCss();
+						}
+			}, {
+						key: 'load',
+						value: function load() {
+									var _this = this;
 
-				if (mode == "in") {
-					if (this.paging == "vertical") {
-						var orgTop = $("#" + this.css_id).attr("__x");
-						var fromTop = orgTop + SwipeScreen.virtualheight();
-					} else if (this.paging == "leftToRight") {
-						var orgLeft = $("#" + this.css_id).attr("__y");
-						var fromLeft = orgLeft + SwipeScreen.virtualwidth();
-					} else {
-						var orgLeft = $("#" + this.css_id).attr("__y");
-						var fromLeft = orgLeft - SwipeScreen.virtualwidth();
-					}
-				} else {
-					if (this.paging == "vertical") {
-						var fromTop = $("#" + this.css_id).attr("__x");
-						var orgTop = fromTop + SwipeScreen.virtualheight();
-					} else if (this.paging == "leftToRight") {
-						var fromLeft = $("#" + this.css_id).attr("__y");
-						var orgLeft = fromLeft + SwipeScreen.virtualwidth();
-					} else {
-						var fromLeft = $("#" + this.css_id).attr("__y");
-						var orgLeft = fromLeft - SwipeScreen.virtualwidth();
-					}
-				}
+									$.each(this.data["pages"], function (index, page) {
+												var scene;
+												if (page["scene"] && (scene = _this.templatePages[page["scene"]])) {
+															scene = _this.templatePages[page["scene"]];
+												}
+												var pageInstance = new SwipePage(page, scene, index);
 
-				if (this.paging == "vertical") {
-					$(element).css("top", fromTop);
-					$(element).animate({
-						"top": orgTop
-					}, {
-						duration: SwipeBook.pageInDuration()
-					});
-				} else {
-					$(element).css("left", fromLeft);
-					$(element).animate({
-						"left": orgLeft
-					}, {
-						duration: SwipeBook.pageInDuration()
-					});
-				}
-			});
+												_this.pages.push(pageInstance);
+									});
+									if (this.data["title"]) {
+												this.title = this.data["title"];
+												document.title = this.title;
+									}
+						}
+			}, {
+						key: 'getTemplatePages',
+						value: function getTemplatePages() {
+									if (this.data["templates"] && this.data["templates"]["pages"]) {
+												return this.data["templates"]["pages"];
+									} else if (this.data["scenes"]) {
+												return this.data["scenes"];
+									}
+									return {};
+						}
+			}, {
+						key: 'getTemplateElements',
+						value: function getTemplateElements() {
+									if (this.data["templates"] && this.data["templates"]["elements"]) {
+												return this.data["templates"]["elements"];
+									} else if (this.data["elements"]) {
+												return this.data["elements"];
+									}
+									return {};
+						}
+			}, {
+						key: 'getMarkdown',
+						value: function getMarkdown() {
+									if (this.data["markdown"]) {
+												return this.data["markdown"];
+									}
+									return {};
+						}
+			}, {
+						key: 'getPaging',
+						value: function getPaging() {
+									if (this.data["paging"] == "leftToRight" || this.data["paging"] == "vertical" || this.data["paging"] == "rightToLeft") {
+												return this.data["paging"];
+									}
+									return "vertical";
+						}
+			}, {
+						key: 'setSwipeCss',
+						value: function setSwipeCss() {
+									var x = ($(window).width() - SwipeScreen.virtualwidth()) / 2.0;
+									$(this.base_css_id).css({
+												height: SwipeScreen.virtualheight(),
+												width: SwipeScreen.virtualwidth(),
+												position: "absolute",
+												left: x
+									});
+									$(this.back_css_id).css({
+												"background-color": this.bc,
+												"height": "100vh",
+												"width": "100vw"
+									});
+						}
+			}, {
+						key: 'resize',
+						value: function resize() {
+									this.setScreen();
+									for (var i = 0; i < this.pages.length; i++) {
+												this.justShow(i);
+									}
+									this.setPageSize();
+						}
+			}, {
+						key: 'setPageSize',
+						value: function setPageSize() {
+									$("svg").css("overflow", "visible");
+									$(".page").css({
+												"overflow": "hidden",
+												"height": SwipeScreen.virtualheight(),
+												"width": SwipeScreen.virtualwidth()
+									});
+						}
+			}, {
+						key: 'domLoad',
+						value: function domLoad() {
+									var pages = [];
+									var instance = this;
+									this.pages.forEach(function (page, page_index) {
+												page.loadElement();
+												pages.push(page.getHtml());
+									});
 
-			if (mode == "in") {
-				if (this.paging == "vertical") {
-					$("#page_" + step).css("top", SwipeScreen.virtualheight());
-					$("#page_" + step).css("opacity", 1);
-					$("#page_" + step).animate({
-						"top": 0,
-						"opacity": 1
-					}, {
-						duration: SwipeBook.pageInDuration()
-					});
-				} else if (this.paging == "leftToRight") {
-					$("#page_" + step).css("left", SwipeScreen.virtualwidth());
-					$("#page_" + step).css("opacity", 1);
-					$("#page_" + step).animate({
-						"left": 0,
-						"opacity": 1
-					}, {
-						duration: SwipeBook.pageInDuration()
-					});
-				} else {
-					$("#page_" + step).css("left", -SwipeScreen.virtualwidth());
-					$("#page_" + step).css("opacity", 1);
-					$("#page_" + step).animate({
-						"left": 0,
-						"opacity": 1
-					}, {
-						duration: SwipeBook.pageInDuration()
-					});
-				}
-			} else {
-				var option = {
-					duration: SwipeBook.pageInDuration(),
-					complete: function complete() {
-						$("#page_" + step).css({ "opacity": 0 });
-					}
-				};
-				if (this.paging == "vertical") {
-					$("#page_" + step).css("top", 0);
-					$("#page_" + step).animate({
-						"top": SwipeScreen.virtualheight()
-					}, option);
-				} else if (this.paging == "leftToRight") {
-					$("#page_" + step).css("left", 0);
-					$("#page_" + step).css("opacity", 1);
-					$("#page_" + step).animate({
-						"left": SwipeScreen.virtualwidth(),
-						"opacity": 1
-					}, option);
-				} else {
-					$("#page_" + step).css("left", 0);
-					$("#page_" + step).css("opacity", 1);
-					$("#page_" + step).animate({
-						"left": -SwipeScreen.virtualwidth(),
-						"opacity": 1
-					}, option);
-				}
-			}
-		}
-	}]);
+									$(this.base_css_id).html(pages.join(""));
 
-	return SwipeBook;
+									this.setPageSize();
+									$(".page").css("opacity", 0);
+									$("#page_" + this.step).css("opacity", 1);
+
+									this.pages[this.step].active();
+
+									$(".image_element").load(function () {
+												$(this).attr("__default_width", $(this).width());
+												$(this).attr("__default_height", $(this).height());
+												instance.initData($(this).attr("__page_id"), $(this).attr("__element_id"));
+												SwipeCounter.decrease();
+
+												if (SwipeCounter.getCounter() == 0) {
+															instance.loadFinish();
+												}
+									});
+
+									$(".element").each(function (index, element) {
+												instance.initData($(element).attr("__page_id"), $(element).attr("__element_id"));
+
+												SwipeCounter.decrease();
+												if (SwipeCounter.getCounter() == 0) {
+															instance.loadFinish();
+												}
+									});
+									this.pages.forEach(function (page, page_index) {
+												var bc = page.getBc();
+												$("#page_" + page_index).css({ "background-color": bc });
+									});
+									$(".page").css({ "position": "absolute" });
+									$(".image_element").css({ "position": "absolute" });
+									$(".video_element").css({ "position": "absolute" });
+									$(".text_element").css({ "position": "absolute" });
+									$(".svg_element").css({ "position": "absolute" });
+						}
+			}, {
+						key: 'loadFinish',
+						value: function loadFinish() {
+									this.show(this.step);
+						}
+			}, {
+						key: 'initData',
+						value: function initData(page_id, element_id) {
+									this.pages[page_id].initElement(element_id);
+						}
+			}, {
+						key: 'next',
+						value: function next() {
+									if (this.step < this.pages.length - 1) {
+												this.show(this.step + 1);
+									}
+						}
+			}, {
+						key: 'justShow',
+						value: function justShow(step) {
+									this.pages[step].justShow();
+						}
+			}, {
+						key: 'show',
+						value: function show(nextStep) {
+									var currentStep = this.step;
+									var mode = nextStep >= currentStep ? "forward" : "back";
+									var loaded = nextStep == currentStep;
+									var same_scene = this.pages[currentStep].getScene() && this.pages[nextStep] && this.pages[nextStep].getScene() == this.pages[currentStep].getScene();
+
+									if (!loaded) {
+												this.pages[currentStep].inactive();
+												this.pages[nextStep].active();
+									}
+									var transition = this.pages[Math.max(currentStep, nextStep)].getTransition();
+
+									if (mode == "forward") {
+												if (same_scene) {
+															this.pages[nextStep].show();
+															this.pages[nextStep].play();
+															$("#page_" + currentStep).css("opacity", 0);
+															$("#page_" + nextStep).css("opacity", 1);
+												} else {
+															// transition
+															if (transition == "fadeIn") {
+																		this.pages[nextStep].finShow();
+																		$("#page_" + nextStep).animate({ "opacity": 1 }, {
+																					duration: SwipeBook.pageInDuration()
+																		});
+															} else if (transition == "replace") {
+																		$("#page_" + currentStep).css({ "opacity": 0 });
+																		$("#page_" + nextStep).css({ "opacity": 1 });
+																		this.pages[nextStep].finShow();
+															} else if (transition == "scroll") {
+																		setTimeout(function () {
+																					$("#page_" + currentStep).css({
+																								"opacity": 0
+																					});
+																		}, SwipeBook.pageInDuration());
+																		this.pageSlide("in", nextStep);
+																		this.pages[nextStep].delayShow();
+															} else {}
+												}
+									} else {
+												// in case back
+												console.log("back");
+												if (same_scene) {
+															this.pages[currentStep].back();
+															setTimeout(function () {
+																		$("#page_" + currentStep).css({ "opacity": 0 });
+																		$("#page_" + nextStep).css({ "opacity": 1 });
+															}, SwipeBook.pageInDuration());
+												} else {
+															// transition
+															if (transition == "fadeIn") {
+																		this.pages[nextStep].finShow();
+																		$("#page_" + currentStep).animate({ "opacity": 0 }, {
+																					duration: SwipeBook.pageInDuration()
+																		});
+															} else if (transition == "replace") {
+																		$("#page_" + currentStep).css({ "opacity": 0 });
+																		$("#page_" + nextStep).css({ "opacity": 1 });
+																		this.pages[nextStep].finShow();
+															} else if (transition == "scroll") {
+																		$("#page_" + nextStep).css({ "opacity": 1 });
+																		this.pages[currentStep].back();
+																		this.pageSlide("out", currentStep);
+																		this.pages[nextStep].finShow();
+															}
+												}
+									}
+
+									this.step = nextStep;
+									location.hash = nextStep;
+						}
+			}, {
+						key: 'getStep',
+						value: function getStep() {
+									return this.step;
+						}
+			}, {
+						key: 'pageSlide',
+						value: function pageSlide(mode, step) {
+									$(".boxelement-" + step).each(function (index, element) {
+												console.log("box");
+
+												if (mode == "in") {
+															if (this.paging == "vertical") {
+																		var orgTop = $("#" + this.css_id).attr("__x");
+																		var fromTop = orgTop + SwipeScreen.virtualheight();
+															} else if (this.paging == "leftToRight") {
+																		var orgLeft = $("#" + this.css_id).attr("__y");
+																		var fromLeft = orgLeft + SwipeScreen.virtualwidth();
+															} else {
+																		var orgLeft = $("#" + this.css_id).attr("__y");
+																		var fromLeft = orgLeft - SwipeScreen.virtualwidth();
+															}
+												} else {
+															if (this.paging == "vertical") {
+																		var fromTop = $("#" + this.css_id).attr("__x");
+																		var orgTop = fromTop + SwipeScreen.virtualheight();
+															} else if (this.paging == "leftToRight") {
+																		var fromLeft = $("#" + this.css_id).attr("__y");
+																		var orgLeft = fromLeft + SwipeScreen.virtualwidth();
+															} else {
+																		var fromLeft = $("#" + this.css_id).attr("__y");
+																		var orgLeft = fromLeft - SwipeScreen.virtualwidth();
+															}
+												}
+
+												if (this.paging == "vertical") {
+															$(element).css("top", fromTop);
+															$(element).animate({
+																		"top": orgTop
+															}, {
+																		duration: SwipeBook.pageInDuration()
+															});
+												} else {
+															$(element).css("left", fromLeft);
+															$(element).animate({
+																		"left": orgLeft
+															}, {
+																		duration: SwipeBook.pageInDuration()
+															});
+												}
+									});
+
+									if (mode == "in") {
+												if (this.paging == "vertical") {
+															$("#page_" + step).css("top", SwipeScreen.virtualheight());
+															$("#page_" + step).css("opacity", 1);
+															$("#page_" + step).animate({
+																		"top": 0,
+																		"opacity": 1
+															}, {
+																		duration: SwipeBook.pageInDuration()
+															});
+												} else if (this.paging == "leftToRight") {
+															$("#page_" + step).css("left", SwipeScreen.virtualwidth());
+															$("#page_" + step).css("opacity", 1);
+															$("#page_" + step).animate({
+																		"left": 0,
+																		"opacity": 1
+															}, {
+																		duration: SwipeBook.pageInDuration()
+															});
+												} else {
+															$("#page_" + step).css("left", -SwipeScreen.virtualwidth());
+															$("#page_" + step).css("opacity", 1);
+															$("#page_" + step).animate({
+																		"left": 0,
+																		"opacity": 1
+															}, {
+																		duration: SwipeBook.pageInDuration()
+															});
+												}
+									} else {
+												var option = {
+															duration: SwipeBook.pageInDuration(),
+															complete: function complete() {
+																		$("#page_" + step).css({ "opacity": 0 });
+															}
+												};
+												if (this.paging == "vertical") {
+															$("#page_" + step).css("top", 0);
+															$("#page_" + step).animate({
+																		"top": SwipeScreen.virtualheight()
+															}, option);
+												} else if (this.paging == "leftToRight") {
+															$("#page_" + step).css("left", 0);
+															$("#page_" + step).css("opacity", 1);
+															$("#page_" + step).animate({
+																		"left": SwipeScreen.virtualwidth(),
+																		"opacity": 1
+															}, option);
+												} else {
+															$("#page_" + step).css("left", 0);
+															$("#page_" + step).css("opacity", 1);
+															$("#page_" + step).animate({
+																		"left": -SwipeScreen.virtualwidth(),
+																		"opacity": 1
+															}, option);
+												}
+									}
+						}
+			}]);
+
+			return SwipeBook;
 }();
 "use strict";
 
@@ -2004,6 +1995,11 @@ var SwipeScreen = function () {
 			}
 
 			_createClass(SwipeScreen, null, [{
+						key: "setSize",
+						value: function setSize(size) {
+									this.size = size;
+						}
+			}, {
 						key: "init",
 						value: function init(width, height) {
 									this.width = width;
@@ -2043,6 +2039,132 @@ var SwipeScreen = function () {
 												this.virtual_width = $(window).width();
 												this.virtual_height = this.height / this.width * this.virtual_width;
 									}
+									if (this.size) {
+												this.virtual_width = this.virtual_width * this.size / 100;
+												this.virtual_height = this.virtual_height * this.size / 100;
+									}
+									this.ration = this.virtual_width / this.width;
+						}
+			}, {
+						key: "getRation",
+						value: function getRation() {
+									return this.ration;
+						}
+			}, {
+						key: "swipewidth",
+						value: function swipewidth() {
+									return this.width;
+						}
+			}, {
+						key: "swipeheight",
+						value: function swipeheight() {
+									return this.height;
+						}
+			}, {
+						key: "virtualwidth",
+						value: function virtualwidth() {
+									return this.virtual_width;
+						}
+			}, {
+						key: "virtualheight",
+						value: function virtualheight() {
+									return this.virtual_height;
+						}
+			}, {
+						key: "refresh",
+						value: function refresh() {
+									SwipeScreen.setOriginalSize();
+									SwipeScreen.setVirtualSize();
+						}
+
+						// width
+
+			}, {
+						key: "virtualX",
+						value: function virtualX(x) {
+									if (x == undefined) {
+												return this.virtual_width;
+									}
+									if (this.width) {
+												return x / this.width * this.virtual_width;
+									}
+									return x;
+						}
+			}, {
+						key: "virtualY",
+						value: function virtualY(y) {
+									if (y == undefined) {
+												return this.virtual_height;
+									}
+									if (this.height) {
+												return y / this.height * this.virtual_height;
+									}
+									return y;
+						}
+			}]);
+
+			return SwipeScreen;
+}();
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var SwipeScreen = function () {
+			function SwipeScreen() {
+						_classCallCheck(this, SwipeScreen);
+			}
+
+			_createClass(SwipeScreen, null, [{
+						key: "setSize",
+						value: function setSize(percentage) {
+									this.percentage = percentage;
+						}
+			}, {
+						key: "init",
+						value: function init(width, height) {
+									this.width = width;
+									this.height = height;
+
+									if (this.width == 0) {
+												this.width = this.height * $(window).width() / $(window).height();
+									}
+									if (this.height == 0) {
+												this.height = this.width * $(window).height() / $(window).width();
+									}
+									SwipeScreen.setOriginalSize();
+									SwipeScreen.setVirtualSize();
+						}
+			}, {
+						key: "setOriginalSize",
+						value: function setOriginalSize() {
+									this.window_width = $(window).width();
+									this.window_height = $(window).height();
+						}
+
+						// todo
+						//  set vertical and horizontal mode
+
+			}, {
+						key: "setVirtualSize",
+						value: function setVirtualSize() {
+									var real_ration = this.window_width / this.window_height;
+									var virtual_ration = this.width / this.height;
+									this.ration = 1.0;
+
+									if (real_ration / virtual_ration >= 1) {
+												this.virtual_height = $(window).height();
+												this.virtual_width = this.width / this.height * this.virtual_height;
+									} else {
+												this.virtual_width = $(window).width();
+												this.virtual_height = this.height / this.width * this.virtual_width;
+									}
+									if (this.percentage) {
+												this.virtual_width = this.virtual_width * this.percentage / 100;
+												this.virtual_height = this.virtual_height * this.percentage / 100;
+									}
+
 									this.ration = this.virtual_width / this.width;
 						}
 			}, {
