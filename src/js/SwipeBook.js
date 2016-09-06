@@ -178,6 +178,12 @@ class SwipeBook {
 	}
     }
 
+    back(){
+	if (this.step > 0){
+	    this.show(this.step - 1);
+	}
+    }
+    
     justShow(step) {
 	this.pages[step].justShow();
     }	
