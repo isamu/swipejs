@@ -75,6 +75,9 @@ var SwipeBook = function () {
 												if (page["scene"] && (scene = _this.templatePages[page["scene"]])) {
 															scene = _this.templatePages[page["scene"]];
 												}
+												if (page["template"] && (scene = _this.templatePages[page["template"]])) {
+															scene = _this.templatePages[page["template"]];
+												}
 												var pageInstance = new SwipePage(page, scene, index);
 
 												_this.pages.push(pageInstance);
@@ -884,7 +887,6 @@ var SwipeElement = function () {
 			var r = info.rotate ? [info.rotate[2], this.initPosData[2] / 2, this.initPosData[3] / 2].join(",") : "0,0,0";
 			ret.push("rotate(" + r + ")");
 
-			console.log(ret.join(" "));
 			return ret.join(" ");
 		}
 	}, {

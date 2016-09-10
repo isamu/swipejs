@@ -388,7 +388,6 @@ class SwipeElement {
 	let r = info.rotate ? [info.rotate[2], this.initPosData[2] / 2, this.initPosData[3] / 2 ].join(",") : "0,0,0";
 	ret.push("rotate(" + r + ")");
 
-	console.log(ret.join(" "));
 	return ret.join(" ");
     }
     parsePath() {
