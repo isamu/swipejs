@@ -570,6 +570,7 @@ var SwipeElement = function () {
 			if (this.isPath()) {
 				this.snap = Snap("#" + this.css_id);
 				this.path = this.snap.path();
+				this.bbox = null;
 			}
 
 			this.setSize();
@@ -591,7 +592,16 @@ var SwipeElement = function () {
 			}
 
 			this.setPrevPos();
-
+			if (this.isPath()) {
+				// get prev path size
+				this.bbox = this.path.getBBox();
+				// show fin path
+				this.setFinPath();
+				// get fin path size
+				this.finbbox = this.path.getBBox();
+				// updat prev path
+				this.setPrevPath();
+			}
 			// set md wrap
 			this.markdown_position();
 		}
@@ -784,6 +794,30 @@ var SwipeElement = function () {
 			});
 		}
 	}, {
+		key: "getPrevPathTranslate",
+		value: function getPrevPathTranslate() {
+			if (this.bbox == null) {
+				return " ";
+			}
+			var x = this.bbox.width > 0 ? -(this.bbox.width / 2 - this.prevPos[2] / 2) : 0;
+			var y = this.bbox.height > 0 ? -(this.bbox.height / 2 - this.prevPos[3] / 2) : 0;
+
+			console.log(" translate(" + x + ", " + y + ") ");
+			return " translate(" + x + ", " + y + ") ";
+		}
+	}, {
+		key: "getFinPathTranslate",
+		value: function getFinPathTranslate() {
+			if (this.finbbox == null) {
+				return " ";
+			}
+			var x = this.finbbox.width > 0 ? -(this.finbbox.width / 2 - this.finPos[2] / 2) : 0;
+			var y = this.finbbox.height > 0 ? -(this.finbbox.height / 2 - this.finPos[3] / 2) : 0;
+
+			console.log(" translate(" + x + ", " + y + ") ");
+			return " translate(" + x + ", " + y + ") ";
+		}
+	}, {
 		key: "setPrevPos",
 		value: function setPrevPos() {
 			var instance = this;
@@ -795,19 +829,47 @@ var SwipeElement = function () {
 				$("#" + this.css_id + "-body").css(this.prevText);
 			}
 			if (this.isPath()) {
-				this.path.attr({
-					d: this.prevPath.d,
-					fill: this.prevPath.fill,
-					transform: this.prevPath.transform,
-					stroke: this.prevPath.stroke,
-					strokeWidth: this.prevPath.strokeWidth
-				});
+				this.setPrevPath();
 			}
+
 			if (this.isMarkdown()) {
 				this.md_css.forEach(function (element, elem_index) {
 					$("#" + instance.css_id + "-" + elem_index).css(element);
 				});
 			}
+		}
+	}, {
+		key: "setPrevPath",
+		value: function setPrevPath() {
+			console.log(this.getPrevPath());
+			this.path.attr(this.getPrevPath());
+		}
+	}, {
+		key: "getPrevPath",
+		value: function getPrevPath() {
+			return {
+				d: this.prevPath.d,
+				fill: this.prevPath.fill,
+				transform: this.getPrevPathTranslate() + this.prevPath.transform,
+				stroke: this.prevPath.stroke,
+				strokeWidth: this.prevPath.strokeWidth
+			};
+		}
+	}, {
+		key: "setFinPath",
+		value: function setFinPath() {
+			this.path.attr(this.getFinPath());
+		}
+	}, {
+		key: "getFinPath",
+		value: function getFinPath() {
+			return {
+				d: this.finPath.d,
+				fill: this.finPath.fill,
+				transform: this.getFinPathTranslate() + this.finPath.transform,
+				stroke: this.finPath.stroke,
+				strokeWidth: this.finPath.strokeWidth
+			};
 		}
 
 		// scale and container height(is my height)
@@ -881,12 +943,12 @@ var SwipeElement = function () {
 			if (scale) {
 				default_scale = [default_scale[0] * scale[0], default_scale[1] * scale[1]];
 			}
-			var scale_array = [default_scale[0], default_scale[1], this.initPosData[2] / 2, this.initPosData[3] / 2];
+			// todo ?? fix pos
+			var scale_array = [default_scale[0], default_scale[1]];
 			ret.push("scale(" + scale_array.join(",") + ")");
 
-			var r = info.rotate ? [info.rotate[2], this.initPosData[2] / 2, this.initPosData[3] / 2].join(",") : "0,0,0";
+			var r = info.rotate ? [info.rotate[2] || 0, this.prevPos[2] / 2, this.prevPos[3] / 2].join(",") : "0,0,0";
 			ret.push("rotate(" + r + ")");
-
 			return ret.join(" ");
 		}
 	}, {
@@ -908,7 +970,7 @@ var SwipeElement = function () {
 		key: "parseFinPath",
 		value: function parseFinPath() {
 			if (!this.hasTo()) {
-				return this.prevPath;
+				return this.getPrevPath();
 			}
 			var info = SwipeUtil.merge(this.info, this.info["to"]);
 
@@ -917,7 +979,6 @@ var SwipeElement = function () {
 			var fillColor = info.fillColor ? info.fillColor : "none";
 
 			var r = info.rotate ? [info.rotate[2], this.prevPos[2] / 2, this.prevPos[3] / 2].join(",") : "0,0,0";
-
 			return {
 				d: info.path,
 				stroke: this.conv_rgba2rgb(strokeColor),
@@ -939,7 +1000,7 @@ var SwipeElement = function () {
 					});
 				}
 				if (this.isPath()) {
-					var path = SwipeParser.clone(this.prevPath);
+					var path = SwipeParser.clone(this.getPrevPath());
 					delete path.stroke;
 					this.path.animate(path, this.duration);
 				}
@@ -984,7 +1045,7 @@ var SwipeElement = function () {
 						});
 					}
 					if (instance.isPath()) {
-						var path = SwipeParser.clone(instance.finPath);
+						var path = SwipeParser.clone(instance.getFinPath());
 						delete path.stroke;
 						instance.path.animate(path, do_duration);
 					}
@@ -2048,11 +2109,12 @@ var SwipeScreen = function () {
 												this.virtual_width = $(window).width();
 												this.virtual_height = this.height / this.width * this.virtual_width;
 									}
+									this.ration = this.virtual_width / this.width;
 									if (this.size) {
 												this.virtual_width = this.virtual_width * this.size / 100;
 												this.virtual_height = this.virtual_height * this.size / 100;
+												this.ration = this.ration * this.size / 100;
 									}
-									this.ration = this.virtual_width / this.width;
 						}
 			}, {
 						key: "getRation",

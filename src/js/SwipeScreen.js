@@ -37,11 +37,12 @@ class SwipeScreen {
 	    this.virtual_width = $(window).width();
 	    this.virtual_height = this.height / this.width * this.virtual_width;
 	}
+	this.ration = this.virtual_width / this.width;
 	if (this.size) {
 	    this.virtual_width  = this.virtual_width  * this.size / 100;
 	    this.virtual_height = this.virtual_height * this.size / 100;
+	    this.ration = this.ration * this.size / 100;
 	}
-	this.ration = this.virtual_width / this.width;
     }
 
     static getRation(){

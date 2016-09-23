@@ -91,6 +91,7 @@ class SwipeElement {
 	if (this.isPath()){
 	    this.snap = Snap("#" + this.css_id);
 	    this.path = this.snap.path();
+	    this.bbox = null;
 	}
 
 	this.setSize();
@@ -112,7 +113,16 @@ class SwipeElement {
 	}
 
 	this.setPrevPos();
-
+	if (this.isPath()) {
+	    // get prev path size
+	    this.bbox = this.path.getBBox();
+	    // show fin path
+	    this.setFinPath();
+	    // get fin path size
+	    this.finbbox = this.path.getBBox();
+	    // updat prev path
+	    this.setPrevPath();
+	}
 	// set md wrap
 	this.markdown_position();
     }
@@ -122,7 +132,7 @@ class SwipeElement {
 	
     	this.originalPrevPos = this.updatePosition(this.initPosData, this.info);
 	this.prevPos = this.getScreenPosition(this.originalPrevPos);
-
+	
 	this.originalFinPos = this.getOriginalFinPos();
 	this.finPos = this.getScreenPosition(this.originalFinPos);
 	if (this.isText()) {
@@ -291,6 +301,26 @@ class SwipeElement {
 	    }
         });
     }
+    getPrevPathTranslate() {
+	if (this.bbox == null) {
+	    return " "; 
+	}
+	let x = (this.bbox.width > 0) ?  - (this.bbox.width / 2  - this.prevPos[2] / 2) : 0;
+	let y = (this.bbox.height > 0) ? - (this.bbox.height / 2  - this.prevPos[3] / 2) : 0 ;
+
+	console.log(" translate(" + x + ", " + y +") ");
+	return  " translate(" + x + ", " + y +") ";
+    }
+    getFinPathTranslate() {
+	if (this.finbbox == null) {
+	    return " "; 
+	}
+	let x = (this.finbbox.width > 0) ?  - (this.finbbox.width / 2  - this.finPos[2] / 2) : 0;
+	let y = (this.finbbox.height > 0) ? - (this.finbbox.height / 2  - this.finPos[3] / 2) : 0 ;
+
+	console.log(" translate(" + x + ", " + y +") ");
+	return  " translate(" + x + ", " + y +") ";
+    }
     setPrevPos(){
 	var instance = this;
 	$("#" + this.css_id).css(this.convCssPos(this.prevPos));
@@ -301,22 +331,41 @@ class SwipeElement {
 	    $("#" + this.css_id + "-body").css(this.prevText);
 	}
 	if (this.isPath()) {
-	    this.path.attr({
-		d: this.prevPath.d,
-		fill: this.prevPath.fill,
-		transform: this.prevPath.transform,
-		stroke: this.prevPath.stroke, 
-		strokeWidth: this.prevPath.strokeWidth,
-	    });
+	    this.setPrevPath();
 	}
+	
 	if (this.isMarkdown()) {
 	    this.md_css.forEach(function(element, elem_index){
 		$("#" + instance.css_id + "-" + elem_index).css(element);
 	    });
 	}
     }
-
-
+    setPrevPath() {
+	console.log(this.getPrevPath());
+	this.path.attr(this.getPrevPath());
+    }
+    getPrevPath() {
+	return {
+	    d: this.prevPath.d,
+	    fill: this.prevPath.fill,
+	    transform: this.getPrevPathTranslate() + this.prevPath.transform ,
+	    stroke: this.prevPath.stroke, 
+	    strokeWidth: this.prevPath.strokeWidth,
+	};
+    }
+    setFinPath() {
+	this.path.attr(this.getFinPath());
+    }
+    getFinPath() {
+	return {
+	    d: this.finPath.d,
+	    fill: this.finPath.fill,
+	    transform: this.getFinPathTranslate() +  this.finPath.transform, 
+	    stroke: this.finPath.stroke, 
+	    strokeWidth: this.finPath.strokeWidth,
+	};
+    }
+    
     // scale and container height(is my height)
     textLayout(info, data){
 	var x = "center";
@@ -382,12 +431,12 @@ class SwipeElement {
 	if (scale) {
 	    default_scale = [default_scale[0] * scale[0], default_scale[1] * scale[1]];
 	}
-	let scale_array = [ default_scale[0] ,default_scale[1],  this.initPosData[2] / 2, this.initPosData[3] / 2];
+	// todo ?? fix pos
+	let scale_array = [ default_scale[0] ,default_scale[1]];
 	ret.push("scale(" + scale_array.join(",") + ")");
 
-	let r = info.rotate ? [info.rotate[2], this.initPosData[2] / 2, this.initPosData[3] / 2 ].join(",") : "0,0,0";
+	let r = info.rotate ? [info.rotate[2] || 0, this.prevPos[2] / 2, this.prevPos[3] / 2 ].join(",") : "0,0,0";
 	ret.push("rotate(" + r + ")");
-
 	return ret.join(" ");
     }
     parsePath() {
@@ -398,7 +447,7 @@ class SwipeElement {
 	return {
 	    d: this.info.path,
 	    stroke: this.conv_rgba2rgb(strokeColor),
-	    transform: this.transform(this.info, this.scale),
+	    transform: this.transform(this.info, this.scale), 
 	    fill: this.conv_rgba2rgb(fillColor),
 	    strokeWidth: line
 	}
@@ -406,7 +455,7 @@ class SwipeElement {
 
     parseFinPath() {
 	if (!this.hasTo()) {
-	    return this.prevPath;
+	    return this.getPrevPath();
 	}
 	let info = SwipeUtil.merge(this.info, this.info["to"]);
 
@@ -415,7 +464,6 @@ class SwipeElement {
 	let fillColor = info.fillColor ? info.fillColor : "none";
 
 	var r = info.rotate ? [info.rotate[2], this.prevPos[2] / 2, this.prevPos[3] / 2].join(",") : "0,0,0";
-	
 	return {
 	    d: info.path,
 	    stroke: this.conv_rgba2rgb(strokeColor),
@@ -436,7 +484,7 @@ class SwipeElement {
 		});
 	    }
 	    if (this.isPath()) {
-		let path =  SwipeParser.clone(this.prevPath);
+		let path =  SwipeParser.clone(this.getPrevPath());
 		delete path.stroke;
 		this.path.animate(path, this.duration);
 	    }
@@ -478,7 +526,7 @@ class SwipeElement {
                     });
 		}
 		if (instance.isPath()) {
-		    let path =  SwipeParser.clone(instance.finPath);
+		    let path =  SwipeParser.clone(instance.getFinPath());
 		    delete path.stroke;
 		    instance.path.animate(path, do_duration);
 		}
