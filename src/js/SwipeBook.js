@@ -151,6 +151,10 @@ class SwipeBook {
 	$(".image_element").load(function() {
 	    $(this).attr("__default_width", $(this).width());
 	    $(this).attr("__default_height", $(this).height());
+
+	    $("#" + $(this).attr("__base_id")).attr("__default_width", $(this).width());
+	    $("#" + $(this).attr("__base_id")).attr("__default_height", $(this).height());
+
 	    instance.initData($(this).attr("__page_id"), $(this).attr("__element_id"));
 	    SwipeCounter.decrease();
 
@@ -173,6 +177,8 @@ class SwipeBook {
 	});
 	$(".page").css({"position": "absolute"});
 	$(".image_element").css({"position": "absolute"});
+	$(".image_box").css({"position": "absolute"});
+	$(".image_box").css({"overflow": "hidden"});
 	$(".video_element").css({"position": "absolute"});
 	$(".text_element").css({"position": "absolute"});
 	$(".svg_element").css({"position": "absolute"});

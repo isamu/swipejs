@@ -14,7 +14,7 @@ class SwipeElement {
 	this.isActive = false;
 	this.videoElement = null;
 	this.isRepeat = Boolean(info["repeat"]);
-	    
+
 	this.x = 0;
 	this.y = 0;
 	this.angle = 0;
@@ -105,6 +105,27 @@ class SwipeElement {
 	    $("#" + this.css_id).css({"background-color": this.bc});
 	}
 
+	if (this.isImage()) {
+	    let div_ration = this.w/this.h;
+	    let w = $("#" + this.css_id + "_image").attr("__default_width");
+	    let h = $("#" + this.css_id + "_image").attr("__default_height");
+	    let image_ration = w/h;
+	    
+	    if (div_ration < image_ration) {
+		$("#" + this.css_id + "_image").css("height", "100%");
+		$("#" + this.css_id + "_image").css("width", "auto");
+	    } else {
+		$("#" + this.css_id + "_image").css("height", "auth");
+		$("#" + this.css_id + "_image").css("width", "100%");
+	    }
+	    $("#" + this.css_id + "_image").css("top", "50%");
+	    $("#" + this.css_id + "_image").css("left", "50%");
+	    $("#" + this.css_id + "_image").css("transform", "translate(-50%,-50%)");
+	    $("#" + this.css_id + "_image").css("-webkit-transform", "translateY(-50%) translateX(-50%)");
+	    $("#" + this.css_id + "_image").css("-moz-transform", "translate(-50%,-50%)");
+
+	}
+
 	this.initAllData();
 	if (this.isPath()){
 	    this.prevPath = this.parsePath();
@@ -182,7 +203,7 @@ class SwipeElement {
 	    if (this.info["w"]){
 		this.w = SwipeParser.parseSize(this.info["w"], SwipeScreen.swipewidth(), SwipeScreen.swipewidth());
 	    } else {
-		if (this.info.img) {
+		if (this.isImage()) {
 		    this.w = $("#" + this.css_id).attr("__default_width");
 		} else {
 		    this.w = this.parentWidth();
@@ -192,7 +213,7 @@ class SwipeElement {
 	    if (this.info["h"]){
 		this.h = SwipeParser.parseSize(this.info["h"], SwipeScreen.swipeheight(), SwipeScreen.swipeheight());
 	    } else {
-		if (this.info.img) {
+		if (this.isImage()) {
 		    this.h = $("#" + this.css_id).attr("__default_height");
 		} else {
 		    this.h =  this.parentHeight();
@@ -610,8 +631,9 @@ class SwipeElement {
 	    return element.html();
 	}).join("");
 	if (this.isImage()) {
-	    return "<img src='" + this.info.img + "' class='image_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" +
-		child_html + "</img>";
+	    return "<div id='" + this.css_id + "' class='image_box'><div id='" + this.css_id + "_inner'>" +
+		"<img src='" + this.info.img + "' class='image_element' id='" + this.css_id + "_image' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" +
+		child_html + "</img></div></div>";
 	} else if (this.isText()) {
 	    return  "<div class='element text_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" +
 		"<div class='text_body' id='" + this.css_id + "-body'>" + this.parseText(this.info.text) + child_html + "</div>" +
