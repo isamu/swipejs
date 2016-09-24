@@ -105,6 +105,29 @@ class SwipeElement {
 	    $("#" + this.css_id).css({"background-color": this.bc});
 	}
 
+/*
+	if (this.isImage()) {
+	    let div_ration = this.w/this.h;
+	    // console.log(ration);
+	    let w = $("#" + this.css_id + "_image").attr("__default_width");
+	    let h = $("#" + this.css_id + "_image").attr("__default_height");
+	    let image_ration = w/h;
+	    
+	    if (div_ration < image_ration) {
+		$("#" + this.css_id + "_image").css("height", "100%");
+		$("#" + this.css_id + "_image").css("width", "auto");
+	    } else {
+		$("#" + this.css_id + "_image").css("height", "auth");
+		$("#" + this.css_id + "_image").css("width", "100%");
+	    }
+	    $("#" + this.css_id + "_image").css("top", "50%");
+	    $("#" + this.css_id + "_image").css("left", "50%");
+	    $("#" + this.css_id + "_image").css("-webkit-transform", "translateY(-50%) translateX(-50%)");
+
+	    // todo
+	    // centering. triming
+	}
+*/	
 	this.initAllData();
 	if (this.isPath()){
 	    this.prevPath = this.parsePath();
@@ -610,6 +633,10 @@ class SwipeElement {
 	    return element.html();
 	}).join("");
 	if (this.isImage()) {
+//	    return "<div id='" + this.css_id + "'>" +
+//		"<div id='" + this.css_id + "_inner'>" +
+//		"<img src='" + this.info.img + "' class='image_element' id='" + this.css_id + "_image' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" +
+//		child_html + "</img></div></div>";
 	    return "<img src='" + this.info.img + "' class='image_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" +
 		child_html + "</img>";
 	} else if (this.isText()) {
