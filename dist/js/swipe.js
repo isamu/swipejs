@@ -56,7 +56,6 @@ var SwipeBook = function () {
 			})();
 		} else {
 			// 	"type":"net.swipe.swipe"
-
 			this.step = defaultPage;
 			this.pages = [];
 			this.title = "Swipe";
