@@ -17,20 +17,30 @@ class SwipeBook {
     constructor (data, defaultPage = 0, base_css_id, back_css_id) {
         $('head').prepend('<meta name="viewport" content="width = 640,user-scalable=no">');
 
-	this.step = defaultPage;
 	this.data = data;
-	this.pages = [];
-	this.title = "Swipe";
-	this.base_css_id = base_css_id;
-	this.back_css_id = back_css_id;
-	
-	SwipeBook.setTemplateElements(this.getTemplateElements());
-	SwipeBook.setMarkdown(this.getMarkdown());
-	this.templatePages = this.getTemplatePages();
-	this.setScreen();
-	this.paging = this.getPaging();
-	this.load();
-	this.domLoad();
+	console.log(data["type"]);
+	if (data["type"] == "net.swipe.list") {
+	    let html = []
+	    this.data.items.forEach((item, item_index) => {
+		html.push('<li><a href="?file=' + item["url"] +  '">' + item["title"]  + '</li>');
+	    });
+	    $(base_css_id).html("<ul>" + html.join("") + "</ul>");
+	} else {
+	    // 	"type":"net.swipe.swipe"
+	    this.step = defaultPage;
+	    this.pages = [];
+	    this.title = "Swipe";
+	    this.base_css_id = base_css_id;
+	    this.back_css_id = back_css_id;
+	    
+	    SwipeBook.setTemplateElements(this.getTemplateElements());
+	    SwipeBook.setMarkdown(this.getMarkdown());
+	    this.templatePages = this.getTemplatePages();
+	    this.setScreen();
+	    this.paging = this.getPaging();
+	    this.load();
+	    this.domLoad();
+	}
     }
     
     setScreen() {
