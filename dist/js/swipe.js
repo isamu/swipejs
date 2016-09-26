@@ -834,15 +834,15 @@ var SwipeElement = function () {
 			$("#" + this.css_id + "-video").css(this.convCssPos(data));
 		}
 	}, {
-		key: "getStripePos",
-		value: function getStripePos() {
+		key: "getSpritePos",
+		value: function getSpritePos() {
 			var w = this.prevPos[2];
 			var h = this.prevPos[3];
 			return [-(w * this.info.slot[0]), -(h * this.info.slot[1]), w * this.info.slice[0], h * this.info.slice[1]];
 		}
 	}, {
-		key: "setStripePos",
-		value: function setStripePos(pos) {
+		key: "setSpritePos",
+		value: function setSpritePos(pos) {
 			$("#" + this.css_id + "_sprite").css("left", pos[0]);
 			$("#" + this.css_id + "_sprite").css("top", pos[1]);
 
@@ -858,8 +858,8 @@ var SwipeElement = function () {
 				this.setVideo(this.prevPos);
 			}
 			if (this.isSprite()) {
-				var stripe_pos = this.getStripePos();
-				this.setStripePos(stripe_pos);
+				var stripe_pos = this.getSpritePos();
+				this.setSpritePos(stripe_pos);
 			}
 			if (this.isText()) {
 				$("#" + this.css_id + "-body").css(this.prevText);
@@ -1213,8 +1213,6 @@ var SwipeElement = function () {
 			if (this.isImage()) {
 				return "<div id='" + this.css_id + "' class='image_box'><div id='" + this.css_id + "_inner'>" + "<img src='" + this.info.img + "' class='image_element' id='" + this.css_id + "_image' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" + child_html + "</img></div></div>";
 			} else if (this.isSprite()) {
-
-				console.log(this.info);
 				return "<div id='" + this.css_id + "' class='image_box'><div id='" + this.css_id + "_inner'>" + "<img src='" + this.info.sprite + "' class='image_element' id='" + this.css_id + "_sprite' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" + child_html + "</img></div></div>";
 			} else if (this.isText()) {
 				return "<div class='element text_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + "<div class='text_body' id='" + this.css_id + "-body'>" + this.parseText(this.info.text) + child_html + "</div>" + "</div>";

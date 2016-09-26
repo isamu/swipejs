@@ -304,12 +304,12 @@ class SwipeElement {
 	var instance = this;
 	$("#" + this.css_id + "-video").css(this.convCssPos(data));
     }
-    getStripePos() {
+    getSpritePos() {
 	let w = this.prevPos[2];
 	let h = this.prevPos[3];
 	return [ - (w * this.info.slot[0]), - (h * this.info.slot[1]), w * this.info.slice[0],  h * this.info.slice[1]];
     }
-    setStripePos(pos) {
+    setSpritePos(pos) {
 	$("#" + this.css_id + "_sprite").css("left", pos[0]);
 	$("#" + this.css_id + "_sprite").css("top", pos[1]);
 
@@ -323,8 +323,8 @@ class SwipeElement {
 	    this.setVideo(this.prevPos);
 	}
 	if (this.isSprite()){
-	    let stripe_pos = this.getStripePos();
-	    this.setStripePos(stripe_pos);
+	    let sprite_pos = this.getSpritePos();
+	    this.setSpritePos(sprite_pos);
 	}
 	if (this.isText()) {
 	    $("#" + this.css_id + "-body").css(this.prevText);
