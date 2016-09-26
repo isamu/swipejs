@@ -304,11 +304,27 @@ class SwipeElement {
 	var instance = this;
 	$("#" + this.css_id + "-video").css(this.convCssPos(data));
     }
+    getStripePos() {
+	let w = this.prevPos[2];
+	let h = this.prevPos[3];
+	return [ - (w * this.info.slot[0]), - (h * this.info.slot[1]), w * this.info.slice[0],  h * this.info.slice[1]];
+    }
+    setStripePos(pos) {
+	$("#" + this.css_id + "_sprite").css("left", pos[0]);
+	$("#" + this.css_id + "_sprite").css("top", pos[1]);
+
+	$("#" + this.css_id + "_sprite").css("width", pos[2]);
+	$("#" + this.css_id + "_sprite").css("height", pos[3]);
+    }
     setPrevPos(){
 	var instance = this;
 	$("#" + this.css_id).css(this.convCssPos(this.prevPos));
 	if (this.isVideo()) {
 	    this.setVideo(this.prevPos);
+	}
+	if (this.isSprite()){
+	    let stripe_pos = this.getStripePos();
+	    this.setStripePos(stripe_pos);
 	}
 	if (this.isText()) {
 	    $("#" + this.css_id + "-body").css(this.prevText);
@@ -579,6 +595,8 @@ class SwipeElement {
     type() {
 	if (this.info.img) {
 	    return "image";
+	} else if (this.info.sprite) {
+	    return "sprite";
 	} else if (this.info.video){
 	    return "video";
 	} else if (this.info.text) {
@@ -594,6 +612,9 @@ class SwipeElement {
 
     isImage() {
 	return this.type() == "image";
+    }
+    isSprite() {
+	return this.type() == "sprite";
     }
     isVideo() {
 	return this.type() == "video";
@@ -625,6 +646,10 @@ class SwipeElement {
 	if (this.isImage()) {
 	    return "<div id='" + this.css_id + "' class='image_box'><div id='" + this.css_id + "_inner'>" +
 		"<img src='" + this.info.img + "' class='image_element' id='" + this.css_id + "_image' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" +
+		child_html + "</img></div></div>";
+	} else if (this.isSprite()) {
+	    return "<div id='" + this.css_id + "' class='image_box'><div id='" + this.css_id + "_inner'>" +
+		"<img src='" + this.info.sprite+ "' class='image_element' id='" + this.css_id + "_sprite' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" +
 		child_html + "</img></div></div>";
 	} else if (this.isText()) {
 	    return  "<div class='element text_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" +
