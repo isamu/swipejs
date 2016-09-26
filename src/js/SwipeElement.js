@@ -302,15 +302,7 @@ class SwipeElement {
     // set or animate position
     setVideo(data) {
 	var instance = this;
-	$("#" + this.css_id).html("<video id='" + this.css_id + "-video' width='"+ data[2] + "' height='" + data[3] + "'><source type='video/mp4' src='" + this.info.video + "'  /></video>");
-	$('#' + this.css_id + "-video").mediaelementplayer({
-
-	    flashName: 'flashmediaelement.swf',
-	    loop: true,
-	    success: function (mediaElement, domObject) { 
-		instance.videoElement = mediaElement;
-	    }
-        });
+	$("#" + this.css_id + "-video").css(this.convCssPos(data));
     }
     setPrevPos(){
 	var instance = this;
@@ -644,7 +636,12 @@ class SwipeElement {
 	    return  "<div class='element markdown_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" +
 		"<div class='markdown_wrap' id='md_" + this.css_id + "'>" + md_array[0] + child_html + "</div></div>";
 	} else if (this.isVideo()) {
-	    return  "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>";
+	    // return  "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>";
+	    return  "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" +
+		"<video id='" + this.css_id + "-video' ><source type='video/mp4' src='" + this.info.video + "'  /></video>" +
+		child_html + "</div>";
+
+
 	} else if (this.isPath()) {
 	    return  '<svg class="element svg_element" id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id +  '" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"></svg>';
 	} else if (this.isDiv()) {

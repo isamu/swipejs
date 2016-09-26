@@ -171,6 +171,22 @@ class SwipeBook {
 		instance.loadFinish();
 	    }
 	});
+
+	$(".video_element").each(function(index, element) {
+	    console.log("elelel");
+	    let player = new MediaElement( $(element).attr("id") + "-video", {
+		flashName: 'flashmediaelement.swf',
+		loop: true,
+		success: function (mediaElement, domObject) { 
+		    instance.videoElement = mediaElement;
+		}
+            });
+	    console.log($(element).attr("__page_id"));
+	    
+	    let media_player = SwipeMediaPlayer.getInstance();
+	    media_player.page($(element).attr("__page_id")).push(player);
+	});
+	
 	this.pages.forEach((page, page_index) => {
 	    var bc = page.getBc();
 	    $("#page_" + page_index).css({"background-color": bc});
@@ -277,6 +293,7 @@ class SwipeBook {
 		}
 	    }
 	}
+	this.pages[nextStep].mediaPlay();
 	
 	this.step = nextStep;
 	location.hash = nextStep;

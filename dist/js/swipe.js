@@ -214,6 +214,22 @@ var SwipeBook = function () {
 					instance.loadFinish();
 				}
 			});
+
+			$(".video_element").each(function (index, element) {
+				console.log("elelel");
+				var player = new MediaElement($(element).attr("id") + "-video", {
+					flashName: 'flashmediaelement.swf',
+					loop: true,
+					success: function success(mediaElement, domObject) {
+						instance.videoElement = mediaElement;
+					}
+				});
+				console.log($(element).attr("__page_id"));
+
+				var media_player = SwipeMediaPlayer.getInstance();
+				media_player.page($(element).attr("__page_id")).push(player);
+			});
+
 			this.pages.forEach(function (page, page_index) {
 				var bc = page.getBc();
 				$("#page_" + page_index).css({ "background-color": bc });
@@ -324,6 +340,7 @@ var SwipeBook = function () {
 					}
 				}
 			}
+			this.pages[nextStep].mediaPlay();
 
 			this.step = nextStep;
 			location.hash = nextStep;
@@ -814,15 +831,7 @@ var SwipeElement = function () {
 		key: "setVideo",
 		value: function setVideo(data) {
 			var instance = this;
-			$("#" + this.css_id).html("<video id='" + this.css_id + "-video' width='" + data[2] + "' height='" + data[3] + "'><source type='video/mp4' src='" + this.info.video + "'  /></video>");
-			$('#' + this.css_id + "-video").mediaelementplayer({
-
-				flashName: 'flashmediaelement.swf',
-				loop: true,
-				success: function success(mediaElement, domObject) {
-					instance.videoElement = mediaElement;
-				}
-			});
+			$("#" + this.css_id + "-video").css(this.convCssPos(data));
 		}
 	}, {
 		key: "setPrevPos",
@@ -1183,7 +1192,8 @@ var SwipeElement = function () {
 				this.md_css = md_array[1];
 				return "<div class='element markdown_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + "<div class='markdown_wrap' id='md_" + this.css_id + "'>" + md_array[0] + child_html + "</div></div>";
 			} else if (this.isVideo()) {
-				return "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>";
+				// return  "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>";
+				return "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + "<video id='" + this.css_id + "-video' ><source type='video/mp4' src='" + this.info.video + "'  /></video>" + child_html + "</div>";
 			} else if (this.isPath()) {
 				return '<svg class="element svg_element" id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id + '" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"></svg>';
 			} else if (this.isDiv()) {
@@ -1661,6 +1671,92 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var SwipeMediaPlayer = function () {
+			_createClass(SwipeMediaPlayer, null, [{
+						key: "getInstance",
+						value: function getInstance() {
+									if (this.instance) {
+												return this.instance;
+									}
+									this.instance = new SwipeMediaPlayer();
+									return this.instance;
+						}
+			}]);
+
+			function SwipeMediaPlayer() {
+						_classCallCheck(this, SwipeMediaPlayer);
+
+						this.current_page = 0;
+						this.current_playing = null;
+						this.media = {};
+			}
+
+			_createClass(SwipeMediaPlayer, [{
+						key: "page",
+						value: function page(num) {
+									this.current_page = num;
+									return this;
+						}
+			}, {
+						key: "push",
+						value: function push(media) {
+									if (!this.media[this.current_page]) {
+												this.media[this.current_page] = [];
+									}
+									console.log("push");
+									console.log(this.current_page);
+
+									this.media[this.current_page].push(media);
+									return this;
+						}
+			}, {
+						key: "play",
+						value: function play() {
+
+									if (this.current_playing != this.current_page) {
+												this.stop();
+												if (this.media[this.current_page]) {
+															console.log("pkay");
+															console.log(this.current_page);
+															this.media[this.current_page].forEach(function (media, media_index) {
+																		console.log("media");
+																		console.log(media_index);
+																		media.play();
+															});
+												}
+												this.current_playing = this.current_page;
+									}
+									return this;
+						}
+			}, {
+						key: "media",
+						value: function media() {
+									return this.media[this.current_page];
+						}
+			}, {
+						key: "stop",
+						value: function stop() {
+									if (this.current_playing !== null) {
+												console.log("stop");
+												console.log(this.current_playing);
+												if (this.media[this.current_playing]) {
+															this.media[this.current_playing].forEach(function (media, media_index) {
+																		media.stop();
+															});
+												}
+									}
+									this.current_playing = null;
+						}
+			}]);
+
+			return SwipeMediaPlayer;
+}();
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var SwipePage = function () {
 			function SwipePage(page, scene, index) {
 						_classCallCheck(this, SwipePage);
@@ -1743,6 +1839,13 @@ var SwipePage = function () {
 									this.elements.forEach(function (element, elem_index) {
 												element.justShow();
 									});
+						}
+			}, {
+						key: "mediaPlay",
+						value: function mediaPlay() {
+									var media_player = SwipeMediaPlayer.getInstance();
+									media_player.page(this.index).play();
+									// console.log(this.index);
 						}
 			}, {
 						key: "show",

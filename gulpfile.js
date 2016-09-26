@@ -5,7 +5,7 @@ var concat = require('gulp-concat');
 var runSequence = require('run-sequence');
  
 
-var version = "0.0.5";
+var version = "0.0.6";
 
 gulp.task("babel", function () {
     gulp.src("src/js/*.js")
@@ -16,6 +16,12 @@ gulp.task("babel2", function () {
     gulp.src("src/js/misc/*.js")
         .pipe(babel())
         .pipe(gulp.dest("lib/misc/"));
+});
+
+gulp.task("babel3", function () {
+    gulp.src("src/js/misc/*.js")
+        .pipe(babel())
+        .pipe(gulp.dest("dist/js/mics/"));
 });
 
 gulp.task('uglify', function(){
@@ -41,10 +47,10 @@ gulp.task('concat', function(){
 });
 
 gulp.task('watch', function() {
-    gulp.watch(['src/js/*.js', 'src/js/misc/*.js'], ['babel', 'babel2', 'uglify', 'concat'])
+    gulp.watch(['src/js/*.js', 'src/js/misc/*.js'], ['babel', 'babel2', 'babel3', 'uglify', 'concat'])
 });
 
 
 gulp.task('default', function(cb) {
-    return runSequence(['babel', 'babel2', 'uglify', 'concat'], cb);
+    return runSequence(['babel', 'babel2', 'babel3', 'uglify', 'concat'], cb);
 });
