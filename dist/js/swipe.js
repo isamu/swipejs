@@ -1324,9 +1324,7 @@ var SwipeElement = function () {
 						duration = duration - this.transition_timing[2];
 					}
 					var instance = this;
-					setTimeout(function () {
-						instance.loop(instance);
-					}, duration);
+					instance.loop(instance, null, duration);
 				} else {
 					console.log("not animate because " + this.play);
 				}
@@ -1352,6 +1350,7 @@ var SwipeElement = function () {
 		key: "loop",
 		value: function loop(instance) {
 			var repeat = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+			var wait_duration = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
 
 			console.log("loop");
 			var data = instance.info["loop"];
@@ -1474,13 +1473,13 @@ var SwipeElement = function () {
 					case "path":
 
 				}
-			}, start_duration);
+			}, start_duration + wait_duration);
 
 			if (data["style"] == "sprite") {
 				console.log("sprite");
 				var _repeat = instance.valueFrom(data, "repeat");
 				var block = instance.info.slice[0];
-				var timing = duration / _repeat / block;
+				var timing = (start_duration + wait_duration) / _repeat / block;
 				for (var i = 0; i < _repeat; i++) {
 					var _loop = function _loop(j) {
 						$("#" + instance.css_id + "_sprite").delay(timing).queue(function () {

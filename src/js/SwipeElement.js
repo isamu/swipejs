@@ -758,9 +758,7 @@ class SwipeElement {
 		    duration = duration - this.transition_timing[2];
 		}
 		var instance = this;
-		setTimeout(function(){
-		    instance.loop(instance);
-		}, duration);
+		instance.loop(instance, null, duration);
 	    } else {
 		console.log("not animate because " + this.play);
 	    }
@@ -781,7 +779,7 @@ class SwipeElement {
 	    }
 	}, end_duration);
     }
-    loop(instance, repeat=null){
+    loop(instance, repeat=null, wait_duration=0){
 	console.log("loop");
 	var data = instance.info["loop"];
 
@@ -909,14 +907,14 @@ class SwipeElement {
 
 		
 	    }
-	}, start_duration);
+	}, start_duration + wait_duration);
 
 
 	if (data["style"] == "sprite"){
 	    console.log("sprite");
 	    let repeat = instance.valueFrom(data, "repeat");
 	    let block = instance.info.slice[0];
-	    var timing = duration / repeat / block;
+	    var timing = (start_duration + wait_duration) / repeat / block;
 	    for(let i = 0; i < repeat ; i ++) {
 		for(let j = 0; j < block ; j ++) {
 		    $("#" + instance.css_id + "_sprite").delay(timing).queue(function(){
