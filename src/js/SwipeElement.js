@@ -309,12 +309,16 @@ class SwipeElement {
 	let h = this.prevPos[3];
 	return [ - (w * this.info.slot[0]), - (h * this.info.slot[1]), w * this.info.slice[0],  h * this.info.slice[1]];
     }
+    getSpriteCss(pos) {
+	return {
+	    left: pos[0],
+	    top: pos[1],
+	    width: pos[2],
+	    height: pos[3]
+	};
+    }
     setSpritePos(pos) {
-	$("#" + this.css_id + "_sprite").css("left", pos[0]);
-	$("#" + this.css_id + "_sprite").css("top", pos[1]);
-
-	$("#" + this.css_id + "_sprite").css("width", pos[2]);
-	$("#" + this.css_id + "_sprite").css("height", pos[3]);
+	$("#" + this.css_id + "_sprite").css(this.getSpriteCss(pos));
     }
     setPrevPos(){
 	var instance = this;
@@ -902,13 +906,34 @@ class SwipeElement {
 		});
 		break;
             case "path":
-            case "sprite":
+
 		
 	    }
 	}, start_duration);
-	
+
+
+	if (data["style"] == "sprite"){
+	    console.log("sprite");
+	    let repeat = instance.valueFrom(data, "repeat");
+	    let block = instance.info.slice[0];
+	    var timing = duration / repeat / block;
+	    for(let i = 0; i < repeat ; i ++) {
+		for(let j = 0; j < block ; j ++) {
+		    $("#" + instance.css_id + "_sprite").delay(timing).queue(function(){
+			let pos = instance.getLoopSpritePos(j);
+			$(this).css(instance.getSpriteCss(pos)).dequeue();
+		    });
+		}
+	    }
+	}
     }
 
+    getLoopSpritePos(num) {
+	let w = this.prevPos[2];
+	let h = this.prevPos[3];
+	return [ - (w * num), - (h * this.info.slot[1]), w * this.info.slice[0],  h * this.info.slice[1]];
+    }
+    
     valueFrom(data, key, defaultValue){
 	if (data[key]){
 	    return data[key];
