@@ -18,7 +18,6 @@ class SwipeBook {
         $('head').prepend('<meta name="viewport" content="width = 640,user-scalable=no">');
 
 	this.data = data;
-	console.log(data["type"]);
 	if (data["type"] == "net.swipe.list") {
 	    let html = []
 	    this.data.items.forEach((item, item_index) => {
@@ -173,7 +172,6 @@ class SwipeBook {
 	});
 
 	$(".video_element").each(function(index, element) {
-	    console.log("elelel");
 	    let player = new MediaElement( $(element).attr("id") + "-video", {
 		flashName: 'flashmediaelement.swf',
 		loop: true,
@@ -181,7 +179,6 @@ class SwipeBook {
 		    instance.videoElement = mediaElement;
 		}
             });
-	    console.log($(element).attr("__page_id"));
 	    
 	    let media_player = SwipeMediaPlayer.getInstance();
 	    media_player.page($(element).attr("__page_id")).push(player);
