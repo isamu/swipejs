@@ -18,6 +18,7 @@ class SwipeElement {
 	this.x = 0;
 	this.y = 0;
 	this.angle = 0;
+	this.to_angle = 0;
 	this.scale = [1, 1];
 	this.no_size = false;
 
@@ -250,9 +251,19 @@ class SwipeElement {
 	    }
 	}
 	if (this.info["rotate"]) {
-	    this.angle = this.info["rotate"];
+	    this.angle = this.getAngle(this.info["rotate"]);
+	    console.log(this.angle);
 	}
 	this.scale = this.getScale(this.info);
+    }
+
+    getAngle(data) {
+	console.log(data);
+	if (jQuery.isArray(data)) {
+	    return data[2];
+	} else {
+	    return data;
+	}
     }
     
     getWidth() {
@@ -463,6 +474,11 @@ class SwipeElement {
 		duration: this.duration
 	});
 	if (this.hasTo()) {
+	    if (this.to_angle > 0 ) {
+		$("#" + this.css_id).rotate({
+		    angle: this.to_angle, animateTo: this.angle, duration: this.duration,
+		})
+	    }
 	    if (this.isText()) {
 		$("#" + this.css_id + "-body").animate(this.prevText, {
 		    duration: this.duration
@@ -502,6 +518,12 @@ class SwipeElement {
 	    
 	    var instance = this;
 	    setTimeout(function(){
+		// todo back
+		if (instance.to_angle > 0 ) {
+		    $("#" + instance.css_id).rotate({
+			angle: instance.angle, animateTo: instance.to_angle, duration: do_duration,
+		    })
+		}
 		$("#" + instance.css_id).animate(instance.convCssPos(instance.finPos), {
 		    duration: do_duration
 		});
@@ -525,7 +547,6 @@ class SwipeElement {
 	if(to["opacity"] != null) {
 	    ret[5] = Number(to["opacity"]);
 	}
-
 	if(to["translate"]) {
 	    var translate = to["translate"];
 	    ret[0] = ret[0] + Number(translate[0]);
@@ -537,6 +558,10 @@ class SwipeElement {
 		// todo skip path!?
 		ret = this.applyScale(ret);
 	    }
+	}
+	if (to["rotate"]) {
+	    // ret[4] = this.getAngle(to["rotate"]);
+	    this.to_angle = this.getAngle(to["rotate"]);
 	}
 	return ret;
     }
@@ -586,7 +611,9 @@ class SwipeElement {
 	    'height': data[3] + 'px',
 	    'opacity' : data[5]
 	};
+	console.log(data[4]);
 	if (data[4]) {
+	    console.log("RORATE");
 	    var rotate = "rotate(" + data[4] +"deg)";
 	    ret["-moz-transform"] = rotate;
 	    ret["-webkit-transform"] = rotate;
