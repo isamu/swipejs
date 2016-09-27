@@ -4,9 +4,11 @@ class SwipeParser {
     }
 
     static parseColor(info, defaultColor){
-	
 	if (info && info["color"]) {
 	    return info["color"];
+	}
+	if (info && info["textColor"]) {
+	    return info["textColor"];
 	}
 	return defaultColor;
     }

@@ -252,13 +252,11 @@ class SwipeElement {
 	}
 	if (this.info["rotate"]) {
 	    this.angle = this.getAngle(this.info["rotate"]);
-	    console.log(this.angle);
 	}
 	this.scale = this.getScale(this.info);
     }
 
     getAngle(data) {
-	console.log(data);
 	if (jQuery.isArray(data)) {
 	    return data[2];
 	} else {
@@ -408,7 +406,7 @@ class SwipeElement {
 	    "line-height" : String(SwipeScreen.virtualY(fontSize)) + "px",
 	    "font-family": fontname,
 	    "textAlign": textAlign,
-	    "color": SwipeParser.parseColor(info, "#000")
+	    "color": this.conv_rgba2rgb(SwipeParser.parseColor(info, "#000"))
 	};
     }
 
@@ -611,9 +609,7 @@ class SwipeElement {
 	    'height': data[3] + 'px',
 	    'opacity' : data[5]
 	};
-	console.log(data[4]);
 	if (data[4]) {
-	    console.log("RORATE");
 	    var rotate = "rotate(" + data[4] +"deg)";
 	    ret["-moz-transform"] = rotate;
 	    ret["-webkit-transform"] = rotate;
