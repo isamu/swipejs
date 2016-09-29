@@ -760,9 +760,7 @@ class SwipeElement {
     getLoopDuration(duration){
 	var loop_duration = duration;
 	if ( this.transition_timing) {
-	    if(this.transition_timing[2] == 0) {
-		loop_duration = 200;
-	    } else {
+	    if(this.transition_timing[2] != 0) {
 		loop_duration = this.transition_timing[2];
 	    }
 	}
@@ -935,11 +933,11 @@ class SwipeElement {
 
 	if (data["style"] == "sprite"){
 	    console.log("sprite");
-	    let repeat = instance.valueFrom(data, "repeat");
+	    let repeat = instance.valueFrom(data, "repeat") || instance.valueFrom(data, "count") ;
 	    let block = instance.info.slice[0];
-	    var timing = (start_duration + wait_duration) / repeat / block;
-	    for(let i = 0; i < repeat ; i ++) {
-		for(let j = 0; j < block ; j ++) {
+	    var timing = (duration) / repeat / block;
+	    for(let i = 0; i < repeat; i ++) {
+		for(let j = 0; j < block; j ++) {
 		    $("#" + instance.css_id + "_sprite").delay(timing).queue(function(){
 			let pos = instance.getLoopSpritePos(j);
 			$(this).css(instance.getSpriteCss(pos)).dequeue();
