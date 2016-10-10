@@ -8,30 +8,30 @@ var runSequence = require('run-sequence');
 var version = "0.1.0";
 
 gulp.task("babel", function () {
-    gulp.src("src/js/*.js")
+    return gulp.src("src/js/*.js")
         .pipe(babel())
         .pipe(gulp.dest("lib/"));
 });
-gulp.task("babel2", function () {
-    gulp.src("src/js/misc/*.js")
+gulp.task("babel2", ["babel"], function () {
+    return gulp.src("src/js/misc/*.js")
         .pipe(babel())
         .pipe(gulp.dest("lib/misc/"));
 });
 
-gulp.task("babel3", function () {
-    gulp.src("src/js/misc/*.js")
+gulp.task("babel3",["babel2"], function () {
+    return gulp.src("src/js/misc/*.js")
         .pipe(babel())
         .pipe(gulp.dest("dist/js/mics/"));
 });
 
-gulp.task('uglify', function(){
-    gulp.src("lib/*.js")
+gulp.task('uglify', ["babel3"], function(){
+    return gulp.src("lib/*.js")
         .pipe(uglify({preserveComments: 'some'}))
         .pipe(gulp.dest("tmp/"))
     ;
 });
 
-gulp.task('concat', function(){
+gulp.task('concat', ['babel', 'babel2', 'babel3', 'uglify'], function(){
     gulp.src('tmp/*.js')
         .pipe(concat('swipe-' + version + '.min.js'))
         .pipe(gulp.dest('dist/js/')) ;

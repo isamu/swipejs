@@ -1,7 +1,15 @@
 class SwipeScreen {
+    static getSize(){
+	if (this.size) {
+	    return this.size;
+	} else {
+	    return 100;
+	}
+    }
     static setSize(size){
 	this.size = size;
     }
+
     static init(width, height){
 	this.width = width;
 	this.height = height;

@@ -108,9 +108,10 @@ class SwipeBook {
 	    position: "absolute",
 	    left: x
 	});
+	var height = SwipeScreen.getSize();
 	$(this.back_css_id).css({
 	    "background-color": this.bc,
-	    "height": "100vh",
+	    "height": height + "vh",
 	    "width": "100vw"
 	});
     }
