@@ -16,9 +16,11 @@ class SwipePage {
     loadElement(){
 	var instance = this;
 	var elems = []
-	this.page["elements"].forEach(function(element, elem_index){
-	    instance.elements.push(new SwipeElement(element, instance.index, elem_index, instance.play_style, instance.duration));
-	});
+	if (this.page["elements"]) {
+	    this.page["elements"].forEach(function(element, elem_index){
+		instance.elements.push(new SwipeElement(element, instance.index, elem_index, instance.play_style, instance.duration));
+	    });
+	}
     }
 
     elementLoad(element){
