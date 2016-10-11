@@ -58,6 +58,9 @@ class SwipeBook {
 	    if (page["template"] && (scene = this.templatePages[page["template"]]) ){
 		scene = this.templatePages[page["template"]];
 	    }
+	    if (this.templatePages["*"]) {
+		scene = this.templatePages["*"];
+	    }
 	    var pageInstance = new SwipePage(page, scene, index);
 
 	    this.pages.push(pageInstance);
@@ -70,6 +73,7 @@ class SwipeBook {
 
     getTemplatePages() {
 	if (this.data["templates"] && this.data["templates"]["pages"]) {
+	    
 	    return this.data["templates"]["pages"];
 	} else if (this.data["scenes"]) {
 	    return this.data["scenes"];
