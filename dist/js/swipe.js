@@ -967,17 +967,14 @@ var SwipeElement = function () {
 
 			scale_array = [default_scale[0] * scale[0], default_scale[1] * scale[1]];
 
+			var cx = 0;
+			var cy = 0;
 			if (scale && (scale[0] != 1.0 || scale[1] != 1.0)) {
-				var cx = (1 - scale[0]) * this.prevPos[2] / 2;
-				var cy = (1 - scale[1]) * this.prevPos[3] / 2;
+				cx = (1 - scale[0]) * this.prevPos[2] / 2;
+				cy = (1 - scale[1]) * this.prevPos[3] / 2;
 				ret.push("translate(" + String(cx) + "," + String(cy) + ")");
 			}
 			ret.push("scale(" + scale_array.join(",") + ")");
-
-			if (info.rotate) {
-				var r = info.rotate ? [info.rotate[2], this.initPosData[2] / 2, this.initPosData[3] / 2].join(",") : "0,0,0";
-				ret.push("rotate(" + r + ")");
-			}
 			return ret.join(" ");
 		}
 	}, {
@@ -1008,7 +1005,7 @@ var SwipeElement = function () {
 
 			var line = info.lineWidth ? info.lineWidth : 1;
 			var strokeColor = info.strokeColor ? info.strokeColor : "black";
-			var fillColor = this.info.fillColor ? this.info.fillColor == "#0000" ? "none" : this.info.fillColor : "none";
+			var fillColor = info.fillColor ? info.fillColor == "#0000" ? "none" : info.fillColor : "none";
 
 			var r = info.rotate ? [info.rotate[2], this.prevPos[2] / 2, this.prevPos[3] / 2].join(",") : "0,0,0";
 
@@ -1029,7 +1026,7 @@ var SwipeElement = function () {
 				duration: this.duration
 			});
 			if (this.hasTo()) {
-				if (this.to_angle > 0) {
+				if (this.to_angle != this.angle) {
 					$("#" + this.css_id).rotate({
 						angle: this.to_angle, animateTo: this.angle, duration: this.duration
 					});
@@ -1076,12 +1073,12 @@ var SwipeElement = function () {
 				this.transition_timing = this.getTiming(this.info["to"], this.duration);
 				var start_duration = this.transition_timing[0];
 				var do_duration = this.transition_timing[1];
+				console.log(do_duration);
 
 				var instance = this;
 				setTimeout(function () {
 					// todo back
-					if (instance.to_angle > 0) {
-						console.log(instance.to_angle);
+					if (instance.angle != instance.to_angle) {
 						$("#" + instance.css_id).rotate({
 							angle: instance.angle, animateTo: instance.to_angle, duration: do_duration
 						});
