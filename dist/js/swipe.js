@@ -509,6 +509,8 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var hoge = {};
+
 var SwipeElement = function () {
 	function SwipeElement(info, page_id, element_id, play, duration) {
 		var parent = arguments.length <= 5 || arguments[5] === undefined ? null : arguments[5];
@@ -533,7 +535,7 @@ var SwipeElement = function () {
 		this.y = 0;
 		this.angle = 0;
 		this.to_angle = 0;
-		this.scale = [1, 1];
+		this.scale = [1.0, 1.0];
 		this.no_size = false;
 
 		this.transition_timing = null;
@@ -611,6 +613,7 @@ var SwipeElement = function () {
 			if (this.isPath()) {
 				this.snap = Snap("#" + this.css_id);
 				this.path = this.snap.path();
+				hoge[this.css_id] = this.path;
 			}
 
 			this.setSize();
@@ -883,13 +886,8 @@ var SwipeElement = function () {
 				$("#" + this.css_id + "-body").css(this.prevText);
 			}
 			if (this.isPath()) {
-				this.path.attr({
-					d: this.prevPath.d,
-					fill: this.prevPath.fill,
-					transform: this.prevPath.transform,
-					stroke: this.prevPath.stroke,
-					strokeWidth: this.prevPath.strokeWidth
-				});
+				this.path.attr(this.prevPath.path);
+				this.path.attr({ fill: this.prevPath.fill });
 			}
 			if (this.isMarkdown()) {
 				this.md_css.forEach(function (element, elem_index) {
@@ -963,18 +961,23 @@ var SwipeElement = function () {
 	}, {
 		key: "transform",
 		value: function transform(info, scale) {
-
 			var ret = [];
 			var default_scale = [SwipeScreen.getRation(), SwipeScreen.getRation()];
-			if (scale) {
-				default_scale = [default_scale[0] * scale[0], default_scale[1] * scale[1]];
+			var scale_array = [];
+
+			scale_array = [default_scale[0] * scale[0], default_scale[1] * scale[1]];
+
+			if (scale && (scale[0] != 1.0 || scale[1] != 1.0)) {
+				var cx = (1 - scale[0]) * this.prevPos[2] / 2;
+				var cy = (1 - scale[1]) * this.prevPos[3] / 2;
+				ret.push("translate(" + String(cx) + "," + String(cy) + ")");
 			}
-			var scale_array = [default_scale[0], default_scale[1], this.initPosData[2] / 2, this.initPosData[3] / 2];
 			ret.push("scale(" + scale_array.join(",") + ")");
 
-			var r = info.rotate ? [info.rotate[2], this.initPosData[2] / 2, this.initPosData[3] / 2].join(",") : "0,0,0";
-			ret.push("rotate(" + r + ")");
-
+			if (info.rotate) {
+				var r = info.rotate ? [info.rotate[2], this.initPosData[2] / 2, this.initPosData[3] / 2].join(",") : "0,0,0";
+				ret.push("rotate(" + r + ")");
+			}
 			return ret.join(" ");
 		}
 	}, {
@@ -982,14 +985,17 @@ var SwipeElement = function () {
 		value: function parsePath() {
 			var line = this.info.lineWidth ? this.info.lineWidth : 1;
 			var strokeColor = this.info.strokeColor ? this.info.strokeColor : "black";
-			var fillColor = this.info.fillColor ? this.info.fillColor : "none";
+			// todo rpga color
+			var fillColor = this.info.fillColor ? this.info.fillColor == "#0000" ? "none" : this.info.fillColor : "none";
 
 			return {
-				d: this.info.path,
-				stroke: this.conv_rgba2rgb(strokeColor),
-				transform: this.transform(this.info, this.scale),
-				fill: this.conv_rgba2rgb(fillColor),
-				strokeWidth: line
+				path: {
+					d: this.info.path,
+					transform: this.transform(this.info, this.scale),
+					stroke: this.conv_rgba2rgb(strokeColor),
+					strokeWidth: line
+				},
+				fill: this.conv_rgba2rgb(fillColor)
 			};
 		}
 	}, {
@@ -1002,16 +1008,18 @@ var SwipeElement = function () {
 
 			var line = info.lineWidth ? info.lineWidth : 1;
 			var strokeColor = info.strokeColor ? info.strokeColor : "black";
-			var fillColor = info.fillColor ? info.fillColor : "none";
+			var fillColor = this.info.fillColor ? this.info.fillColor == "#0000" ? "none" : this.info.fillColor : "none";
 
 			var r = info.rotate ? [info.rotate[2], this.prevPos[2] / 2, this.prevPos[3] / 2].join(",") : "0,0,0";
 
 			return {
-				d: info.path,
-				stroke: this.conv_rgba2rgb(strokeColor),
-				transform: this.transform(info, this.getScale(info)),
-				fill: this.conv_rgba2rgb(fillColor),
-				strokeWidth: line
+				path: {
+					d: info.path,
+					transform: this.transform(info, this.getScale(info)),
+					stroke: this.conv_rgba2rgb(strokeColor),
+					strokeWidth: line
+				},
+				fill: this.conv_rgba2rgb(fillColor)
 			};
 		}
 	}, {
@@ -1032,9 +1040,12 @@ var SwipeElement = function () {
 					});
 				}
 				if (this.isPath()) {
-					var path = SwipeParser.clone(this.prevPath);
+					var path = SwipeParser.clone(this.prevPath.path);
 					delete path.stroke;
 					this.path.animate(path, this.duration);
+					if (this.prevPath.fill != this.finPath.fill) {
+						this.path.attr({ fill: this.prevPath.fill });
+					}
 				}
 			}
 		}
@@ -1070,6 +1081,7 @@ var SwipeElement = function () {
 				setTimeout(function () {
 					// todo back
 					if (instance.to_angle > 0) {
+						console.log(instance.to_angle);
 						$("#" + instance.css_id).rotate({
 							angle: instance.angle, animateTo: instance.to_angle, duration: do_duration
 						});
@@ -1083,9 +1095,14 @@ var SwipeElement = function () {
 						});
 					}
 					if (instance.isPath()) {
-						var path = SwipeParser.clone(instance.finPath);
+						var path = SwipeParser.clone(instance.finPath.path);
 						delete path.stroke;
 						instance.path.animate(path, do_duration);
+						if (instance.prevPath.fill != instance.finPath.fill) {
+							setTimeout(function () {
+								instance.path.attr({ fill: instance.finPath.fill });
+							}, do_duration);
+						}
 					}
 				}, start_duration);
 			}

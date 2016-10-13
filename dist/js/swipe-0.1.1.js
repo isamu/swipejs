@@ -883,13 +883,7 @@ var SwipeElement = function () {
 				$("#" + this.css_id + "-body").css(this.prevText);
 			}
 			if (this.isPath()) {
-				this.path.attr({
-					d: this.prevPath.d,
-					fill: this.prevPath.fill,
-					transform: this.prevPath.transform,
-					stroke: this.prevPath.stroke,
-					strokeWidth: this.prevPath.strokeWidth
-				});
+				this.path.attr(this.prevPath.path);
 			}
 			if (this.isMarkdown()) {
 				this.md_css.forEach(function (element, elem_index) {
@@ -985,11 +979,13 @@ var SwipeElement = function () {
 			var fillColor = this.info.fillColor ? this.info.fillColor : "none";
 
 			return {
-				d: this.info.path,
-				stroke: this.conv_rgba2rgb(strokeColor),
-				transform: this.transform(this.info, this.scale),
-				fill: this.conv_rgba2rgb(fillColor),
-				strokeWidth: line
+				path: {
+					d: this.info.path,
+					stroke: this.conv_rgba2rgb(strokeColor),
+					transform: this.transform(this.info, this.scale),
+					strokeWidth: line
+				},
+				fill: this.conv_rgba2rgb(fillColor)
 			};
 		}
 	}, {
@@ -1003,15 +999,22 @@ var SwipeElement = function () {
 			var line = info.lineWidth ? info.lineWidth : 1;
 			var strokeColor = info.strokeColor ? info.strokeColor : "black";
 			var fillColor = info.fillColor ? info.fillColor : "none";
+			console.log(info);
+			console.log("-----");
+			console.log(fillColor);
+			console.log(this.conv_rgba2rgb(fillColor));
 
 			var r = info.rotate ? [info.rotate[2], this.prevPos[2] / 2, this.prevPos[3] / 2].join(",") : "0,0,0";
 
 			return {
-				d: info.path,
-				stroke: this.conv_rgba2rgb(strokeColor),
-				transform: this.transform(info, this.getScale(info)),
-				fill: this.conv_rgba2rgb(fillColor),
-				strokeWidth: line
+				path: {
+					d: info.path,
+					stroke: this.conv_rgba2rgb(strokeColor),
+					transform: this.transform(info, this.getScale(info)),
+					strokeWidth: line
+				},
+				fill: '#e4007f'
+				//	    fill: this.conv_rgba2rgb(fillColor),
 			};
 		}
 	}, {
@@ -1032,7 +1035,7 @@ var SwipeElement = function () {
 					});
 				}
 				if (this.isPath()) {
-					var path = SwipeParser.clone(this.prevPath);
+					var path = SwipeParser.clone(this.prevPath.path);
 					delete path.stroke;
 					this.path.animate(path, this.duration);
 				}
@@ -1083,7 +1086,7 @@ var SwipeElement = function () {
 						});
 					}
 					if (instance.isPath()) {
-						var path = SwipeParser.clone(instance.finPath);
+						var path = SwipeParser.clone(instance.finPath.path);
 						delete path.stroke;
 						instance.path.animate(path, do_duration);
 					}
