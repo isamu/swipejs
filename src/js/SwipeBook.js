@@ -18,19 +18,20 @@ class SwipeBook {
         $('head').prepend('<meta name="viewport" content="width = 640,user-scalable=no">');
 
 	this.data = data;
+	this.title = "Swipe";
+	this.pages = [];
+	this.base_css_id = base_css_id;
+	this.back_css_id = back_css_id;
 	if (data["type"] == "net.swipe.list") {
 	    let html = []
 	    this.data.items.forEach((item, item_index) => {
 		html.push('<li><a href="?file=' + item["url"] +  '">' + item["title"]  + '</li>');
 	    });
 	    $(base_css_id).html("<ul>" + html.join("") + "</ul>");
+	    this.setScreen();
 	} else {
 	    // 	"type":"net.swipe.swipe"
 	    this.step = defaultPage;
-	    this.pages = [];
-	    this.title = "Swipe";
-	    this.base_css_id = base_css_id;
-	    this.back_css_id = back_css_id;
 	    
 	    SwipeBook.setTemplateElements(this.getTemplateElements());
 	    SwipeBook.setMarkdown(this.getMarkdown());
@@ -38,7 +39,12 @@ class SwipeBook {
 	    this.setScreen();
 	    this.paging = this.getPaging();
 	    this.load();
-	    this.domLoad();
+	    if (this.step > this.pages.length) {
+		this.step = this.pages.length - 1;
+	    }
+	    if (this.pages.length > 0) {
+		this.domLoad();
+	    }
 	}
     }
     
