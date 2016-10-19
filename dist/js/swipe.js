@@ -932,7 +932,7 @@ var SwipeElement = function () {
 			var fontSize = function (info, scale) {
 				var defaultSize = 20 / 480 * SwipeScreen.swipeheight();
 				var size = SwipeParser.parseFontSize(info, SwipeScreen.swipeheight(), defaultSize, false);
-				return Math.round(size * scale[1]);
+				return Math.round(size * Math.abs(scale[1]));
 			}(info, data[6]);
 
 			var containerHeight = fontSize;
@@ -971,13 +971,15 @@ var SwipeElement = function () {
 			var default_scale = [SwipeScreen.getRation(), SwipeScreen.getRation()];
 			var scale_array = [];
 
-			scale_array = [default_scale[0] * scale[0], default_scale[1] * scale[1]];
+			var scale_x = Math.abs(scale[0]);
+			var scale_y = Math.abs(scale[1]);
+			scale_array = [default_scale[0] * scale_x, default_scale[1] * scale_y];
 
 			var cx = 0;
 			var cy = 0;
-			if (scale && (scale[0] != 1.0 || scale[1] != 1.0)) {
-				cx = (1 - scale[0]) * this.prevPos[2] / 2;
-				cy = (1 - scale[1]) * this.prevPos[3] / 2;
+			if (scale && (scale_x != 1.0 || scale_y != 1.0)) {
+				cx = (1 - scale_x) * this.prevPos[2] / 2;
+				cy = (1 - scale_y) * this.prevPos[3] / 2;
 				ret.push("translate(" + String(cx) + "," + String(cy) + ")");
 			}
 			ret.push("scale(" + scale_array.join(",") + ")");
@@ -1158,6 +1160,7 @@ var SwipeElement = function () {
 					scale = [Number(info["scale"]), Number(info["scale"])];
 				}
 			}
+			// scale = [Math.abs(scale[0]), Math.abs(scale[1])];
 			return scale;
 		}
 	}, {
@@ -1165,8 +1168,10 @@ var SwipeElement = function () {
 		value: function applyScale(data) {
 			var scale = data[6];
 			if (scale && scale.length == 2 && scale[0] != 1 && scale[1] != 1) {
-				var new_w = data[2] * scale[0];
-				var new_h = data[3] * scale[1];
+				var scale_x = Math.abs(scale[0]);
+				var scale_y = Math.abs(scale[1]);
+				var new_w = data[2] * scale_x;
+				var new_h = data[3] * scale_y;
 				var new_x = data[0] - (new_w - data[2]) / 2;
 				var new_y = data[1] - (new_h - data[3]) / 2;
 				data[0] = new_x;
@@ -1192,6 +1197,30 @@ var SwipeElement = function () {
 				ret["-webkit-transform"] = rotate;
 				ret["-o-transform"] = rotate;
 				ret["-ms-transform"] = rotate;
+			}
+			var scale = data[6];
+			if (scale && scale.length == 2 && (scale[0] < 0 || scale[1] < 0)) {
+				if (scale[0] < 0 && scale[1] < 0) {
+					ret["-webkit-transform"] = "scale(-1,-1)";
+					ret["-o-transform"] = "scale(-1,-1)";
+					ret["-moz-transform"] = "scale(-1,-1)";
+					ret["transform"] = "scale(-1,-1)";
+					ret["filter"] = "FlipH FlipV";
+				} else if (scale[0] < 0) {
+					ret["-webkit-transform"] = "scaleX(-1)";
+					ret["-o-transform"] = "scaleX(-1)";
+					ret["-moz-transform"] = "scaleX(-1)";
+					ret["transform"] = "scaleX(-1)";
+					ret["filter"] = "FlipH";
+					ret["-ms-filter"] = "FlipH";
+				} else if (scale[1] < 0) {
+					ret["-webkit-transform"] = "scaleY(-1)";
+					ret["-o-transform"] = "scaleY(-1)";
+					ret["-moz-transform"] = "scaleY(-1)";
+					ret["transform"] = "scaleY(-1)";
+					ret["filter"] = "FlipV";
+					ret["-ms-filter"] = "FlipV";
+				}
 			}
 			return ret;
 		}
