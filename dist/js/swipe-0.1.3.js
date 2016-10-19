@@ -734,7 +734,7 @@ var SwipeElement = function () {
 				this.h = this.info["size"][1];
 			} else {
 				if (this.info["w"]) {
-					this.w = SwipeParser.parseSize(this.info["w"], SwipeScreen.swipewidth(), SwipeScreen.swipewidth());
+					this.w = SwipeParser.parseSize(this.info["w"], this.getWidth(), this.getWidth());
 				} else {
 					if (this.isImage()) {
 						this.w = $("#" + this.css_id).attr("__default_width");
@@ -744,7 +744,7 @@ var SwipeElement = function () {
 					}
 				}
 				if (this.info["h"]) {
-					this.h = SwipeParser.parseSize(this.info["h"], SwipeScreen.swipeheight(), SwipeScreen.swipeheight());
+					this.h = SwipeParser.parseSize(this.info["h"], this.getHeight(), this.getHeight());
 				} else {
 					if (this.isImage()) {
 						this.h = $("#" + this.css_id).attr("__default_height");

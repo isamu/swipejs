@@ -243,7 +243,6 @@ class SwipeBook {
 	    this.pages[nextStep].active();
 	}
 	var transition = this.pages[Math.max(currentStep, nextStep)].getTransition();
-
 	
 	if (mode == "forward") {
 	    if (same_scene) {
