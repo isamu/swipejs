@@ -653,7 +653,6 @@ class SwipeElement {
 	    var direction_y = (scale[1] < 0) ? "-1" : "1";
 	    
 	    let transform = "scale(" + direction_x + "," + direction_y +")";
-	    console.log(transform);
 	    ret["-webkit-transform"] = transform;
 	    ret["-o-transform"] = transform;
 	    ret["-moz-transform"] = transform;
@@ -791,6 +790,16 @@ class SwipeElement {
 	}, SwipeBook.pageInDuration());
     }
 
+    doLoopProcess() {
+	console.log("show");
+	if (this.elements) {
+	    this.elements.forEach(function(element, elem_index){
+		element.doLoopProcess();
+	    });
+	}
+	this.loopProcess();
+    }
+    
     getTiming(element, duration){
 	var timing = function(element) {
 	    if (element["timing"]) {

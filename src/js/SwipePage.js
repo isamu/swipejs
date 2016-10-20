@@ -121,6 +121,11 @@ class SwipePage {
 	    element.play();
 	});
     }
+    doLoopProcess() {
+	this.elements.forEach(function(element, elem_index){
+	    element.doLoopProcess();
+	});
+    }
     getScene() {
 	return this.scene;
     }
