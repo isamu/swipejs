@@ -243,61 +243,49 @@ class SwipeBook {
 	    this.pages[nextStep].active();
 	}
 	var transition = this.pages[Math.max(currentStep, nextStep)].getTransition();
-	
+
 	if (mode == "forward") {
-	    if (same_scene) {
+	    // transition 
+	    if (transition == "fadeIn") {
+		this.pages[nextStep].finShow();
+		$("#page_" + nextStep ).animate({ "opacity": 1 }, {
+		    duration: SwipeBook.pageInDuration()
+		});
+	    }else if (transition == "replace") {
 		this.pages[nextStep].show();
 		this.pages[nextStep].play();
-		$("#page_" + currentStep ).css("opacity", 0);
-		$("#page_" + nextStep ).css("opacity", 1);
-	    } else {
-		// transition 
-		if (transition == "fadeIn") {
-		    this.pages[nextStep].finShow();
-		    $("#page_" + nextStep ).animate({ "opacity": 1 }, {
-			duration: SwipeBook.pageInDuration()
+		$("#page_" + currentStep ).css({ "opacity": 0 });
+		$("#page_" + nextStep ).css({ "opacity": 1 });
+		
+		// this.pages[nextStep].finShow();
+	    }else if (transition == "scroll") {
+		setTimeout(function(){
+		    $("#page_" + currentStep ).css({
+			"opacity": 0
 		    });
-		}else if (transition == "replace") {
-		    $("#page_" + currentStep ).css({ "opacity": 0 });
-		    $("#page_" + nextStep ).css({ "opacity": 1 });
-		    this.pages[nextStep].finShow();
-		}else if (transition == "scroll") {
-		    setTimeout(function(){
-			$("#page_" + currentStep ).css({
-			    "opacity": 0
-			});
-		    }, SwipeBook.pageInDuration());
-		    this.pageSlide("in", nextStep);
-		    this.pages[nextStep].delayShow();
-		} else {
-		    
-		}
+		}, SwipeBook.pageInDuration());
+		this.pageSlide("in", nextStep);
+		this.pages[nextStep].delayShow();
 	    }
 	} else { // in case back
 	    console.log("back");
-	    if (same_scene) {
+	    // transition 
+	    if (transition == "fadeIn") {
+		this.pages[nextStep].finShow();
+		$("#page_" + currentStep ).animate({ "opacity": 0 }, {
+		    duration: SwipeBook.pageInDuration()
+		});
+	    }else if (transition == "replace") {
 		this.pages[currentStep].back();
 		setTimeout(function(){
 		    $("#page_" + currentStep ).css({"opacity": 0});
 		    $("#page_" + nextStep).css({"opacity": 1});
 		}, SwipeBook.pageInDuration());
-	    } else {
-		// transition 
-		if (transition == "fadeIn") {
-		    this.pages[nextStep].finShow();
-		    $("#page_" + currentStep ).animate({ "opacity": 0 }, {
-			duration: SwipeBook.pageInDuration()
-		    });
-		}else if (transition == "replace") {
-		    $("#page_" + currentStep ).css({ "opacity": 0 });
-		    $("#page_" + nextStep ).css({ "opacity": 1 });
-		    this.pages[nextStep].finShow();
-		}else if (transition == "scroll") {
-		    $("#page_" + nextStep).css({"opacity": 1});
-		    this.pages[currentStep].back();
-		    this.pageSlide("out", currentStep);
-		    this.pages[nextStep].finShow();
-		}
+	    }else if (transition == "scroll") {
+		$("#page_" + nextStep).css({"opacity": 1});
+		this.pages[currentStep].back();
+		this.pageSlide("out", currentStep);
+		this.pages[nextStep].finShow();
 	    }
 	}
 	this.pages[nextStep].mediaPlay();
