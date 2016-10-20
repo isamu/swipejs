@@ -536,9 +536,13 @@ class SwipeElement {
 			angle: instance.angle, animateTo: instance.to_angle, duration: do_duration * 2,
 		    })
 		}
-		$("#" + instance.css_id).animate(instance.convCssPos(instance.finPos), {
+		$("#" + instance.css_id).animate(instance.convBasicCssPos(instance.finPos), {
 		    duration: do_duration
 		});
+		setTimeout(function(){
+		    $("#" + instance.css_id).css(instance.convScaleCssPos(instance.finPos));
+		},  do_duration);
+		
 		if (instance.isText()) {
 		    $("#" + instance.css_id + "-body").animate(instance.finText, {
 			duration: do_duration
@@ -623,7 +627,7 @@ class SwipeElement {
 	}
 	return data;
     }
-    convCssPos(data) {
+    convBasicCssPos(data) {
 	var ret = {
 	    'left': data[0] + 'px',
 	    'top': data[1] + 'px',
@@ -638,30 +642,29 @@ class SwipeElement {
 	    ret["-o-transform"] = rotate;
 	    ret["-ms-transform"] = rotate;
 	}
+	return ret;
+    }
+    convScaleCssPos(data) {
+	var ret = {};
+
 	var scale = data[6];
-	if (scale && scale.length == 2 && (scale[0] < 0 || scale[1] < 0)) {
-	    if (scale[0] < 0 && scale[1] < 0) {
-		ret["-webkit-transform"] = "scale(-1,-1)";
-		ret["-o-transform"] = "scale(-1,-1)";
-		ret["-moz-transform"] = "scale(-1,-1)";
-		ret["transform"] = "scale(-1,-1)";
-		ret["filter"] = "FlipH FlipV";
-	    } else if (scale[0] < 0) {
-		ret["-webkit-transform"] = "scaleX(-1)";
-		ret["-o-transform"] = "scaleX(-1)";
-		ret["-moz-transform"] = "scaleX(-1)";
-		ret["transform"] = "scaleX(-1)";
-		ret["filter"] = "FlipH";
-		ret["-ms-filter"] = "FlipH";
-	    } else if (scale[1] < 0) {
-		ret["-webkit-transform"] = "scaleY(-1)";
-		ret["-o-transform"] = "scaleY(-1)";
-		ret["-moz-transform"] = "scaleY(-1)";
-		ret["transform"] = "scaleY(-1)";
-		ret["filter"] = "FlipV";
-		ret["-ms-filter"] = "FlipV";
-	    }
+	if (scale && scale.length == 2) {
+	    var direction_x = (scale[0] < 0) ? "-1" : "1";
+	    var direction_y = (scale[1] < 0) ? "-1" : "1";
+	    
+	    let transform = "scale(" + direction_x + "," + direction_y +")";
+	    console.log(transform);
+	    ret["-webkit-transform"] = transform;
+	    ret["-o-transform"] = transform;
+	    ret["-moz-transform"] = transform;
+	    ret["transform"] = transform;
 	}
+	return ret;
+    }
+    convCssPos(data) {
+	var basic_ret = this.convBasicCssPos(data);
+	var scale_ret = this.convScaleCssPos(data);
+	var ret = SwipeUtil.merge(basic_ret, scale_ret);
 	return ret;
     }
   
