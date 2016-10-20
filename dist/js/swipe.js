@@ -2077,8 +2077,6 @@ var SwipePage = function () {
 }();
 "use strict";
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -2130,7 +2128,7 @@ var SwipeParser = function () {
 															if (ret[keyString] == null) {
 																		ret[keyString] = ret_val;
 															} else {
-																		if (SwipeParser.is("Array", ret[keyString]) || SwipeParser.is("object", ret[keyString])) {
+																		if (SwipeParser.is("Array", ret[keyString]) && ret[keyString].length > 0 && SwipeParser.is("Object", ret[keyString][0]) || SwipeParser.is("Object", ret[keyString])) {
 																					if (SwipeParser.is("Number", ret_val) || SwipeParser.is("String", ret_val)) {
 																								ret[keyString] = ret_val;
 																					} else {
@@ -2247,7 +2245,7 @@ var SwipeParser = function () {
 									var copy;
 
 									// Handle the 3 simple types, and null or undefined
-									if (null == obj || "object" != (typeof obj === "undefined" ? "undefined" : _typeof(obj))) return obj;
+									if (null == obj || "Object" != typeof obj) return obj;
 
 									// Handle Date
 									if (obj instanceof Date) {

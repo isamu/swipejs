@@ -37,7 +37,8 @@ class SwipeParser {
 		if (ret[keyString] == null){
 		    ret[keyString] = ret_val;
 		} else {
-		    if ( SwipeParser.is("Array", ret[keyString]) || SwipeParser.is("object", ret[keyString])) {
+		    if ( (SwipeParser.is("Array", ret[keyString]) && ret[keyString].length > 0 && SwipeParser.is("Object", ret[keyString][0])) || 
+			 SwipeParser.is("Object", ret[keyString])) {
 			if (SwipeParser.is("Number", ret_val) || SwipeParser.is("String", ret_val)){
 			    ret[keyString] = ret_val;
 			} else {
@@ -140,7 +141,7 @@ class SwipeParser {
 	var copy;
 	
 	// Handle the 3 simple types, and null or undefined
-	if (null == obj || "object" != typeof obj) return obj;
+	if (null == obj || "Object" != typeof obj) return obj;
 	
 	// Handle Date
 	if (obj instanceof Date) {

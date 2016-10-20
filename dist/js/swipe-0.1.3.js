@@ -2130,7 +2130,7 @@ var SwipeParser = function () {
 															if (ret[keyString] == null) {
 																		ret[keyString] = ret_val;
 															} else {
-																		if (SwipeParser.is("Array", ret[keyString]) || SwipeParser.is("object", ret[keyString])) {
+																		if (SwipeParser.is("object", ret[keyString])) {
 																					if (SwipeParser.is("Number", ret_val) || SwipeParser.is("String", ret_val)) {
 																								ret[keyString] = ret_val;
 																					} else {
