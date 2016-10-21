@@ -114,7 +114,6 @@ var SwipeBook = function () {
 		key: 'getTemplatePages',
 		value: function getTemplatePages() {
 			if (this.data["templates"] && this.data["templates"]["pages"]) {
-
 				return this.data["templates"]["pages"];
 			} else if (this.data["scenes"]) {
 				return this.data["scenes"];
@@ -385,6 +384,7 @@ var SwipeBook = function () {
 		key: 'pageSlide',
 		value: function pageSlide(mode, step) {
 			if (mode == "in") {
+				$("#page_" + step).css("opacity", 1);
 				if (this.paging == "vertical") {
 					$("#page_" + step).css("top", SwipeScreen.virtualheight());
 					$("#page_" + step).css("opacity", 1);
@@ -418,8 +418,7 @@ var SwipeBook = function () {
 					$("#page_" + step).css("top", 0);
 					$("#page_" + step).css("opacity", 1);
 					$("#page_" + step).animate({
-						"top": -SwipeScreen.virtualheight(),
-						"opacity": 1
+						"top": -SwipeScreen.virtualheight()
 					}, {
 						duration: SwipeBook.pageInDuration()
 					});
@@ -427,8 +426,7 @@ var SwipeBook = function () {
 					$("#page_" + step).css("left", SwipeScreen.virtualwidth());
 					$("#page_" + step).css("opacity", 1);
 					$("#page_" + step).animate({
-						"left": 0,
-						"opacity": 1
+						"left": 0
 					}, {
 						duration: SwipeBook.pageInDuration()
 					});
@@ -436,12 +434,14 @@ var SwipeBook = function () {
 					$("#page_" + step).css("left", -SwipeScreen.virtualwidth());
 					$("#page_" + step).css("opacity", 1);
 					$("#page_" + step).animate({
-						"left": 0,
-						"opacity": 1
+						"left": 0
 					}, {
 						duration: SwipeBook.pageInDuration()
 					});
 				}
+				setTimeout(function () {
+					$("#page_" + step).css("opacity", 0);
+				}, SwipeBook.pageInDuration());
 			} else if (mode == "in_back") {
 				var option = {
 					duration: SwipeBook.pageInDuration(),
@@ -471,12 +471,13 @@ var SwipeBook = function () {
 						"opacity": 1
 					}, option);
 				}
+				setTimeout(function () {
+					$("#page_" + step).css("opacity", 0);
+				}, SwipeBook.pageInDuration());
 			} else if (mode == "out_back") {
+				$("#page_" + step).css("opacity", 1);
 				var _option = {
-					duration: SwipeBook.pageInDuration(),
-					complete: function complete() {
-						// $("#page_" + step ).css({"opacity": 0});
-					}
+					duration: SwipeBook.pageInDuration()
 				};
 				if (this.paging == "vertical") {
 					console.log("outback?");
