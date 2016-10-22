@@ -144,15 +144,22 @@ class SwipeElement {
 
     initAllData(){
 	this.initPosData = [Number(this.x), Number(this.y), Number(this.w), Number(this.h), Number(this.angle), Number(this.opacity), this.scale];
-	
+	if (this.isText()){    
+	}
     	this.originalPrevPos = this.updatePosition(this.initPosData, this.info);
 	this.prevPos = this.getScreenPosition(this.originalPrevPos);
-
+	if (this.isText()){
+	    console.log(this.initPosData);
+	    console.log(this.info);
+	    console.log(this.originalPrevPos);
+	    console.log(this.prevPos);
+	}
+	
 	this.originalFinPos = this.getOriginalFinPos();
 	this.finPos = this.getScreenPosition(this.originalFinPos);
 	if (this.isText()) {
-	    this.prevText = this.textLayout(this.info, this.prevPos);
-	    this.finText = this.textLayout(this.info, this.finPos);
+	    this.prevText = this.textLayout(this.info, this.originalPrevPos);
+	    this.finText = this.textLayout(this.info, this.originalFinPos);
 	}
     }
     getOriginalFinPos() {
@@ -358,6 +365,7 @@ class SwipeElement {
 
 
     // scale and container height(is my height)
+    // data is original data not screen converted data.
     textLayout(info, data){
 	var x = "center";
 	var textAlign = "center";
@@ -391,17 +399,32 @@ class SwipeElement {
 	var divHeight = data[3];
 	var top = 0;
 
+	// todo font size
 	if (x == "bottom") {
 	    top = divHeight - containerHeight;
 	} else if ( x == "center") {
-	    top = (divHeight - containerHeight) / 2;
-	}
+	    // top = (divHeight - containerHeight) / 2;
+	    return {
+		position: "relative",
+		top: "0px",
+		"font-size": String(SwipeScreen.virtualY(fontSize)) + "px",
+		"line-height" : String(SwipeScreen.virtualY( Math.abs(fontSize * 1.5))) + "px",
+		"font-family": fontname,
+		"textAlign": textAlign,
+		
+		"display": "table-cell",
+		"vertical-align": "middle",
+		"height": String(SwipeScreen.virtualY(divHeight)) + "px",
 
+		"color": this.conv_rgba2rgb(SwipeParser.parseColor(info, "#000"))
+	    };
+	}
+	
 	return {
 	    position: "relative",
 	    top: String(SwipeScreen.virtualY(top)) + "px",
 	    "font-size": String(SwipeScreen.virtualY(fontSize)) + "px",
-	    "line-height" : String(SwipeScreen.virtualY(fontSize)) + "px",
+	    "line-height" : String(SwipeScreen.virtualY( Math.abs(fontSize * 1.5))) + "px",
 	    "font-family": fontname,
 	    "textAlign": textAlign,
 	    "color": this.conv_rgba2rgb(SwipeParser.parseColor(info, "#000"))
@@ -515,7 +538,7 @@ class SwipeElement {
 	    this.setVideo(this.finPos);
 	}
 	if (this.isText()) {
-	    var text_css = this.textLayout(this.info, this.finPos);
+	    var text_css = this.textLayout(this.info, this.originalFinPos);
 	    $("#" + this.css_id + "-body").css(text_css);
 	}
     }
@@ -577,7 +600,9 @@ class SwipeElement {
 	    if(to["scale"]) {
 		ret[6] = this.getScale(to);
 		// todo skip path!?
-		ret = this.applyScale(ret);
+		if (!this.isText()){
+		    ret = this.applyScale(ret);
+		}
 	    }
 	}
 	if (to["rotate"]) {
@@ -728,7 +753,7 @@ class SwipeElement {
 		child_html + "</img></div></div>";
 	} else if (this.isText()) {
 	    return  "<div class='element text_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" +
-		"<div class='text_body' id='" + this.css_id + "-body'>" + this.parseText(this.info.text) + child_html + "</div>" +
+		"<div class='text_body' id='" + this.css_id + "-body'><span>" + this.parseText(this.info.text) + child_html + "</span></div>" +
 		"</div>";
 	} else if (this.isMarkdown()){
 	    let md_array = this.parseMarkdown(this.info.markdown);

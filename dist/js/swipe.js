@@ -383,32 +383,32 @@ var SwipeBook = function () {
 	}, {
 		key: 'pageSlide',
 		value: function pageSlide(mode, step) {
+			console.log("pageSlide");
+			console.log(mode);
+			console.log(step);
+
 			if (mode == "in") {
 				$("#page_" + step).css("opacity", 1);
+				console.log("IN");
+				console.log(step);
 				if (this.paging == "vertical") {
 					$("#page_" + step).css("top", SwipeScreen.virtualheight());
-					$("#page_" + step).css("opacity", 1);
 					$("#page_" + step).animate({
-						"top": 0,
-						"opacity": 1
+						"top": 0
 					}, {
 						duration: SwipeBook.pageInDuration()
 					});
 				} else if (this.paging == "leftToRight") {
 					$("#page_" + step).css("left", SwipeScreen.virtualwidth());
-					$("#page_" + step).css("opacity", 1);
 					$("#page_" + step).animate({
-						"left": 0,
-						"opacity": 1
+						"left": 0
 					}, {
 						duration: SwipeBook.pageInDuration()
 					});
 				} else {
 					$("#page_" + step).css("left", -SwipeScreen.virtualwidth());
-					$("#page_" + step).css("opacity", 1);
 					$("#page_" + step).animate({
-						"left": 0,
-						"opacity": 1
+						"left": 0
 					}, {
 						duration: SwipeBook.pageInDuration()
 					});
@@ -709,15 +709,21 @@ var SwipeElement = function () {
 		key: "initAllData",
 		value: function initAllData() {
 			this.initPosData = [Number(this.x), Number(this.y), Number(this.w), Number(this.h), Number(this.angle), Number(this.opacity), this.scale];
-
+			if (this.isText()) {}
 			this.originalPrevPos = this.updatePosition(this.initPosData, this.info);
 			this.prevPos = this.getScreenPosition(this.originalPrevPos);
+			if (this.isText()) {
+				console.log(this.initPosData);
+				console.log(this.info);
+				console.log(this.originalPrevPos);
+				console.log(this.prevPos);
+			}
 
 			this.originalFinPos = this.getOriginalFinPos();
 			this.finPos = this.getScreenPosition(this.originalFinPos);
 			if (this.isText()) {
-				this.prevText = this.textLayout(this.info, this.prevPos);
-				this.finText = this.textLayout(this.info, this.finPos);
+				this.prevText = this.textLayout(this.info, this.originalPrevPos);
+				this.finText = this.textLayout(this.info, this.originalFinPos);
 			}
 		}
 	}, {
@@ -943,6 +949,7 @@ var SwipeElement = function () {
 		}
 
 		// scale and container height(is my height)
+		// data is original data not screen converted data.
 
 	}, {
 		key: "textLayout",
@@ -979,17 +986,33 @@ var SwipeElement = function () {
 			var divHeight = data[3];
 			var top = 0;
 
+			// todo font size
+
 			if (x == "bottom") {
 				top = divHeight - containerHeight;
 			} else if (x == "center") {
-				top = (divHeight - containerHeight) / 2;
+				// top = (divHeight - containerHeight) / 2;
+				return {
+					position: "relative",
+					top: "0px",
+					"font-size": String(SwipeScreen.virtualY(fontSize)) + "px",
+					"line-height": String(SwipeScreen.virtualY(Math.abs(fontSize * 1.5))) + "px",
+					"font-family": fontname,
+					"textAlign": textAlign,
+
+					"display": "table-cell",
+					"vertical-align": "middle",
+					"height": String(SwipeScreen.virtualY(divHeight)) + "px",
+
+					"color": this.conv_rgba2rgb(SwipeParser.parseColor(info, "#000"))
+				};
 			}
 
 			return {
 				position: "relative",
 				top: String(SwipeScreen.virtualY(top)) + "px",
 				"font-size": String(SwipeScreen.virtualY(fontSize)) + "px",
-				"line-height": String(SwipeScreen.virtualY(fontSize)) + "px",
+				"line-height": String(SwipeScreen.virtualY(Math.abs(fontSize * 1.5))) + "px",
 				"font-family": fontname,
 				"textAlign": textAlign,
 				"color": this.conv_rgba2rgb(SwipeParser.parseColor(info, "#000"))
@@ -1110,7 +1133,7 @@ var SwipeElement = function () {
 				this.setVideo(this.finPos);
 			}
 			if (this.isText()) {
-				var text_css = this.textLayout(this.info, this.finPos);
+				var text_css = this.textLayout(this.info, this.originalFinPos);
 				$("#" + this.css_id + "-body").css(text_css);
 			}
 		}
@@ -1176,7 +1199,9 @@ var SwipeElement = function () {
 				if (to["scale"]) {
 					ret[6] = this.getScale(to);
 					// todo skip path!?
-					ret = this.applyScale(ret);
+					if (!this.isText()) {
+						ret = this.applyScale(ret);
+					}
 				}
 			}
 			if (to["rotate"]) {
@@ -1343,7 +1368,7 @@ var SwipeElement = function () {
 			} else if (this.isSprite()) {
 				return "<div id='" + this.css_id + "' class='image_box'><div id='" + this.css_id + "_inner'>" + "<img src='" + this.info.sprite + "' class='image_element' id='" + this.css_id + "_sprite' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" + child_html + "</img></div></div>";
 			} else if (this.isText()) {
-				return "<div class='element text_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + "<div class='text_body' id='" + this.css_id + "-body'>" + this.parseText(this.info.text) + child_html + "</div>" + "</div>";
+				return "<div class='element text_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + "<div class='text_body' id='" + this.css_id + "-body'><span>" + this.parseText(this.info.text) + child_html + "</span></div>" + "</div>";
 			} else if (this.isMarkdown()) {
 				var md_array = this.parseMarkdown(this.info.markdown);
 				this.md_css = md_array[1];

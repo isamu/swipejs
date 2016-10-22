@@ -9,7 +9,7 @@ $(document).ready(function() {
 });
 
 function callback(data){
-//    SwipeScreen.setSize(50);
+    SwipeScreen.setSize(50);
     SwipeUtil.initSwipe(data, "#swipe", "#swipe_back");
 }
 
