@@ -114,6 +114,7 @@ class SwipeBook {
 	$(this.base_css_id).css({
 	    height: SwipeScreen.virtualheight(),
 	    width: SwipeScreen.virtualwidth(),
+	    overflow: "hidden",
 	    position: "absolute",
 	    left: x
 	});
