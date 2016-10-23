@@ -296,6 +296,7 @@ var SwipeBook = function () {
 
 			if (mode == "forward") {
 				// transition
+
 				if (nextTransition == "fadeIn") {
 					this.pages[nextStep].finShow();
 					$("#page_" + nextStep).animate({ "opacity": 1 }, {
@@ -308,6 +309,8 @@ var SwipeBook = function () {
 				} else if (nextTransition == "scroll") {
 					this.pageSlide("in", nextStep);
 					this.pages[nextStep].delayShow();
+				} else {
+					console.log("wrong transition in step " + String(nextStep));
 				}
 
 				if (!loaded) {
@@ -384,13 +387,9 @@ var SwipeBook = function () {
 		key: 'pageSlide',
 		value: function pageSlide(mode, step) {
 			console.log("pageSlide");
-			console.log(mode);
-			console.log(step);
 
 			if (mode == "in") {
 				$("#page_" + step).css("opacity", 1);
-				console.log("IN");
-				console.log(step);
 				if (this.paging == "vertical") {
 					$("#page_" + step).css("top", SwipeScreen.virtualheight());
 					$("#page_" + step).animate({
@@ -450,8 +449,6 @@ var SwipeBook = function () {
 					}
 				};
 				if (this.paging == "vertical") {
-					console.log("inback?");
-					console.log(step);
 					$("#page_" + step).css("top", 0);
 					$("#page_" + step).animate({
 						"top": SwipeScreen.virtualheight()
@@ -480,8 +477,6 @@ var SwipeBook = function () {
 					duration: SwipeBook.pageInDuration()
 				};
 				if (this.paging == "vertical") {
-					console.log("outback?");
-					console.log(step);
 					$("#page_" + step).css("top", -SwipeScreen.virtualheight());
 					$("#page_" + step).animate({
 						"top": 0
@@ -712,12 +707,6 @@ var SwipeElement = function () {
 			if (this.isText()) {}
 			this.originalPrevPos = this.updatePosition(this.initPosData, this.info);
 			this.prevPos = this.getScreenPosition(this.originalPrevPos);
-			if (this.isText()) {
-				console.log(this.initPosData);
-				console.log(this.info);
-				console.log(this.originalPrevPos);
-				console.log(this.prevPos);
-			}
 
 			this.originalFinPos = this.getOriginalFinPos();
 			this.finPos = this.getScreenPosition(this.originalFinPos);
@@ -926,6 +915,9 @@ var SwipeElement = function () {
 		key: "setPrevPos",
 		value: function setPrevPos() {
 			var instance = this;
+			if (this.isPath()) {
+				// console.log(this.convCssPos(this.prevPos));
+			}
 			$("#" + this.css_id).css(this.convCssPos(this.prevPos));
 			if (this.isVideo()) {
 				this.setVideo(this.prevPos);
@@ -987,7 +979,6 @@ var SwipeElement = function () {
 			var top = 0;
 
 			// todo font size
-
 			if (x == "bottom") {
 				top = divHeight - containerHeight;
 			} else if (x == "center") {
@@ -1044,6 +1035,12 @@ var SwipeElement = function () {
 				cx = (1 - scale_x) * this.prevPos[2] / 2;
 				cy = (1 - scale_y) * this.prevPos[3] / 2;
 				ret.push("translate(" + String(cx) + "," + String(cy) + ")");
+			}
+			// todo position check
+
+			if (info.rotate) {
+				// todo
+				// ret.push("rotate("+ String(info.rotate) + "deg)");
 			}
 			ret.push("scale(" + scale_array.join(",") + ")");
 			return ret.join(" ");
@@ -1155,11 +1152,11 @@ var SwipeElement = function () {
 							angle: instance.angle, animateTo: instance.to_angle, duration: do_duration * 2
 						});
 					}
-					$("#" + instance.css_id).animate(instance.convBasicCssPos(instance.finPos), {
+					$("#" + instance.css_id).animate(instance.convCssPos(instance.finPos), {
 						duration: do_duration
 					});
 					setTimeout(function () {
-						$("#" + instance.css_id).css(instance.convScaleCssPos(instance.finPos));
+						$("#" + instance.css_id).css(instance.convCssPos(instance.finPos));
 					}, do_duration);
 
 					if (instance.isText()) {
@@ -1253,19 +1250,21 @@ var SwipeElement = function () {
 	}, {
 		key: "convBasicCssPos",
 		value: function convBasicCssPos(data) {
-			var ret = {
+			return {
 				'left': data[0] + 'px',
 				'top': data[1] + 'px',
 				'width': data[2] + 'px',
 				'height': data[3] + 'px',
 				'opacity': data[5]
 			};
-			if (data[4]) {
-				var rotate = "rotate(" + data[4] + "deg)";
-				ret["-moz-transform"] = rotate;
-				ret["-webkit-transform"] = rotate;
-				ret["-o-transform"] = rotate;
-				ret["-ms-transform"] = rotate;
+		}
+	}, {
+		key: "convBasicRotateCssPos",
+		value: function convBasicRotateCssPos(data) {
+			var ret = this.convBasicCssPos(data);
+			var rotate = this.getRotateTranform(data);
+			if (rotate) {
+				ret = this.setTransform(ret, [rotate]);
 			}
 			return ret;
 		}
@@ -1274,26 +1273,62 @@ var SwipeElement = function () {
 		value: function convScaleCssPos(data) {
 			var ret = {};
 
-			var scale = data[6];
-			if (scale && scale.length == 2) {
-				var direction_x = scale[0] < 0 ? "-1" : "1";
-				var direction_y = scale[1] < 0 ? "-1" : "1";
-
-				var transform = "scale(" + direction_x + "," + direction_y + ")";
-				ret["-webkit-transform"] = transform;
-				ret["-o-transform"] = transform;
-				ret["-moz-transform"] = transform;
-				ret["transform"] = transform;
+			var scale = this.getScaleTransform(data);
+			if (scale) {
+				ret = this.setTransform(ret, [scale]);
 			}
 			return ret;
 		}
 	}, {
 		key: "convCssPos",
 		value: function convCssPos(data) {
-			var basic_ret = this.convBasicCssPos(data);
-			var scale_ret = this.convScaleCssPos(data);
-			var ret = SwipeUtil.merge(basic_ret, scale_ret);
+			var ret = this.convBasicCssPos(data);
+			var transform = [];
+
+			var rotate = this.getRotateTranform(data);
+			if (rotate) {
+				transform.push(rotate);
+			}
+			var scale = this.getScaleTransform(data);
+			if (scale) {
+				transform.push(scale);
+			}
+			if (transform.length > 0) {
+				ret = this.setTransform(ret, transform);
+			}
 			return ret;
+		}
+	}, {
+		key: "setTransform",
+		value: function setTransform(data, transform) {
+			if (transform && transform.length > 0) {
+				var tran = transform.join(" ");
+				data["-moz-transform"] = tran;
+				data["-webkit-transform"] = tran;
+				data["-o-transform"] = tran;
+				data["-ms-transform"] = tran;
+			}
+			return data;
+		}
+	}, {
+		key: "getRotateTranform",
+		value: function getRotateTranform(data) {
+			if (data[4]) {
+				return "rotate(" + data[4] + "deg)";
+			}
+			return null;
+		}
+	}, {
+		key: "getScaleTransform",
+		value: function getScaleTransform(data) {
+			var scale = data[6];
+			if (scale && scale.length == 2) {
+				var direction_x = scale[0] < 0 ? "-1" : "1";
+				var direction_y = scale[1] < 0 ? "-1" : "1";
+
+				return "scale(" + direction_x + "," + direction_y + ")";
+			}
+			return null;
 		}
 	}, {
 		key: "type",

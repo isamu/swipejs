@@ -246,6 +246,7 @@ class SwipeBook {
 	
 	if (mode == "forward") {
 	    // transition 
+	    
 	    if (nextTransition == "fadeIn") {
 		this.pages[nextStep].finShow();
 		$("#page_" + nextStep ).animate({ "opacity": 1 }, {
@@ -259,6 +260,8 @@ class SwipeBook {
 	    }else if (nextTransition == "scroll") {
 		this.pageSlide("in", nextStep);
 		this.pages[nextStep].delayShow();
+	    } else {
+		console.log("wrong transition in step " + String(nextStep));
 	    }
 
 	    if (!loaded) {
@@ -335,13 +338,9 @@ class SwipeBook {
     
     pageSlide(mode, step) {
 	console.log("pageSlide");
-	console.log(mode);
-	console.log(step);
 	
 	if (mode == "in") {
 	    $("#page_" + step ).css("opacity", 1);
-	    console.log("IN");
-	    console.log(step);
 	    if (this.paging == "vertical") {
 		$("#page_" + step ).css("top", SwipeScreen.virtualheight());
 		$("#page_" + step ).animate({
@@ -402,8 +401,6 @@ class SwipeBook {
 		}
 	    };
 	    if (this.paging == "vertical") {
-		console.log("inback?");
-		console.log(step);
 		$("#page_" + step ).css("top", 0);
 		$("#page_" + step ).animate({
 		    "top": SwipeScreen.virtualheight(),
@@ -432,8 +429,6 @@ class SwipeBook {
 		duration: SwipeBook.pageInDuration(),
 	    };
 	    if (this.paging == "vertical") {
-		console.log("outback?");
-		console.log(step);
 		$("#page_" + step ).css("top", - SwipeScreen.virtualheight());
 		$("#page_" + step ).animate({
 		    "top": 0,
