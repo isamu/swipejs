@@ -2248,27 +2248,22 @@ var SwipeParser = function () {
 															if (ret[keyString] == null) {
 																		ret[keyString] = ret_val;
 															} else {
-																		if (SwipeParser.is("Array", ret[keyString]) && ret[keyString].length > 0 && SwipeParser.is("Object", ret[keyString][0]) || SwipeParser.is("Object", ret[keyString])) {
-																					if (SwipeParser.is("Number", ret_val) || SwipeParser.is("String", ret_val)) {
-																								ret[keyString] = ret_val;
-																					} else {
-																								idMap = {};
+																		if (SwipeParser.is("Array", ret[keyString]) && ret[keyString].length > 0 && SwipeParser.is("Object", ret[keyString][0])) {
+																					idMap = {};
 
-																								$.each(ret_val, function (index, tempItem) {
-																											if (SwipeParser.is("String", tempItem["id"])) {
-																														idMap[tempItem["id"]] = index;
-																											}
-																								});
-																								ret[keyString].forEach(function (objItem, key) {
-																											if (SwipeParser.is("String", objItem["id"]) && (key = idMap[objItem["id"]]) != null) {
-
-																														ret_val[key] = SwipeParser.inheritProperties(objItem, ret_val[key]);
-																											} else {
-																														ret_val.push(objItem);
-																											}
-																								});
-																								ret[keyString] = ret_val;
-																					}
+																					$.each(ret_val, function (index, tempItem) {
+																								if (SwipeParser.is("String", tempItem["id"])) {
+																											idMap[tempItem["id"]] = index;
+																								}
+																					});
+																					ret[keyString].forEach(function (objItem, key) {
+																								if (SwipeParser.is("String", objItem["id"]) && (key = idMap[objItem["id"]]) != null) {
+																											ret_val[key] = SwipeParser.inheritProperties(objItem, ret_val[key]);
+																								} else {
+																											ret_val.push(objItem);
+																								}
+																					});
+																					ret[keyString] = ret_val;
 																		}
 															}
 												});
