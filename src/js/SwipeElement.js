@@ -408,7 +408,7 @@ class SwipeElement {
 		"line-height" : String(SwipeScreen.virtualY( Math.abs(fontSize * 1.5))) + "px",
 		"font-family": fontname,
 		"textAlign": textAlign,
-		
+		"width": "inherit",
 		"display": "table-cell",
 		"vertical-align": "middle",
 		"height": String(SwipeScreen.virtualY(divHeight)) + "px",
