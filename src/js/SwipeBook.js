@@ -38,6 +38,7 @@ class SwipeBook {
 	    this.templatePages = this.getTemplatePages();
 	    this.setScreen();
 	    this.paging = this.getPaging();
+	    this.isReady = false;
 	    this.load();
 	    if (this.step > this.pages.length) {
 		this.step = this.pages.length - 1;
@@ -111,6 +112,17 @@ class SwipeBook {
     
     setSwipeCss() {
 	var x = ($(window).width() -  SwipeScreen.virtualwidth()) / 2.0;
+
+	$("#loading").css({
+	    height: SwipeScreen.virtualheight(),
+	    width: SwipeScreen.virtualwidth(),
+	    "z-index": 100,
+	    "background-color": "#fff",
+	    overflow: "hidden",
+	    position: "absolute",
+	    left: x
+	});
+	    
 	$(this.base_css_id).css({
 	    height: SwipeScreen.virtualheight(),
 	    width: SwipeScreen.virtualwidth(),
@@ -167,19 +179,25 @@ class SwipeBook {
 
 	    instance.initData($(this).attr("__page_id"), $(this).attr("__element_id"));
 	    SwipeCounter.decrease();
+	    $("#counter").html(SwipeCounter.getCounter());
 
 	    if(SwipeCounter.getCounter() == 0){
 		instance.loadFinish();
+		console.log("OK!!!");
 	    }
+	    console.log(SwipeCounter.getCounter());
 	});
 
 	$(".element").each(function(index, element) {
 	    instance.initData($(element).attr("__page_id"), $(element).attr("__element_id"));
 
 	    SwipeCounter.decrease();
+	    $("#counter").html(SwipeCounter.getCounter());
 	    if(SwipeCounter.getCounter() == 0){
 		instance.loadFinish();
+		console.log("OK!!!");
 	    }
+	    console.log(SwipeCounter.getCounter());
 	});
 
 	$(".video_element").each(function(index, element) {
@@ -209,6 +227,8 @@ class SwipeBook {
     }
 
     loadFinish(){
+	$("#loading").remove();
+	this.isReady = true;
 	this.show(this.step);
     }
     initData(page_id, element_id){
@@ -216,14 +236,18 @@ class SwipeBook {
     }
     
     next(){
-	if (this.step < this.pages.length - 1){
-	    this.show(this.step + 1);
+	if (this.isReady) {
+	    if (this.step < this.pages.length - 1){
+		this.show(this.step + 1);
+	    }
 	}
     }
 
     back(){
-	if (this.step > 0){
-	    this.show(this.step - 1);
+	if (this.isReady) {
+	    if (this.step > 0){
+		this.show(this.step - 1);
+	    }
 	}
     }
     

@@ -67,6 +67,7 @@ var SwipeBook = function () {
 			this.templatePages = this.getTemplatePages();
 			this.setScreen();
 			this.paging = this.getPaging();
+			this.isReady = false;
 			this.load();
 			if (this.step > this.pages.length) {
 				this.step = this.pages.length - 1;
@@ -150,6 +151,17 @@ var SwipeBook = function () {
 		key: 'setSwipeCss',
 		value: function setSwipeCss() {
 			var x = ($(window).width() - SwipeScreen.virtualwidth()) / 2.0;
+
+			$("#loading").css({
+				height: SwipeScreen.virtualheight(),
+				width: SwipeScreen.virtualwidth(),
+				"z-index": 100,
+				"background-color": "#fff",
+				overflow: "hidden",
+				position: "absolute",
+				left: x
+			});
+
 			$(this.base_css_id).css({
 				height: SwipeScreen.virtualheight(),
 				width: SwipeScreen.virtualwidth(),
@@ -210,19 +222,25 @@ var SwipeBook = function () {
 
 				instance.initData($(this).attr("__page_id"), $(this).attr("__element_id"));
 				SwipeCounter.decrease();
+				$("#counter").html(SwipeCounter.getCounter());
 
 				if (SwipeCounter.getCounter() == 0) {
 					instance.loadFinish();
+					console.log("OK!!!");
 				}
+				console.log(SwipeCounter.getCounter());
 			});
 
 			$(".element").each(function (index, element) {
 				instance.initData($(element).attr("__page_id"), $(element).attr("__element_id"));
 
 				SwipeCounter.decrease();
+				$("#counter").html(SwipeCounter.getCounter());
 				if (SwipeCounter.getCounter() == 0) {
 					instance.loadFinish();
+					console.log("OK!!!");
 				}
+				console.log(SwipeCounter.getCounter());
 			});
 
 			$(".video_element").each(function (index, element) {
@@ -253,6 +271,8 @@ var SwipeBook = function () {
 	}, {
 		key: 'loadFinish',
 		value: function loadFinish() {
+			$("#loading").remove();
+			this.isReady = true;
 			this.show(this.step);
 		}
 	}, {
@@ -263,15 +283,19 @@ var SwipeBook = function () {
 	}, {
 		key: 'next',
 		value: function next() {
-			if (this.step < this.pages.length - 1) {
-				this.show(this.step + 1);
+			if (this.isReady) {
+				if (this.step < this.pages.length - 1) {
+					this.show(this.step + 1);
+				}
 			}
 		}
 	}, {
 		key: 'back',
 		value: function back() {
-			if (this.step > 0) {
-				this.show(this.step - 1);
+			if (this.isReady) {
+				if (this.step > 0) {
+					this.show(this.step - 1);
+				}
 			}
 		}
 	}, {
@@ -1410,7 +1434,6 @@ var SwipeElement = function () {
 				this.md_css = md_array[1];
 				return "<div class='element markdown_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + "<div class='markdown_wrap' id='md_" + this.css_id + "'>" + md_array[0] + child_html + "</div></div>";
 			} else if (this.isVideo()) {
-				// return  "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>";
 				return "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + "<video id='" + this.css_id + "-video' ><source type='video/mp4' src='" + this.info.video + "'  /></video>" + child_html + "</div>";
 			} else if (this.isPath()) {
 				return '<svg class="element svg_element" id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id + '" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"></svg>';
