@@ -559,15 +559,15 @@ class SwipeElement {
 		if (instance.angle != instance.to_angle) {
 		    console.log(do_duration);
 		    $("#" + instance.css_id).rotate({
-			angle: instance.angle, animateTo: instance.to_angle, duration: do_duration * 2,
+			angle: instance.angle, animateTo: instance.to_angle, duration: do_duration,
 		    })
 		}
 		$("#" + instance.css_id).animate(instance.convCssPos(instance.finPos), {
 		    duration: do_duration
 		});
-		setTimeout(function(){
-		    $("#" + instance.css_id).css(instance.convCssPos(instance.finPos));
-		},  do_duration);
+		// setTimeout(function(){
+		    // $("#" + instance.css_id).css(instance.convCssPos(instance.finPos));
+		// },  do_duration);
 		
 		if (instance.isText()) {
 		    $("#" + instance.css_id + "-body").animate(instance.finText, {
