@@ -1693,18 +1693,22 @@ var SwipeElement = function () {
 			if (data["style"] == "sprite") {
 				console.log("sprite");
 				var _repeat = instance.valueFrom(data, "repeat") || instance.valueFrom(data, "count");
-				var block = instance.info.slice[0];
-				var timing = duration / _repeat / block;
-				for (var i = 0; i < _repeat; i++) {
-					var _loop = function _loop(j) {
-						$("#" + instance.css_id + "_sprite").delay(timing).queue(function () {
-							var pos = instance.getLoopSpritePos(j);
-							$(this).css(instance.getSpriteCss(pos)).dequeue();
-						});
-					};
 
-					for (var j = 0; j < block; j++) {
-						_loop(j);
+				// todo in case of image array. i need sample file.
+				if (instance.info.slice) {
+					var block = instance.info.slice[0];
+					var timing = duration / _repeat / block;
+					for (var i = 0; i < _repeat; i++) {
+						var _loop = function _loop(j) {
+							$("#" + instance.css_id + "_sprite").delay(timing).queue(function () {
+								var pos = instance.getLoopSpritePos(j);
+								$(this).css(instance.getSpriteCss(pos)).dequeue();
+							});
+						};
+
+						for (var j = 0; j < block; j++) {
+							_loop(j);
+						}
 					}
 				}
 			}

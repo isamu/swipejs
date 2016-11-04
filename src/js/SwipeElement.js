@@ -1049,14 +1049,18 @@ class SwipeElement {
 	if (data["style"] == "sprite"){
 	    console.log("sprite");
 	    let repeat = instance.valueFrom(data, "repeat") || instance.valueFrom(data, "count") ;
-	    let block = instance.info.slice[0];
-	    var timing = (duration) / repeat / block;
-	    for(let i = 0; i < repeat; i ++) {
-		for(let j = 0; j < block; j ++) {
-		    $("#" + instance.css_id + "_sprite").delay(timing).queue(function(){
-			let pos = instance.getLoopSpritePos(j);
-			$(this).css(instance.getSpriteCss(pos)).dequeue();
-		    });
+
+	    // todo in case of image array. i need sample file.
+	    if (instance.info.slice) {
+		let block = instance.info.slice[0];
+		var timing = (duration) / repeat / block;
+		for(let i = 0; i < repeat; i ++) {
+		    for(let j = 0; j < block; j ++) {
+			$("#" + instance.css_id + "_sprite").delay(timing).queue(function(){
+			    let pos = instance.getLoopSpritePos(j);
+			    $(this).css(instance.getSpriteCss(pos)).dequeue();
+			});
+		    }
 		}
 	    }
 	}
