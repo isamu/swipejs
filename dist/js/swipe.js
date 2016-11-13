@@ -429,7 +429,7 @@ var SwipeBook = function () {
 					}, {
 						duration: SwipeBook.pageInDuration()
 					});
-				} else {
+				} else if (this.paging == "rightToLeft") {
 					$("#page_" + step).css("left", -SwipeScreen.virtualwidth());
 					$("#page_" + step).animate({
 						"left": 0
@@ -447,18 +447,18 @@ var SwipeBook = function () {
 						duration: SwipeBook.pageInDuration()
 					});
 				} else if (this.paging == "leftToRight") {
-					$("#page_" + step).css("left", SwipeScreen.virtualwidth());
+					$("#page_" + step).css("left", 0);
 					$("#page_" + step).css("opacity", 1);
 					$("#page_" + step).animate({
-						"left": 0
+						"left": -SwipeScreen.virtualwidth()
 					}, {
 						duration: SwipeBook.pageInDuration()
 					});
-				} else {
-					$("#page_" + step).css("left", -SwipeScreen.virtualwidth());
+				} else if (this.paging == "rightToLeft") {
+					$("#page_" + step).css("left", 0);
 					$("#page_" + step).css("opacity", 1);
 					$("#page_" + step).animate({
-						"left": 0
+						"left": SwipeScreen.virtualwidth()
 					}, {
 						duration: SwipeBook.pageInDuration()
 					});
@@ -485,7 +485,7 @@ var SwipeBook = function () {
 						"left": SwipeScreen.virtualwidth(),
 						"opacity": 1
 					}, option);
-				} else {
+				} else if (this.paging == "rightToLeft") {
 					$("#page_" + step).css("left", 0);
 					$("#page_" + step).css("opacity", 1);
 					$("#page_" + step).animate({
@@ -507,14 +507,14 @@ var SwipeBook = function () {
 						"top": 0
 					}, _option);
 				} else if (this.paging == "leftToRight") {
-					$("#page_" + step).css("left", SwipeScreen.virtualwidth());
+					$("#page_" + step).css("left", -SwipeScreen.virtualwidth());
 					$("#page_" + step).css("opacity", 1);
 					$("#page_" + step).animate({
 						"left": 0,
 						"opacity": 1
 					}, _option);
-				} else {
-					$("#page_" + step).css("left", -SwipeScreen.virtualwidth());
+				} else if (this.paging == "rightToLeft") {
+					$("#page_" + step).css("left", SwipeScreen.virtualwidth());
 					$("#page_" + step).css("opacity", 1);
 					$("#page_" + step).animate({
 						"left": 0,

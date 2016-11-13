@@ -380,7 +380,7 @@ class SwipeBook {
 		}, {
 		    duration: SwipeBook.pageInDuration()
 		});
-	    } else {
+	    } else if (this.paging == "rightToLeft"){
 		$("#page_" + step ).css("left", - SwipeScreen.virtualwidth());
 		$("#page_" + step ).animate({
 		    "left": 0
@@ -398,18 +398,18 @@ class SwipeBook {
 		    duration: SwipeBook.pageInDuration()
 		});
 	    } else if (this.paging == "leftToRight"){
-		$("#page_" + step ).css("left", SwipeScreen.virtualwidth());
+		$("#page_" + step ).css("left", 0);
 		$("#page_" + step ).css("opacity", 1);
 		$("#page_" + step ).animate({
-		    "left": 0
+		    "left": - SwipeScreen.virtualwidth()
 		}, {
 		    duration: SwipeBook.pageInDuration()
 		});
-	    } else {
-		$("#page_" + step ).css("left", - SwipeScreen.virtualwidth());
+	    } else if (this.paging == "rightToLeft"){
+		$("#page_" + step ).css("left", 0);
 		$("#page_" + step ).css("opacity", 1);
 		$("#page_" + step ).animate({
-		    "left": 0
+		    "left": SwipeScreen.virtualwidth()
 		}, {
 		    duration: SwipeBook.pageInDuration()
 		});
@@ -437,7 +437,7 @@ class SwipeBook {
 		    "left": SwipeScreen.virtualwidth(),
 		    "opacity": 1
 		}, option);
-	    } else {
+	    } else if (this.paging == "rightToLeft"){
 		$("#page_" + step ).css("left", 0);
 		$("#page_" + step ).css("opacity", 1);
 		$("#page_" + step ).animate({
@@ -459,14 +459,14 @@ class SwipeBook {
 		    "top": 0,
 		}, option);
 	    } else if (this.paging == "leftToRight"){
-		$("#page_" + step ).css("left", SwipeScreen.virtualwidth());
+		$("#page_" + step ).css("left", -SwipeScreen.virtualwidth());
 		$("#page_" + step ).css("opacity", 1);
 		$("#page_" + step ).animate({
 		    "left": 0,
 		    "opacity": 1
 		}, option);
-	    } else {
-		$("#page_" + step ).css("left", - SwipeScreen.virtualwidth());
+	    } else if (this.paging == "rightToLeft"){
+		$("#page_" + step ).css("left", SwipeScreen.virtualwidth());
 		$("#page_" + step ).css("opacity", 1);
 		$("#page_" + step ).animate({
 		    "left": 0,
