@@ -1,5 +1,3 @@
-var hoge = {};
-
 class SwipeElement {
 
     constructor (info, page_id, element_id, play, duration, parent=null) {
@@ -94,7 +92,6 @@ class SwipeElement {
 	if (this.isPath()){
 	    this.snap = Snap("#" + this.css_id);
 	    this.path = this.snap.path();
-	    hoge[this.css_id] = this.path;
 	}
 
 	this.setSize();
@@ -517,6 +514,13 @@ class SwipeElement {
 		    duration: this.duration
 		});
 	    }
+	    /*
+	    if (this.isVideo()){
+		$("#" + this.css_id + "-video").animate(this.convCssPos(this.prevPos), {
+		    duration: do_duration
+		});
+	    }
+	    */
 	    if (this.isPath()) {
 		let path =  SwipeParser.clone(this.prevPath.path);
 		delete path.stroke;
@@ -568,6 +572,11 @@ class SwipeElement {
 		// setTimeout(function(){
 		    // $("#" + instance.css_id).css(instance.convCssPos(instance.finPos));
 		// },  do_duration);
+		if (instance.isVideo()){
+		    $("#" + instance.css_id + "-video").animate(instance.convCssPos(instance.finPos), {
+			duration: do_duration
+		    });
+		}
 		
 		if (instance.isText()) {
 		    $("#" + instance.css_id + "-body").animate(instance.finText, {

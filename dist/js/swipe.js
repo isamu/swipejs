@@ -575,8 +575,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var hoge = {};
-
 var SwipeElement = function () {
 	function SwipeElement(info, page_id, element_id, play, duration) {
 		var parent = arguments.length <= 5 || arguments[5] === undefined ? null : arguments[5];
@@ -679,7 +677,6 @@ var SwipeElement = function () {
 			if (this.isPath()) {
 				this.snap = Snap("#" + this.css_id);
 				this.path = this.snap.path();
-				hoge[this.css_id] = this.path;
 			}
 
 			this.setSize();
@@ -1129,6 +1126,13 @@ var SwipeElement = function () {
 						duration: this.duration
 					});
 				}
+				/*
+    if (this.isVideo()){
+    $("#" + this.css_id + "-video").animate(this.convCssPos(this.prevPos), {
+     duration: do_duration
+    });
+    }
+    */
 				if (this.isPath()) {
 					var path = SwipeParser.clone(this.prevPath.path);
 					delete path.stroke;
@@ -1183,6 +1187,11 @@ var SwipeElement = function () {
 					// setTimeout(function(){
 					// $("#" + instance.css_id).css(instance.convCssPos(instance.finPos));
 					// },  do_duration);
+					if (instance.isVideo()) {
+						$("#" + instance.css_id + "-video").animate(instance.convCssPos(instance.finPos), {
+							duration: do_duration
+						});
+					}
 
 					if (instance.isText()) {
 						$("#" + instance.css_id + "-body").animate(instance.finText, {
