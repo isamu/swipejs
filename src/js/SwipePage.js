@@ -73,12 +73,6 @@ class SwipePage {
 	    element.justShow();
 	});
     }
-    mediaPlay() {
-	let media_player = SwipeMediaPlayer.getInstance();
-	media_player.page(this.index).play();
-	// console.log(this.index);
-    }
-    
     show(){
 	let instance = this;
 	this.elements.forEach(function(element, elem_index){
@@ -117,6 +111,9 @@ class SwipePage {
 	});
     }
     play() {
+	let media_player = SwipeMediaPlayer.getInstance();
+	media_player.page(this.index).play();
+
 	this.elements.forEach(function(element, elem_index){
 	    element.play();
 	});

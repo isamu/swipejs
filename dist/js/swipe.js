@@ -253,7 +253,14 @@ var SwipeBook = function () {
 				});
 
 				var media_player = SwipeMediaPlayer.getInstance();
-				media_player.page($(element).attr("__page_id")).push(player);
+				var data = { media: player };
+				if ($(element).attr("__videoStart")) {
+					data["videoStart"] = $(element).attr("__videoStart");
+				}
+				if ($(element).attr("__videoDuration")) {
+					data["videoDuration"] = $(element).attr("__videoDuration");
+				}
+				media_player.page($(element).attr("__page_id")).push($(element).attr("id"), data);
 			});
 
 			this.pages.forEach(function (page, page_index) {
@@ -329,7 +336,6 @@ var SwipeBook = function () {
 					});
 				} else if (nextTransition == "replace") {
 					this.pages[nextStep].show();
-					// this.pages[nextStep].play(); // todo is this duplicate media play?
 					$("#page_" + nextStep).css({ "opacity": 1 });
 				} else if (nextTransition == "scroll") {
 					this.pageSlide("in", nextStep);
@@ -398,7 +404,7 @@ var SwipeBook = function () {
 					this.pageSlide("in_back", currentStep);
 				}
 			}
-			this.pages[nextStep].mediaPlay();
+			this.pages[nextStep].play();
 
 			this.step = nextStep;
 			location.hash = nextStep;
@@ -1437,13 +1443,26 @@ var SwipeElement = function () {
 			} else if (this.isSprite()) {
 				return "<div id='" + this.css_id + "' class='image_box'><div id='" + this.css_id + "_inner'>" + "<img src='" + this.info.sprite + "' class='image_element' id='" + this.css_id + "_sprite' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" + child_html + "</img></div></div>";
 			} else if (this.isText()) {
-				return "<div class='element text_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + "<div class='text_body' id='" + this.css_id + "-body'><span>" + this.parseText(this.info.text) + child_html + "</span></div>" + "</div>";
+				var attrs = this.defaultAttr('element text_element');
+				var attr_str = this.getAttrStr(attrs);
+
+				return "<div " + attr_str + ">" + "<div class='text_body' id='" + this.css_id + "-body'><span>" + this.parseText(this.info.text) + child_html + "</span></div>" + "</div>";
 			} else if (this.isMarkdown()) {
 				var md_array = this.parseMarkdown(this.info.markdown);
 				this.md_css = md_array[1];
 				return "<div class='element markdown_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + "<div class='markdown_wrap' id='md_" + this.css_id + "'>" + md_array[0] + child_html + "</div></div>";
 			} else if (this.isVideo()) {
-				return "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + "<video id='" + this.css_id + "-video' ><source type='video/mp4' src='" + this.info.video + "'  /></video>" + child_html + "</div>";
+				var attrs = this.defaultAttr('element video_element');
+
+				console.log(this.info);
+				if (this.info["videoStart"]) {
+					attrs["__videoStart"] = this.info["videoStart"];
+				}
+				if (this.info["videoDuration"]) {
+					attrs["__videoDuration"] = this.info["videoDuration"];
+				}
+				var attr_str = this.getAttrStr(attrs);
+				return "<div " + attr_str + ">" + "<video id='" + this.css_id + "-video' ><source type='video/mp4' src='" + this.info.video + "'  /></video>" + child_html + "</div>";
 			} else if (this.isPath()) {
 				return '<svg class="element svg_element" id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id + '" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"></svg>';
 			} else if (this.isDiv()) {
@@ -1451,6 +1470,23 @@ var SwipeElement = function () {
 			} else {
 				return "";
 			}
+		}
+	}, {
+		key: "defaultAttr",
+		value: function defaultAttr(class_name) {
+			var attrs = {};
+			attrs["class"] = class_name;
+			attrs["id"] = this.css_id;
+			attrs["__page_id"] = this.page_id;
+			attrs["__element_id"] = this.element_id;
+			return attrs;
+		}
+	}, {
+		key: "getAttrStr",
+		value: function getAttrStr(attrs) {
+			return Object.keys(attrs).map(function (key) {
+				return key + "='" + attrs[key] + "'";
+			}).join(" ");
 		}
 	}, {
 		key: "justShow",
@@ -1986,29 +2022,41 @@ var SwipeMediaPlayer = function () {
 						}
 			}, {
 						key: "push",
-						value: function push(media) {
+						value: function push(key, media) {
 									if (!this.media[this.current_page]) {
-												this.media[this.current_page] = [];
+												this.media[this.current_page] = {};
 									}
 									console.log("push");
 									console.log(this.current_page);
 
-									this.media[this.current_page].push(media);
+									this.media[this.current_page][key] = media;
 									return this;
 						}
 			}, {
 						key: "play",
 						value: function play() {
-
 									if (this.current_playing != this.current_page) {
 												this.stop();
 												if (this.media[this.current_page]) {
-															console.log("pkay");
-															console.log(this.current_page);
-															this.media[this.current_page].forEach(function (media, media_index) {
-																		console.log("media");
-																		console.log(media_index);
-																		media.play();
+															console.log("play");
+															var page = this.media[this.current_page];
+															Object.keys(page).forEach(function (key) {
+																		var player = page[key].media;
+																		var start = 0;
+																		if (page[key] && page[key].videoStart) {
+																					start = page[key].videoStart;
+																					player.setCurrentTime(start);
+																		}
+																		player.play();
+																		if (page[key] && page[key].videoDuration) {
+																					var duration = page[key].videoDuration;
+																					setTimeout(function () {
+																								// accuracy of settimeout is not good. so I add  a second.
+																								if (player.currentTime + 1 > Number(start) + Number(duration)) {
+																											player.stop();
+																								}
+																					}, duration * 1000);
+																		}
 															});
 												}
 												this.current_playing = this.current_page;
@@ -2027,8 +2075,9 @@ var SwipeMediaPlayer = function () {
 												console.log("stop");
 												console.log(this.current_playing);
 												if (this.media[this.current_playing]) {
-															this.media[this.current_playing].forEach(function (media, media_index) {
-																		media.stop();
+															var page = this.media[this.current_playing];
+															Object.keys(page).forEach(function (key) {
+																		page[key].media.stop();
 															});
 												}
 									}
@@ -2130,13 +2179,6 @@ var SwipePage = function () {
 									});
 						}
 			}, {
-						key: "mediaPlay",
-						value: function mediaPlay() {
-									var media_player = SwipeMediaPlayer.getInstance();
-									media_player.page(this.index).play();
-									// console.log(this.index);
-						}
-			}, {
 						key: "show",
 						value: function show() {
 									var instance = this;
@@ -2181,6 +2223,9 @@ var SwipePage = function () {
 			}, {
 						key: "play",
 						value: function play() {
+									var media_player = SwipeMediaPlayer.getInstance();
+									media_player.page(this.index).play();
+
 									this.elements.forEach(function (element, elem_index) {
 												element.play();
 									});

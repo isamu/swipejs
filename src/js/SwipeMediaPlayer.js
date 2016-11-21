@@ -16,28 +16,40 @@ class SwipeMediaPlayer {
 	this.current_page = num;
 	return this;
     }
-    push(media) {
+    push(key, media) {
 	if (!this.media[this.current_page]) {
-	    this.media[this.current_page] = [];
+	    this.media[this.current_page] = {};
 	}
 	console.log("push");
 	console.log(this.current_page);
 	
-	this.media[this.current_page].push(media);
+	this.media[this.current_page][key] = media;
 	return this;
     }
 
     play(){
-
 	if (this.current_playing != this.current_page){
 	    this.stop();
 	    if (this.media[this.current_page]) {
-		console.log("pkay");
-		console.log(this.current_page);
-		this.media[this.current_page].forEach((media, media_index) => {
-		    console.log("media");
-		    console.log(media_index);
-		    media.play();
+		console.log("play");
+		var page = this.media[this.current_page];
+		Object.keys(page).forEach(function (key) {
+		    var player = page[key].media;
+		    var start = 0;
+		    if (page[key] && page[key].videoStart) {
+			start = page[key].videoStart;
+			player.setCurrentTime(start);
+		    }
+		    player.play();
+		    if (page[key] && page[key].videoDuration) {
+			var duration = page[key].videoDuration;
+			setTimeout(function(){
+			    // accuracy of settimeout is not good. so I add  a second.
+			    if (player.currentTime + 1 > (Number(start) + Number(duration))) {
+				player.stop();
+			    }
+			}, duration * 1000);
+		    }
 		});
 	    }
 	    this.current_playing = this.current_page;
@@ -52,8 +64,9 @@ class SwipeMediaPlayer {
 	    console.log("stop");
 	    console.log(this.current_playing);
 	    if (this.media[this.current_playing]) {
-		this.media[this.current_playing].forEach((media, media_index) => {
-		    media.stop();
+		var page = this.media[this.current_playing];
+		Object.keys(page).forEach(function (key) {
+		    page[key].media.stop();
 		});
 	    }
 	}

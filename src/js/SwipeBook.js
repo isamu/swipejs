@@ -199,7 +199,7 @@ class SwipeBook {
 	    }
 	    console.log(SwipeCounter.getCounter());
 	});
-
+	
 	$(".video_element").each(function(index, element) {
 	    let player = new MediaElement( $(element).attr("id") + "-video", {
 		flashName: 'flashmediaelement.swf',
@@ -210,7 +210,14 @@ class SwipeBook {
             });
 	    
 	    let media_player = SwipeMediaPlayer.getInstance();
-	    media_player.page($(element).attr("__page_id")).push(player);
+	    let data = {media: player};
+	    if ($(element).attr("__videoStart")) {
+		data["videoStart"] = $(element).attr("__videoStart");
+	    }
+	    if ($(element).attr("__videoDuration")) {
+		data["videoDuration"] = $(element).attr("__videoDuration");
+	    }
+	    media_player.page($(element).attr("__page_id")).push($(element).attr("id"), data);
 	});
 	
 	this.pages.forEach((page, page_index) => {
@@ -279,7 +286,6 @@ class SwipeBook {
 		});
 	    }else if (nextTransition == "replace") {
 		this.pages[nextStep].show();
-		// this.pages[nextStep].play(); // todo is this duplicate media play?
 		$("#page_" + nextStep ).css({ "opacity": 1 });
 		
 	    }else if (nextTransition == "scroll") {
@@ -351,7 +357,7 @@ class SwipeBook {
 	    }		
 
 	}
-	this.pages[nextStep].mediaPlay();
+	this.pages[nextStep].play();
 	
 	this.step = nextStep;
 	location.hash = nextStep;

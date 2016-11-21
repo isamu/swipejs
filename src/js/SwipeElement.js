@@ -796,7 +796,10 @@ class SwipeElement {
 		"<img src='" + this.info.sprite+ "' class='image_element' id='" + this.css_id + "_sprite' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" +
 		child_html + "</img></div></div>";
 	} else if (this.isText()) {
-	    return  "<div class='element text_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" +
+	    var attrs = this.defaultAttr('element text_element');
+	    var attr_str = this.getAttrStr(attrs);
+
+	    return  "<div "+ attr_str + ">" +
 		"<div class='text_body' id='" + this.css_id + "-body'><span>" + this.parseText(this.info.text) + child_html + "</span></div>" +
 		"</div>";
 	} else if (this.isMarkdown()){
@@ -805,7 +808,17 @@ class SwipeElement {
 	    return  "<div class='element markdown_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" +
 		"<div class='markdown_wrap' id='md_" + this.css_id + "'>" + md_array[0] + child_html + "</div></div>";
 	} else if (this.isVideo()) {
-	    return  "<div class='element video_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" +
+	    var attrs = this.defaultAttr('element video_element');
+
+	    console.log(this.info);
+	    if (this.info["videoStart"]) {
+		attrs["__videoStart"] = this.info["videoStart"];
+	    }
+	    if (this.info["videoDuration"]) {
+		attrs["__videoDuration"] = this.info["videoDuration"];
+	    }
+	    var attr_str = this.getAttrStr(attrs);
+	    return  "<div " + attr_str + ">" +
 		"<video id='" + this.css_id + "-video' ><source type='video/mp4' src='" + this.info.video + "'  /></video>" +
 		child_html + "</div>";
 	} else if (this.isPath()) {
@@ -816,7 +829,21 @@ class SwipeElement {
 	    return "";
 	}
     }
+    defaultAttr(class_name){
+	var attrs = {}
+	attrs["class"] = class_name;
+	attrs["id"] = this.css_id;
+	attrs["__page_id"] = this.page_id;
+	attrs["__element_id"] =  this.element_id;
+	return attrs;
+    }
+    getAttrStr(attrs) {
+	return Object.keys(attrs).map(function (key) {
+	    return key + "='" + attrs[key] + "'";
+	}).join(" ");
+    }
 
+    
     justShow(){
 	console.log("justShow");
 	if (this.elements) {
@@ -1110,12 +1137,12 @@ class SwipeElement {
     }
     play() {
 	if (this.elements) {
-	    this.elements.forEach(function(element, elem_index){
+            this.elements.forEach(function(element, elem_index){
 		element.play();
-	    });
+            });
 	}
 	if (this.videoElement){
-	    this.videoElement.play();
+            this.videoElement.play();
 	}
     }
     inactive(){
