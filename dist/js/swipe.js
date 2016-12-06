@@ -221,26 +221,12 @@ var SwipeBook = function () {
 				$("#" + $(this).attr("__base_id")).attr("__default_height", $(this).height());
 
 				instance.initData($(this).attr("__page_id"), $(this).attr("__element_id"));
-				SwipeCounter.decrease();
-				$("#counter").html(SwipeCounter.getCounter());
-
-				if (SwipeCounter.getCounter() == 0) {
-					instance.loadFinish();
-					console.log("OK!!!");
-				}
-				console.log(SwipeCounter.getCounter());
+				instance.counterDecrease();
 			});
 
 			$(".element").each(function (index, element) {
 				instance.initData($(element).attr("__page_id"), $(element).attr("__element_id"));
-
-				SwipeCounter.decrease();
-				$("#counter").html(SwipeCounter.getCounter());
-				if (SwipeCounter.getCounter() == 0) {
-					instance.loadFinish();
-					console.log("OK!!!");
-				}
-				console.log(SwipeCounter.getCounter());
+				instance.counterDecrease();
 			});
 
 			$(".video_element").each(function (index, element) {
@@ -251,16 +237,18 @@ var SwipeBook = function () {
 						instance.videoElement = mediaElement;
 					}
 				});
+				var __element = instance.pages[$(element).attr("__page_id")].getElement($(element).attr("__element_id"));
 
 				var media_player = SwipeMediaPlayer.getInstance();
 				var data = { media: player };
-				if ($(element).attr("__videoStart")) {
-					data["videoStart"] = $(element).attr("__videoStart");
+				if (__element.videoStart) {
+					data["videoStart"] = __element.videoStart;
 				}
-				if ($(element).attr("__videoDuration")) {
-					data["videoDuration"] = $(element).attr("__videoDuration");
+				if (__element.videoDuration) {
+					data["videoDuration"] = __element.videoDuration;
 				}
 				media_player.page($(element).attr("__page_id")).push($(element).attr("id"), data);
+				instance.counterDecrease();
 			});
 
 			this.pages.forEach(function (page, page_index) {
@@ -274,6 +262,18 @@ var SwipeBook = function () {
 			$(".video_element").css({ "position": "absolute" });
 			$(".text_element").css({ "position": "absolute" });
 			$(".svg_element").css({ "position": "absolute" });
+		}
+	}, {
+		key: 'counterDecrease',
+		value: function counterDecrease() {
+			SwipeCounter.decrease();
+			$("#counter").html(SwipeCounter.getCounter());
+
+			if (SwipeCounter.getCounter() == 0) {
+				this.loadFinish();
+				console.log("OK!!!");
+			}
+			console.log(SwipeCounter.getCounter());
 		}
 	}, {
 		key: 'loadFinish',
@@ -304,6 +304,16 @@ var SwipeBook = function () {
 					this.show(this.step - 1);
 				}
 			}
+		}
+	}, {
+		key: 'getStep',
+		value: function getStep() {
+			return this.step;
+		}
+	}, {
+		key: 'getPages',
+		value: function getPages() {
+			return this.pages;
 		}
 	}, {
 		key: 'justShow',
@@ -599,6 +609,8 @@ var SwipeElement = function () {
 
 		this.isActive = false;
 		this.videoElement = null;
+		this.videoStart = 0;
+		this.videoDuration = null;
 		this.isRepeat = Boolean(info["repeat"]);
 
 		this.x = 0;
@@ -663,6 +675,20 @@ var SwipeElement = function () {
 			return parser.parse(element, this.css_id);
 		}
 	}, {
+		key: "getElement",
+		value: function getElement(index) {
+			if (index !== undefined) {
+				var indexes = index.split("-");
+				if (indexes.length == 1) {
+					return this.elements[index];
+				} else {
+					return this.elements[indexes.shift()].getElement(indexes.join("-"));
+				}
+				return;
+			}
+			return this;
+		}
+	}, {
 		key: "initData",
 		value: function initData(index) {
 			if (index !== undefined) {
@@ -684,7 +710,9 @@ var SwipeElement = function () {
 				this.snap = Snap("#" + this.css_id);
 				this.path = this.snap.path();
 			}
-
+			if (this.isVideo()) {
+				this.initVideo();
+			}
 			this.setSize();
 			this.setPosition();
 			this.setOption();
@@ -787,6 +815,16 @@ var SwipeElement = function () {
 
 			if (this.info["clip"] && this.info["clip"] === true) {
 				$("#" + this.css_id).css("overflow", "hidden");
+			}
+		}
+	}, {
+		key: "initVideo",
+		value: function initVideo() {
+			if (this.info["videoStart"]) {
+				this.videoStart = this.info["videoStart"];
+			}
+			if (this.info["videoDuration"]) {
+				this.videoDuration = this.info["videoDuration"];
 			}
 		}
 	}, {
@@ -1434,6 +1472,9 @@ var SwipeElement = function () {
 		value: function html() {
 			if (this.type()) {
 				SwipeCounter.increase();
+				if (this.isVideo()) {
+					SwipeCounter.increase();
+				}
 			}
 			var child_html = this.elements.map(function (element, key) {
 				return element.html();
@@ -1453,14 +1494,6 @@ var SwipeElement = function () {
 				return "<div class='element markdown_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + "<div class='markdown_wrap' id='md_" + this.css_id + "'>" + md_array[0] + child_html + "</div></div>";
 			} else if (this.isVideo()) {
 				var attrs = this.defaultAttr('element video_element');
-
-				console.log(this.info);
-				if (this.info["videoStart"]) {
-					attrs["__videoStart"] = this.info["videoStart"];
-				}
-				if (this.info["videoDuration"]) {
-					attrs["__videoDuration"] = this.info["videoDuration"];
-				}
 				var attr_str = this.getAttrStr(attrs);
 				return "<div " + attr_str + ">" + "<video id='" + this.css_id + "-video' ><source type='video/mp4' src='" + this.info.video + "'  /></video>" + child_html + "</div>";
 			} else if (this.isPath()) {
@@ -2038,7 +2071,6 @@ var SwipeMediaPlayer = function () {
 									if (this.current_playing != this.current_page) {
 												this.stop();
 												if (this.media[this.current_page]) {
-															console.log("play");
 															var page = this.media[this.current_page];
 															Object.keys(page).forEach(function (key) {
 																		var player = page[key].media;
@@ -2072,8 +2104,6 @@ var SwipeMediaPlayer = function () {
 						key: "stop",
 						value: function stop() {
 									if (this.current_playing !== null) {
-												console.log("stop");
-												console.log(this.current_playing);
 												if (this.media[this.current_playing]) {
 															var page = this.media[this.current_playing];
 															Object.keys(page).forEach(function (key) {
@@ -2169,6 +2199,16 @@ var SwipePage = function () {
 												this.elements[index].initData();
 									} else {
 												this.elements[indexes.shift()].initData(indexes.join("-"));
+									}
+						}
+			}, {
+						key: "getElement",
+						value: function getElement(index) {
+									var indexes = index.split("-");
+									if (indexes.length == 1) {
+												return this.elements[index].getElement();
+									} else {
+												return this.elements[indexes.shift()].getElement(indexes.join("-"));
 									}
 						}
 			}, {
@@ -2329,7 +2369,7 @@ var SwipeParser = function () {
 															if (ret[keyString] == null) {
 																		ret[keyString] = ret_val;
 															} else {
-																		if (SwipeParser.is("Array", ret[keyString]) && ret[keyString].length > 0 && SwipeParser.is("Object", ret[keyString][0])) {
+																		if (SwipeParser.is("Array", ret[keyString]) && SwipeParser.is("Array", ret_val)) {
 																					idMap = {};
 
 																					$.each(ret_val, function (index, tempItem) {

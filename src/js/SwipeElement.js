@@ -13,6 +13,8 @@ class SwipeElement {
 
 	this.isActive = false;
 	this.videoElement = null;
+	this.videoStart = 0;
+	this.videoDuration = null;
 	this.isRepeat = Boolean(info["repeat"]);
 
 	this.x = 0;
@@ -73,6 +75,18 @@ class SwipeElement {
 	return parser.parse(element, this.css_id);
     }
     
+    getElement(index) {
+	if (index !== undefined) {
+	    var indexes = index.split("-");
+	    if (indexes.length == 1) {
+		return this.elements[index];
+	    } else {
+		return this.elements[indexes.shift()].getElement(indexes.join("-"));
+	    }
+	    return;
+	}
+	return this;
+    }
     initData(index) {
 	if (index !== undefined) {
 	    var indexes = index.split("-");
@@ -93,7 +107,9 @@ class SwipeElement {
 	    this.snap = Snap("#" + this.css_id);
 	    this.path = this.snap.path();
 	}
-
+	if (this.isVideo()){
+	    this.initVideo();
+	}
 	this.setSize();
 	this.setPosition();
 	this.setOption();
@@ -196,7 +212,14 @@ class SwipeElement {
 	}
 
     }	
-    
+    initVideo() {
+	if (this.info["videoStart"]) {
+	    this.videoStart = this.info["videoStart"];
+	}
+	if (this.info["videoDuration"]) {
+	    this.videoDuration = this.info["videoDuration"];
+	}
+    }    
     setSize() {
     	if (this.info["size"]) {
 	    this.w = this.info["size"][0];
@@ -783,6 +806,9 @@ class SwipeElement {
     html() {
 	if (this.type()){
 	    SwipeCounter.increase();
+	    if (this.isVideo()){
+		SwipeCounter.increase();
+	    }
 	}
 	var child_html = this.elements.map(function(element, key){
 	    return element.html();
@@ -809,14 +835,6 @@ class SwipeElement {
 		"<div class='markdown_wrap' id='md_" + this.css_id + "'>" + md_array[0] + child_html + "</div></div>";
 	} else if (this.isVideo()) {
 	    var attrs = this.defaultAttr('element video_element');
-
-	    console.log(this.info);
-	    if (this.info["videoStart"]) {
-		attrs["__videoStart"] = this.info["videoStart"];
-	    }
-	    if (this.info["videoDuration"]) {
-		attrs["__videoDuration"] = this.info["videoDuration"];
-	    }
 	    var attr_str = this.getAttrStr(attrs);
 	    return  "<div " + attr_str + ">" +
 		"<video id='" + this.css_id + "-video' ><source type='video/mp4' src='" + this.info.video + "'  /></video>" +

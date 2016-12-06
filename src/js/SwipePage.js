@@ -68,6 +68,15 @@ class SwipePage {
 	}
     }
 
+    getElement(index) {
+	var indexes = index.split("-");
+	if (indexes.length == 1) {
+	    return this.elements[index].getElement();
+	} else {
+	    return this.elements[indexes.shift()].getElement(indexes.join("-"));
+	}
+    }
+    
     justShow() {
 	this.elements.forEach(function(element, elem_index){
 	    element.justShow();

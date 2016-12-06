@@ -31,7 +31,6 @@ class SwipeMediaPlayer {
 	if (this.current_playing != this.current_page){
 	    this.stop();
 	    if (this.media[this.current_page]) {
-		console.log("play");
 		var page = this.media[this.current_page];
 		Object.keys(page).forEach(function (key) {
 		    var player = page[key].media;
@@ -61,8 +60,6 @@ class SwipeMediaPlayer {
     }
     stop() {
 	if (this.current_playing !== null) {
-	    console.log("stop");
-	    console.log(this.current_playing);
 	    if (this.media[this.current_playing]) {
 		var page = this.media[this.current_playing];
 		Object.keys(page).forEach(function (key) {

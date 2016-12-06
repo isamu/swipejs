@@ -37,7 +37,7 @@ class SwipeParser {
 		if (ret[keyString] == null){
 		    ret[keyString] = ret_val;
 		} else {
-		    if ((SwipeParser.is("Array", ret[keyString]) && ret[keyString].length > 0 && SwipeParser.is("Object", ret[keyString][0]))) {
+ 		    if ((SwipeParser.is("Array", ret[keyString]) && SwipeParser.is("Array", ret_val))) {
 			idMap = {};
 
 			$.each(ret_val, (index, tempItem) => {

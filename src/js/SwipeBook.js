@@ -178,26 +178,12 @@ class SwipeBook {
 	    $("#" + $(this).attr("__base_id")).attr("__default_height", $(this).height());
 
 	    instance.initData($(this).attr("__page_id"), $(this).attr("__element_id"));
-	    SwipeCounter.decrease();
-	    $("#counter").html(SwipeCounter.getCounter());
-
-	    if(SwipeCounter.getCounter() == 0){
-		instance.loadFinish();
-		console.log("OK!!!");
-	    }
-	    console.log(SwipeCounter.getCounter());
+	    instance.counterDecrease();
 	});
 
 	$(".element").each(function(index, element) {
 	    instance.initData($(element).attr("__page_id"), $(element).attr("__element_id"));
-
-	    SwipeCounter.decrease();
-	    $("#counter").html(SwipeCounter.getCounter());
-	    if(SwipeCounter.getCounter() == 0){
-		instance.loadFinish();
-		console.log("OK!!!");
-	    }
-	    console.log(SwipeCounter.getCounter());
+	    instance.counterDecrease();
 	});
 	
 	$(".video_element").each(function(index, element) {
@@ -208,16 +194,19 @@ class SwipeBook {
 		    instance.videoElement = mediaElement;
 		}
             });
-	    
+	    var __element = instance.pages[$(element).attr("__page_id")].getElement( $(element).attr("__element_id"));
+
 	    let media_player = SwipeMediaPlayer.getInstance();
 	    let data = {media: player};
-	    if ($(element).attr("__videoStart")) {
-		data["videoStart"] = $(element).attr("__videoStart");
+	    if (__element.videoStart) {
+		data["videoStart"] = __element.videoStart;
 	    }
-	    if ($(element).attr("__videoDuration")) {
-		data["videoDuration"] = $(element).attr("__videoDuration");
+	    if (__element.videoDuration) {
+		data["videoDuration"] = __element.videoDuration;
 	    }
 	    media_player.page($(element).attr("__page_id")).push($(element).attr("id"), data);
+	    instance.counterDecrease();
+	    
 	});
 	
 	this.pages.forEach((page, page_index) => {
@@ -232,7 +221,17 @@ class SwipeBook {
 	$(".text_element").css({"position": "absolute"});
 	$(".svg_element").css({"position": "absolute"});
     }
+    counterDecrease(){
+	SwipeCounter.decrease();
+	$("#counter").html(SwipeCounter.getCounter());
 
+	if(SwipeCounter.getCounter() == 0){
+	    this.loadFinish();
+	    console.log("OK!!!");
+	}
+	console.log(SwipeCounter.getCounter());
+    }
+    
     loadFinish(){
 	$("#loading").remove();
 	this.isReady = true;
@@ -256,6 +255,12 @@ class SwipeBook {
 		this.show(this.step - 1);
 	    }
 	}
+    }
+    getStep() {
+	return this.step;
+    }
+    getPages() {
+	return this.pages;
     }
     
     justShow(step) {
