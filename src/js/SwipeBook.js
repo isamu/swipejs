@@ -535,7 +535,6 @@ class SwipeBook {
 	} else { // in case back
 	    console.log("back");
 	    // transition 
-
 	    if (nextTransition == "fadeIn") {
 		$("#page_" + nextStep).css({"opacity": SwipeBook.pageInDuration() * ration});
 	    } else if (nextTransition == "replace") {
@@ -563,7 +562,7 @@ class SwipeBook {
 	    if (currentTransition == "fadeIn") {
 		$("#page_" + currentStep).css({"opacity": (1 - ration)});
 	    } else if (currentTransition == "replace" ) {
-		this.pages[currentStep].back();
+		//this.pages[currentStep].back();
 		//setTimeout(function(){
 //		    $("#page_" + currentStep ).css({"opacity": 0});
 //		}, SwipeBook.pageInDuration());
@@ -582,8 +581,10 @@ class SwipeBook {
 	$("#page_" + String(this.step + 1)).css("opacity", 1);
     }
     prevStart(){
-	console.log(this.step + 1);
+	console.log(this.step - 1);
 	$("#page_" + String(this.step - 1)).css("opacity", 1);
+	//this.pages[this.step - 1].finShow();
+
     }
     nextEnd(){
 	var nextStep = this.step + 1;
@@ -594,7 +595,7 @@ class SwipeBook {
 	$("#page_" +  (nextStep) ).css("top", 0 );
 	$("#page_" +  (nextStep) ).css("left", 0 );
 	$("#page_" +  (nextStep) ).css("opacity", 1);
-	this.pages[nextStep].show();
+	this.pages[nextStep].finShow();
 	this.step = nextStep;
 	location.hash = nextStep;
     }
@@ -608,11 +609,10 @@ class SwipeBook {
 	$("#page_" +  (nextStep) ).css("opacity", 1);
 	$("#page_" +  (nextStep) ).css("top", 0 );
 	$("#page_" +  (nextStep) ).css("left", 0 );
-	this.pages[nextStep].show();
+	this.pages[nextStep].finShow();
 	this.step = nextStep;
 	location.hash = nextStep;
     }
-    
     pageSlide2(mode, step, ration) {
 	console.log("pageSlide2");
 	console.log(mode);

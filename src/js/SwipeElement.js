@@ -628,6 +628,59 @@ class SwipeElement {
 	}
     }
 
+    animateShow(ration){
+	if (this.hasTo()) {
+	    
+	    var instance = this;
+
+	    // todo back
+	    /*
+	    if (instance.angle != instance.to_angle) {
+		console.log(do_duration);
+		$("#" + instance.css_id).rotate({
+		    angle: instance.angle, animateTo: instance.to_angle, duration: do_duration,
+		})
+	    }
+	    */
+	    $("#" + instance.css_id).css(instance.convCssPos(instance.finPos),
+					 {
+					     duration: 100000000, 
+					     step: function(s){
+						 $("#steps").text(s);
+						 if (ration == 1) {
+						     $(this).stop(0);
+						 }
+						 
+					     },
+					     easing: "swipe"
+					 }
+					);
+	    /*
+	    if (instance.isVideo()){
+		$("#" + instance.css_id + "-video").animate(instance.convCssPos(instance.finPos), {
+		    duration: do_duration
+		});
+	    }
+	    
+	    if (instance.isText()) {
+		$("#" + instance.css_id + "-body").animate(instance.finText, {
+		    duration: do_duration
+                });
+	    }
+	    if (instance.isPath()) {
+		let path =  SwipeParser.clone(instance.finPath.path);
+		delete path.stroke;
+		instance.path.animate(path, do_duration);
+		if (instance.prevPath.fill !=  instance.finPath.fill) {
+		    setTimeout(function(){
+			instance.path.attr({fill: instance.finPath.fill});
+		    }, do_duration);
+		}
+	    }
+	    */
+	}
+    }
+    
     // calculate position
     updatePosition(data, to){
 	var ret = Object.assign({}, data);

@@ -93,6 +93,8 @@ class SwipePage {
 	}, this.duration);
 	
     }
+    animateShow() {
+    }
 
     delayShow(){
 	let instance = this;

@@ -76,18 +76,37 @@ class SwipeUtil {
 
 	function scroll_event_handler(event, ration) {
 	    //show_status(event, ration);
+	    console.log(this.status);
+	    var currentStatus = null;
+	    if (ration > 0) {
+		currentStatus = "forward";
+	    }
+	    if (ration < 0) {
+		currentStatus = "back";
+	    }
+	    
 	    var swipe_book = SwipeUtil.getSwipeBook();
+	    if (currentStatus != this.status) {
+		if (currentStatus == "forward") {
+		    swipe_book.nextStart(ration);
+		}
+		if (currentStatus = "back") {
+		    swipe_book.prevStart(ration);
+		}
+		this.status = currentStatus;
+	    }
+
 	    swipe_book.view(ration);
 	}
 	
 	function stop_event(event, ration){
 	    if (ration > 0) {
 		go_ration(ration, 0.1);
+		this.status = null;
 	    } else {
-		//	step = step - 1;
 		go_ration(ration, -0.1);
+		this.status = null;
 	    }
-	    // go_ration(ration);
 	}
 	
 	function go_ration(ration, delta) {
@@ -100,7 +119,6 @@ class SwipeUtil {
 	    } else if (ration < -1){
 		ration = -1;
 		swipe_book.prevEnd();
-		
 	    } else {
 		var swipe_book = SwipeUtil.getSwipeBook();
 		swipe_book.view(ration);
@@ -113,11 +131,7 @@ class SwipeUtil {
 	
 	function start_event(event, ration){
 	    var swipe_book = SwipeUtil.getSwipeBook();
-	    if (ration > 0) {
-		swipe_book.nextStart(ration);
-	    } else {
-		swipe_book.prevStart(ration);
-	    }		
+	    this.status = null;
 	}
 	
 	$.extend($.easing,
