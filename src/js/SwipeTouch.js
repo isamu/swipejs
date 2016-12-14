@@ -5,7 +5,8 @@ class SwipeTouch {
 	this.diff = 0;
 	this.ration = 0;
 	this.options = options;
-
+	this.status = "stop";
+	
 	var dom = options.dom ? options.dom : window;
 
 	var scroll_event = 'onwheel' in document ? 'wheel' : 'onmousewheel' in document ? 'mousewheel' : 'DOMMouseScroll';
@@ -48,6 +49,7 @@ class SwipeTouch {
     
     static scroll_event_handler(event) {
 	console.log("scroll");
+	this.status = "scroll";
 	if(this.options.scroll_callback) {
 	    this.options.scroll_callback(event, this.ration)
 	}
@@ -55,6 +57,7 @@ class SwipeTouch {
 
     static stop_event(event){
 	console.log("stop");
+	this.status = "stop";
 	if(this.options.stop_callback) {
 	    this.options.stop_callback(event, this.ration)
 	}
@@ -63,14 +66,21 @@ class SwipeTouch {
     static getRation() {
 	return this.ration;
     }
+    static setRation(ration) {
+	this.ration = ration;
+    }
     static start_event(){
 	this.ration = 0;
 	console.log("start");
+	this.status = "start";
 	if(this.options.start_callback) {
 	    this.options.start_callback(event, this.ration)
 	}
     }
 
+    static getStatus() {
+	return this.status;
+    }
 		 
     
 }

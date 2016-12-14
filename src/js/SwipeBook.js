@@ -511,7 +511,7 @@ class SwipeBook {
 		this.pages[nextStep].finShow();
 		$("#page_" + nextStep ).css({ "opacity": ration });
 	    }else if (nextTransition == "replace") {
-		$("#page_" + nextStep ).css({ "opacity": ration });
+		$("#page_" + nextStep ).css({ "opacity": 1 });
 		
 	    }else if (nextTransition == "scroll") {
 		this.pageSlide2("in", nextStep, ration);
@@ -572,13 +572,14 @@ class SwipeBook {
 
 	}
 	
-	this.pages[nextStep].play();
+	// this.pages[nextStep].play();
 	
 
     }
     nextStart(){
 	console.log(this.step + 1);
 	$("#page_" + String(this.step + 1)).css("opacity", 1);
+	this.pages[this.step + 1].animateShow();
     }
     prevStart(){
 	console.log(this.step - 1);

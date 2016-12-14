@@ -566,7 +566,7 @@ var SwipeBook = function () {
 					this.pages[nextStep].finShow();
 					$("#page_" + nextStep).css({ "opacity": ration });
 				} else if (nextTransition == "replace") {
-					$("#page_" + nextStep).css({ "opacity": ration });
+					$("#page_" + nextStep).css({ "opacity": 1 });
 				} else if (nextTransition == "scroll") {
 					this.pageSlide2("in", nextStep, ration);
 				} else {
@@ -626,13 +626,14 @@ var SwipeBook = function () {
 				}
 			}
 
-			this.pages[nextStep].play();
+			// this.pages[nextStep].play();
 		}
 	}, {
 		key: 'nextStart',
 		value: function nextStart() {
 			console.log(this.step + 1);
 			$("#page_" + String(this.step + 1)).css("opacity", 1);
+			this.pages[this.step + 1].animateShow();
 		}
 	}, {
 		key: 'prevStart',
@@ -1472,6 +1473,12 @@ var SwipeElement = function () {
 	}, {
 		key: "animateShow",
 		value: function animateShow(ration) {
+			if (this.elements) {
+				this.elements.forEach(function (element, elem_index) {
+					element.animateShow(ration);
+				});
+			}
+
 			if (this.hasTo()) {
 
 				var instance = this;
@@ -1485,11 +1492,13 @@ var SwipeElement = function () {
     })
     }
     */
-				$("#" + instance.css_id).css(instance.convCssPos(instance.finPos), {
+				console.log(instance.css_id);
+				$("#" + instance.css_id).animate(instance.convCssPos(instance.finPos), {
 					duration: 100000000,
 					step: function step(s) {
-						$("#steps").text(s);
-						if (ration == 1) {
+						//console.log(s);
+
+						if (SwipeTouch.getStatus() == "stop") {
 							$(this).stop(0);
 						}
 					},
@@ -2497,7 +2506,11 @@ var SwipePage = function () {
 						}
 			}, {
 						key: "animateShow",
-						value: function animateShow() {}
+						value: function animateShow() {
+									this.elements.forEach(function (element, elem_index) {
+												element.animateShow();
+									});
+						}
 			}, {
 						key: "delayShow",
 						value: function delayShow() {
@@ -2941,6 +2954,7 @@ var SwipeTouch = function () {
 									this.diff = 0;
 									this.ration = 0;
 									this.options = options;
+									this.status = "stop";
 
 									var dom = options.dom ? options.dom : window;
 
@@ -2988,6 +3002,7 @@ var SwipeTouch = function () {
 						key: 'scroll_event_handler',
 						value: function scroll_event_handler(event) {
 									console.log("scroll");
+									this.status = "scroll";
 									if (this.options.scroll_callback) {
 												this.options.scroll_callback(event, this.ration);
 									}
@@ -2996,6 +3011,7 @@ var SwipeTouch = function () {
 						key: 'stop_event',
 						value: function stop_event(event) {
 									console.log("stop");
+									this.status = "stop";
 									if (this.options.stop_callback) {
 												this.options.stop_callback(event, this.ration);
 									}
@@ -3006,13 +3022,24 @@ var SwipeTouch = function () {
 									return this.ration;
 						}
 			}, {
+						key: 'setRation',
+						value: function setRation(ration) {
+									this.ration = ration;
+						}
+			}, {
 						key: 'start_event',
 						value: function start_event() {
 									this.ration = 0;
 									console.log("start");
+									this.status = "start";
 									if (this.options.start_callback) {
 												this.options.start_callback(event, this.ration);
 									}
+						}
+			}, {
+						key: 'getStatus',
+						value: function getStatus() {
+									return this.status;
 						}
 			}]);
 
@@ -3144,7 +3171,9 @@ var SwipeUtil = function () {
 
 			function go_ration(ration, delta) {
 				ration = ration + delta;
+
 				var swipe_book = SwipeUtil.getSwipeBook();
+				SwipeTouch.setRation(ration);
 
 				if (ration > 1) {
 					ration = 1;
@@ -3169,7 +3198,6 @@ var SwipeUtil = function () {
 
 			$.extend($.easing, {
 				swipe: function swipe(x, t, b, c, d) {
-					// console.log(SwipeTouch.getRation());
 					return SwipeTouch.getRation();
 				}
 			});

@@ -94,6 +94,9 @@ class SwipePage {
 	
     }
     animateShow() {
+	this.elements.forEach(function(element, elem_index){
+	    element.animateShow();
+	});
     }
 
     delayShow(){

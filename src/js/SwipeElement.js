@@ -629,6 +629,12 @@ class SwipeElement {
     }
 
     animateShow(ration){
+	if (this.elements) {
+	    this.elements.forEach(function(element, elem_index){
+		element.animateShow(ration);
+	    });
+	}
+
 	if (this.hasTo()) {
 	    
 	    var instance = this;
@@ -642,15 +648,16 @@ class SwipeElement {
 		})
 	    }
 	    */
-	    $("#" + instance.css_id).css(instance.convCssPos(instance.finPos),
+	    console.log(instance.css_id);
+	    $("#" + instance.css_id).animate(instance.convCssPos(instance.finPos),
 					 {
 					     duration: 100000000, 
 					     step: function(s){
-						 $("#steps").text(s);
-						 if (ration == 1) {
+						 //console.log(s);
+
+						 if (SwipeTouch.getStatus() == "stop") {
 						     $(this).stop(0);
 						 }
-						 
 					     },
 					     easing: "swipe"
 					 }

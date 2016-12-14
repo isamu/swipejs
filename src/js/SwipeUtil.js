@@ -111,8 +111,10 @@ class SwipeUtil {
 	
 	function go_ration(ration, delta) {
 	    ration = ration + delta;
-	    var swipe_book = SwipeUtil.getSwipeBook();
 	    
+	    var swipe_book = SwipeUtil.getSwipeBook();
+	    SwipeTouch.setRation(ration);
+
 	    if (ration > 1){
 		ration = 1;
 		swipe_book.nextEnd();
@@ -137,7 +139,6 @@ class SwipeUtil {
 	$.extend($.easing,
 		 {
 		     swipe: function (x, t, b, c, d) {
-			 // console.log(SwipeTouch.getRation());
 			 return SwipeTouch.getRation();
 		     }
 		 });
