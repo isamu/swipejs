@@ -353,6 +353,14 @@ class SwipeElement {
     setSpritePos(pos) {
 	$("#" + this.css_id + "_sprite").css(this.getSpriteCss(pos));
     }
+    prevShow() {
+	if (this.elements) {
+	    this.elements.forEach(function(element, elem_index){
+		element.prevShow();
+	    });
+	}
+	this.setPrevPos();
+    }
     setPrevPos(){
 	var instance = this;
 	if (this.isPath()){

@@ -57,5 +57,82 @@ class SwipeUtil {
 	}
 	return newObject;
     }
+
+    static initTouchSwipe(data){
+	$(document.body).css({"margin":0, "padding": 0, "background-color": "#fff", "font-size": "26px"})
+	$('div').css({"margin":0, "padding": 0, "background-color": "#fff", "font-size": "26px"})
+	
+
+	var swipe_book = new SwipeBook(data, 0, "#swipe", "#swipe_back");
+	this.swipe_book = swipe_book;
     
+	$(window).resize(function() {
+	    clearTimeout(window.resizedFinished);
+	    window.resizedFinished = setTimeout(function(){
+		swipe_book.resize();
+	    }, 250);
+	});
+	
+
+	function scroll_event_handler(event, ration) {
+	    //show_status(event, ration);
+	    var swipe_book = SwipeUtil.getSwipeBook();
+	    swipe_book.view(ration);
+	}
+	
+	function stop_event(event, ration){
+	    if (ration > 0) {
+		go_ration(ration, 0.1);
+	    } else {
+		//	step = step - 1;
+		go_ration(ration, -0.1);
+	    }
+	    // go_ration(ration);
+	}
+	
+	function go_ration(ration, delta) {
+	    ration = ration + delta;
+	    var swipe_book = SwipeUtil.getSwipeBook();
+	    
+	    if (ration > 1){
+		ration = 1;
+		swipe_book.nextEnd();
+	    } else if (ration < -1){
+		ration = -1;
+		swipe_book.prevEnd();
+		
+	    } else {
+		var swipe_book = SwipeUtil.getSwipeBook();
+		swipe_book.view(ration);
+		
+		setTimeout(function(){
+		    go_ration(ration, delta);
+		}, 10);
+	    }
+	}
+	
+	function start_event(event, ration){
+	    var swipe_book = SwipeUtil.getSwipeBook();
+	    if (ration > 0) {
+		swipe_book.nextStart(ration);
+	    } else {
+		swipe_book.prevStart(ration);
+	    }		
+	}
+	
+	$.extend($.easing,
+		 {
+		     swipe: function (x, t, b, c, d) {
+			 // console.log(SwipeTouch.getRation());
+			 return SwipeTouch.getRation();
+		     }
+		 });
+	
+	SwipeTouch.init({
+	    start_callback: start_event,
+	    scroll_callback: scroll_event_handler,
+	    stop_callback: stop_event
+			});
+	
+    }
 }

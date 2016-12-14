@@ -119,6 +119,11 @@ class SwipePage {
 	    element.finShow();
 	});
     }
+    prevShow() {
+	this.elements.forEach(function(element, elem_index){
+	    element.prevShow();
+	});
+    }
     play() {
 	let media_player = SwipeMediaPlayer.getInstance();
 	media_player.page(this.index).play();

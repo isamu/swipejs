@@ -11,7 +11,7 @@ class SwipeTouch {
 	var scroll_event = 'onwheel' in document ? 'wheel' : 'onmousewheel' in document ? 'mousewheel' : 'DOMMouseScroll';
 
 	var self = this;
-	$(dom).on("scrollstart", function(e) {
+	$(window).on("scrollstart", function(e) {
 	    self.currentY = e.originalEvent.clientY;
 	    self.startY  = e.originalEvent.clientY;
 	    SwipeTouch.start_event(e);
@@ -22,7 +22,6 @@ class SwipeTouch {
 	    self.currentY = self.currentY - delta;
 	    self.diff =  self.currentY - self.startY;
 	    self.ration =   (self.diff / $(window).innerHeight());
-	    console.log(self.ration);
 	    
 	    if (self.ration > 1){ self.ration = 1;}
 	    if (self.ration < -1){ self.ration = -1;}
@@ -50,14 +49,14 @@ class SwipeTouch {
     static scroll_event_handler(event) {
 	console.log("scroll");
 	if(this.options.scroll_callback) {
-	    this.options.scroll_callback(event, this.raiton)
+	    this.options.scroll_callback(event, this.ration)
 	}
     }
 
     static stop_event(event){
 	console.log("stop");
 	if(this.options.stop_callback) {
-	    this.options.stop_callback(event, this.raiton)
+	    this.options.stop_callback(event, this.ration)
 	}
     }
     
@@ -68,7 +67,7 @@ class SwipeTouch {
 	this.ration = 0;
 	console.log("start");
 	if(this.options.start_callback) {
-	    this.options.start_callback(event, this.raiton)
+	    this.options.start_callback(event, this.ration)
 	}
     }
 
