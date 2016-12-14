@@ -76,7 +76,6 @@ class SwipeUtil {
 
 	function scroll_event_handler(event, ration) {
 	    //show_status(event, ration);
-	    console.log(this.status);
 	    var currentStatus = null;
 	    if (ration > 0) {
 		currentStatus = "forward";
@@ -90,7 +89,7 @@ class SwipeUtil {
 		if (currentStatus == "forward") {
 		    swipe_book.nextStart(ration);
 		}
-		if (currentStatus = "back") {
+		if (currentStatus == "back") {
 		    swipe_book.prevStart(ration);
 		}
 		this.status = currentStatus;
@@ -139,7 +138,7 @@ class SwipeUtil {
 	$.extend($.easing,
 		 {
 		     swipe: function (x, t, b, c, d) {
-			 return SwipeTouch.getRation();
+			 return Math.abs(SwipeTouch.getRation());
 		     }
 		 });
 	

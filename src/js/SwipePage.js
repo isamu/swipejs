@@ -98,6 +98,11 @@ class SwipePage {
 	    element.animateShow();
 	});
     }
+    animateShowBack() {
+	this.elements.forEach(function(element, elem_index){
+	    element.animateShowBack();
+	});
+    }
 
     delayShow(){
 	let instance = this;

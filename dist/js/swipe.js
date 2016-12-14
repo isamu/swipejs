@@ -625,22 +625,19 @@ var SwipeBook = function () {
 					this.pageSlide2("in_back", currentStep, ration);
 				}
 			}
-
-			// this.pages[nextStep].play();
 		}
 	}, {
 		key: 'nextStart',
 		value: function nextStart() {
-			console.log(this.step + 1);
 			$("#page_" + String(this.step + 1)).css("opacity", 1);
+			this.pages[this.step + 1].prevShow();
 			this.pages[this.step + 1].animateShow();
 		}
 	}, {
 		key: 'prevStart',
 		value: function prevStart() {
-			console.log(this.step - 1);
-			$("#page_" + String(this.step - 1)).css("opacity", 1);
-			//this.pages[this.step - 1].finShow();
+			this.pages[this.step].finShow();
+			this.pages[this.step].animateShowBack();
 		}
 	}, {
 		key: 'nextEnd',
@@ -1498,6 +1495,62 @@ var SwipeElement = function () {
 					step: function step(s) {
 						//console.log(s);
 
+						if (SwipeTouch.getStatus() == "stop") {
+							$(this).stop(0);
+						}
+					},
+					easing: "swipe"
+				});
+				/*
+    if (instance.isVideo()){
+    $("#" + instance.css_id + "-video").animate(instance.convCssPos(instance.finPos), {
+     duration: do_duration
+    });
+    }
+    
+    if (instance.isText()) {
+    $("#" + instance.css_id + "-body").animate(instance.finText, {
+     duration: do_duration
+               });
+    }
+    if (instance.isPath()) {
+    let path =  SwipeParser.clone(instance.finPath.path);
+    delete path.stroke;
+    instance.path.animate(path, do_duration);
+    if (instance.prevPath.fill !=  instance.finPath.fill) {
+     setTimeout(function(){
+    instance.path.attr({fill: instance.finPath.fill});
+     }, do_duration);
+    }
+    }
+    */
+			}
+		}
+	}, {
+		key: "animateShowBack",
+		value: function animateShowBack(ration) {
+			if (this.elements) {
+				this.elements.forEach(function (element, elem_index) {
+					element.animateShowBack(ration);
+				});
+			}
+
+			if (this.hasTo()) {
+				var instance = this;
+
+				// todo back
+				/*
+    if (instance.angle != instance.to_angle) {
+    console.log(do_duration);
+    $("#" + instance.css_id).rotate({
+     angle: instance.angle, animateTo: instance.to_angle, duration: do_duration,
+    })
+    }
+    */
+				$("#" + instance.css_id).animate(instance.convCssPos(instance.prevPos), {
+					duration: 100000000,
+					step: function step(s) {
+						//console.log(s);
 						if (SwipeTouch.getStatus() == "stop") {
 							$(this).stop(0);
 						}
@@ -2512,6 +2565,13 @@ var SwipePage = function () {
 									});
 						}
 			}, {
+						key: "animateShowBack",
+						value: function animateShowBack() {
+									this.elements.forEach(function (element, elem_index) {
+												element.animateShowBack();
+									});
+						}
+			}, {
 						key: "delayShow",
 						value: function delayShow() {
 									var instance = this;
@@ -3136,7 +3196,6 @@ var SwipeUtil = function () {
 
 			function scroll_event_handler(event, ration) {
 				//show_status(event, ration);
-				console.log(this.status);
 				var currentStatus = null;
 				if (ration > 0) {
 					currentStatus = "forward";
@@ -3150,7 +3209,7 @@ var SwipeUtil = function () {
 					if (currentStatus == "forward") {
 						swipe_book.nextStart(ration);
 					}
-					if (currentStatus = "back") {
+					if (currentStatus == "back") {
 						swipe_book.prevStart(ration);
 					}
 					this.status = currentStatus;
@@ -3198,7 +3257,7 @@ var SwipeUtil = function () {
 
 			$.extend($.easing, {
 				swipe: function swipe(x, t, b, c, d) {
-					return SwipeTouch.getRation();
+					return Math.abs(SwipeTouch.getRation());
 				}
 			});
 

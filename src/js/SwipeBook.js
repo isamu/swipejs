@@ -572,19 +572,15 @@ class SwipeBook {
 
 	}
 	
-	// this.pages[nextStep].play();
-	
-
     }
     nextStart(){
-	console.log(this.step + 1);
 	$("#page_" + String(this.step + 1)).css("opacity", 1);
+	this.pages[this.step + 1].prevShow();
 	this.pages[this.step + 1].animateShow();
     }
     prevStart(){
-	console.log(this.step - 1);
-	$("#page_" + String(this.step - 1)).css("opacity", 1);
-	//this.pages[this.step - 1].finShow();
+	this.pages[this.step].finShow();
+	this.pages[this.step].animateShowBack();
 
     }
     nextEnd(){
