@@ -489,6 +489,7 @@ class SwipeBook {
     }
 
     // scroll
+    
     view(ration) {
 	var nextStep = this.step + ((ration > 0) ? 1 : - 1);
 	var currentStep =  this.step;
@@ -574,15 +575,29 @@ class SwipeBook {
 	
     }
     nextStart(){
+	if (this.step + 1 >= this.pages.length) {
+	    return 0;
+	}
 	$("#page_" + String(this.step + 1)).css("opacity", 1);
 	this.pages[this.step + 1].prevShow();
 	this.pages[this.step + 1].animateShow();
     }
     prevStart(){
+	if (this.step <= 0) {
+	    return 0;
+	}
 	$("#page_" + String(this.step - 1)).css("opacity", 1);
 	this.pages[this.step].finShow();
 	this.pages[this.step].animateShowBack();
 
+    }
+    nextHide() {
+	var nextStep = this.step + 1;
+	if (nextStep >= this.pages.length) {
+	    return 0;
+	}
+	$("#page_" +  (nextStep) ).css("opacity", 0);
+	this.pages[nextStep].finShow();
     }
     nextEnd(){
 	var nextStep = this.step + 1;
@@ -597,7 +612,14 @@ class SwipeBook {
 	this.step = nextStep;
 	location.hash = nextStep;
     }
-    
+    prevHide(){
+	var nextStep = this.step - 1;
+	if (nextStep < 0) {
+	    return 0;
+	}
+	$("#page_" +  (nextStep) ).css("opacity", 0);
+	this.pages[nextStep].finShow();
+    }
     prevEnd(){
 	var nextStep = this.step - 1;
 	if (nextStep < 0) {
@@ -612,8 +634,8 @@ class SwipeBook {
 	location.hash = nextStep;
     }
     pageSlide2(mode, step, ration) {
-	console.log("pageSlide2");
-	console.log(mode);
+	// console.log("pageSlide2");
+	// console.log(mode);
 	
 	if (mode == "in") {
 	    $("#page_" + step ).css("opacity", 1);

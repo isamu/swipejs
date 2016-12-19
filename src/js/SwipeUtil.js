@@ -125,9 +125,15 @@ class SwipeUtil {
 	var swipe_book = SwipeUtil.getSwipeBook();
 	if (currentStatus != SwipeUtil.getStatus()) {
 	    if (currentStatus == "forward") {
+		if (SwipeUtil.getStatus() == "back") {
+		    swipe_book.prevHide();
+		}
 		swipe_book.nextStart(ration);
 	    }
 	    if (currentStatus == "back") {
+		if (SwipeUtil.getStatus() == "forward") {
+		    swipe_book.nextHide();
+		}
 		swipe_book.prevStart(ration);
 	    }
 	    SwipeUtil.setStatus(currentStatus);
@@ -160,7 +166,6 @@ class SwipeUtil {
     }
 
     static go_ration(delta) {
-	console.log( SwipeUtil.getStatus());
 	if( SwipeUtil.getStatus() != "stopping") {
 	    return ;
 	}

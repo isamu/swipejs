@@ -629,6 +629,9 @@ var SwipeBook = function () {
 	}, {
 		key: 'nextStart',
 		value: function nextStart() {
+			if (this.step + 1 >= this.pages.length) {
+				return 0;
+			}
 			$("#page_" + String(this.step + 1)).css("opacity", 1);
 			this.pages[this.step + 1].prevShow();
 			this.pages[this.step + 1].animateShow();
@@ -636,9 +639,22 @@ var SwipeBook = function () {
 	}, {
 		key: 'prevStart',
 		value: function prevStart() {
+			if (this.step <= 0) {
+				return 0;
+			}
 			$("#page_" + String(this.step - 1)).css("opacity", 1);
 			this.pages[this.step].finShow();
 			this.pages[this.step].animateShowBack();
+		}
+	}, {
+		key: 'nextHide',
+		value: function nextHide() {
+			var nextStep = this.step + 1;
+			if (nextStep >= this.pages.length) {
+				return 0;
+			}
+			$("#page_" + nextStep).css("opacity", 0);
+			this.pages[nextStep].finShow();
 		}
 	}, {
 		key: 'nextEnd',
@@ -654,6 +670,16 @@ var SwipeBook = function () {
 			this.pages[nextStep].finShow();
 			this.step = nextStep;
 			location.hash = nextStep;
+		}
+	}, {
+		key: 'prevHide',
+		value: function prevHide() {
+			var nextStep = this.step - 1;
+			if (nextStep < 0) {
+				return 0;
+			}
+			$("#page_" + nextStep).css("opacity", 0);
+			this.pages[nextStep].finShow();
 		}
 	}, {
 		key: 'prevEnd',
@@ -673,8 +699,8 @@ var SwipeBook = function () {
 	}, {
 		key: 'pageSlide2',
 		value: function pageSlide2(mode, step, ration) {
-			console.log("pageSlide2");
-			console.log(mode);
+			// console.log("pageSlide2");
+			// console.log(mode);
 
 			if (mode == "in") {
 				$("#page_" + step).css("opacity", 1);
@@ -3247,9 +3273,15 @@ var SwipeUtil = function () {
 									var swipe_book = SwipeUtil.getSwipeBook();
 									if (currentStatus != SwipeUtil.getStatus()) {
 												if (currentStatus == "forward") {
+															if (SwipeUtil.getStatus() == "back") {
+																		swipe_book.prevHide();
+															}
 															swipe_book.nextStart(ration);
 												}
 												if (currentStatus == "back") {
+															if (SwipeUtil.getStatus() == "forward") {
+																		swipe_book.nextHide();
+															}
 															swipe_book.prevStart(ration);
 												}
 												SwipeUtil.setStatus(currentStatus);
@@ -3285,7 +3317,6 @@ var SwipeUtil = function () {
 			}, {
 						key: "go_ration",
 						value: function go_ration(delta) {
-									console.log(SwipeUtil.getStatus());
 									if (SwipeUtil.getStatus() != "stopping") {
 												return;
 									}
