@@ -579,6 +579,7 @@ class SwipeBook {
 	this.pages[this.step + 1].animateShow();
     }
     prevStart(){
+	$("#page_" + String(this.step - 1)).css("opacity", 1);
 	this.pages[this.step].finShow();
 	this.pages[this.step].animateShowBack();
 

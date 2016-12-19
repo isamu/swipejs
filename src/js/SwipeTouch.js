@@ -27,7 +27,7 @@ class SwipeTouch {
 	    if (self.ration > 1){ self.ration = 1;}
 	    if (self.ration < -1){ self.ration = -1;}
 
-	    SwipeTouch.scroll_event_handler(e);
+	    SwipeTouch.scroll_event_handler(e, self.ration);
 	}).on("scrollstop", function(e) {
 	    SwipeTouch.stop_event(e);
 	}).on("touchstart", function(e) {
@@ -39,7 +39,7 @@ class SwipeTouch {
 	    self.diff = self.startY - e.originalEvent.pageY;
 	    self.ration = self.diff / $(window).innerHeight()      
 
-	    SwipeTouch.scroll_event_handler(e);
+	    SwipeTouch.scroll_event_handler(e, self.ration);
 	}).on("touchend", function(e) {
 	    self.diff = self.startY - e.originalEvent.pageY;
 	    SwipeTouch.stop_event(e);
@@ -47,11 +47,11 @@ class SwipeTouch {
     }	     
     
     
-    static scroll_event_handler(event) {
+    static scroll_event_handler(event, ration) {
 	console.log("scroll");
 	this.status = "scroll";
 	if(this.options.scroll_callback) {
-	    this.options.scroll_callback(event, this.ration)
+	    this.options.scroll_callback(event, ration)
 	}
     }
 
@@ -65,9 +65,6 @@ class SwipeTouch {
     
     static getRation() {
 	return this.ration;
-    }
-    static setRation(ration) {
-	this.ration = ration;
     }
     static start_event(){
 	this.ration = 0;

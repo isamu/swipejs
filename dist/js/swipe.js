@@ -636,6 +636,7 @@ var SwipeBook = function () {
 	}, {
 		key: 'prevStart',
 		value: function prevStart() {
+			$("#page_" + String(this.step - 1)).css("opacity", 1);
 			this.pages[this.step].finShow();
 			this.pages[this.step].animateShowBack();
 		}
@@ -3040,7 +3041,7 @@ var SwipeTouch = function () {
 															self.ration = -1;
 												}
 
-												SwipeTouch.scroll_event_handler(e);
+												SwipeTouch.scroll_event_handler(e, self.ration);
 									}).on("scrollstop", function (e) {
 												SwipeTouch.stop_event(e);
 									}).on("touchstart", function (e) {
@@ -3052,7 +3053,7 @@ var SwipeTouch = function () {
 												self.diff = self.startY - e.originalEvent.pageY;
 												self.ration = self.diff / $(window).innerHeight();
 
-												SwipeTouch.scroll_event_handler(e);
+												SwipeTouch.scroll_event_handler(e, self.ration);
 									}).on("touchend", function (e) {
 												self.diff = self.startY - e.originalEvent.pageY;
 												SwipeTouch.stop_event(e);
@@ -3060,11 +3061,11 @@ var SwipeTouch = function () {
 						}
 			}, {
 						key: 'scroll_event_handler',
-						value: function scroll_event_handler(event) {
+						value: function scroll_event_handler(event, ration) {
 									console.log("scroll");
 									this.status = "scroll";
 									if (this.options.scroll_callback) {
-												this.options.scroll_callback(event, this.ration);
+												this.options.scroll_callback(event, ration);
 									}
 						}
 			}, {
@@ -3080,11 +3081,6 @@ var SwipeTouch = function () {
 						key: 'getRation',
 						value: function getRation() {
 									return this.ration;
-						}
-			}, {
-						key: 'setRation',
-						value: function setRation(ration) {
-									this.ration = ration;
 						}
 			}, {
 						key: 'start_event',
@@ -3112,162 +3108,202 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var SwipeUtil = function () {
-	function SwipeUtil() {
-		_classCallCheck(this, SwipeUtil);
-	}
-
-	_createClass(SwipeUtil, null, [{
-		key: "getParameterByName",
-		value: function getParameterByName(name, url) {
-			if (!url) url = window.location.href;
-			name = name.replace(/[\[\]]/g, "\\$&");
-			var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-			    results = regex.exec(url);
-			if (!results) return null;
-			if (!results[2]) return '';
-			return decodeURIComponent(results[2].replace(/\+/g, " "));
-		}
-	}, {
-		key: "initSwipe",
-		value: function initSwipe(data, css_id, back_css_id) {
-			$(document.body).css({ "margin": 0, "padding": 0, "background-color": "#fff", "font-size": "26px" });
-			$('div').css({ "margin": 0, "padding": 0, "background-color": "#fff", "font-size": "26px" });
-
-			var default_page = 0;
-
-			if (location.hash) {
-				default_page = Number(location.hash.substr(1));
+			function SwipeUtil() {
+						_classCallCheck(this, SwipeUtil);
 			}
 
-			var swipe_book = new SwipeBook(data, default_page, css_id, back_css_id);
-			this.swipe_book = swipe_book;
+			_createClass(SwipeUtil, null, [{
+						key: "getParameterByName",
+						value: function getParameterByName(name, url) {
+									if (!url) url = window.location.href;
+									name = name.replace(/[\[\]]/g, "\\$&");
+									var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+									    results = regex.exec(url);
+									if (!results) return null;
+									if (!results[2]) return '';
+									return decodeURIComponent(results[2].replace(/\+/g, " "));
+						}
+			}, {
+						key: "initSwipe",
+						value: function initSwipe(data, css_id, back_css_id) {
+									$(document.body).css({ "margin": 0, "padding": 0, "background-color": "#fff", "font-size": "26px" });
+									$('div').css({ "margin": 0, "padding": 0, "background-color": "#fff", "font-size": "26px" });
 
-			$(css_id).on("click", function () {
-				swipe_book.next();
-			});
+									var default_page = 0;
 
-			$(window).on('hashchange', function () {
-				if ("#" + swipe_book.getStep() != location.hash) {
-					swipe_book.show(Number(location.hash.substr(1)));
-				}
-			});
+									if (location.hash) {
+												default_page = Number(location.hash.substr(1));
+									}
 
-			$(window).resize(function () {
-				clearTimeout(window.resizedFinished);
-				window.resizedFinished = setTimeout(function () {
-					swipe_book.resize();
-				}, 250);
-			});
-		}
-	}, {
-		key: "getSwipeBook",
-		value: function getSwipeBook() {
-			return this.swipe_book;
-		}
-	}, {
-		key: "merge",
-		value: function merge(object1, object2) {
-			var newObject = {};
-			var keys = Object.keys(object1);
-			for (var i = 0; i < keys.length; i++) {
-				newObject[keys[i]] = object1[keys[i]];
-			}
-			keys = Object.keys(object2);
-			for (i = 0; i < keys.length; i++) {
-				newObject[keys[i]] = object2[keys[i]];
-			}
-			return newObject;
-		}
-	}, {
-		key: "initTouchSwipe",
-		value: function initTouchSwipe(data) {
-			$(document.body).css({ "margin": 0, "padding": 0, "background-color": "#fff", "font-size": "26px" });
-			$('div').css({ "margin": 0, "padding": 0, "background-color": "#fff", "font-size": "26px" });
+									var swipe_book = new SwipeBook(data, default_page, css_id, back_css_id);
+									this.swipe_book = swipe_book;
 
-			var swipe_book = new SwipeBook(data, 0, "#swipe", "#swipe_back");
-			this.swipe_book = swipe_book;
+									$(css_id).on("click", function () {
+												swipe_book.next();
+									});
 
-			$(window).resize(function () {
-				clearTimeout(window.resizedFinished);
-				window.resizedFinished = setTimeout(function () {
-					swipe_book.resize();
-				}, 250);
-			});
+									$(window).on('hashchange', function () {
+												if ("#" + swipe_book.getStep() != location.hash) {
+															swipe_book.show(Number(location.hash.substr(1)));
+												}
+									});
 
-			function scroll_event_handler(event, ration) {
-				//show_status(event, ration);
-				var currentStatus = null;
-				if (ration > 0) {
-					currentStatus = "forward";
-				}
-				if (ration < 0) {
-					currentStatus = "back";
-				}
+									$(window).resize(function () {
+												clearTimeout(window.resizedFinished);
+												window.resizedFinished = setTimeout(function () {
+															swipe_book.resize();
+												}, 250);
+									});
+						}
+			}, {
+						key: "getSwipeBook",
+						value: function getSwipeBook() {
+									return this.swipe_book;
+						}
+			}, {
+						key: "merge",
+						value: function merge(object1, object2) {
+									var newObject = {};
+									var keys = Object.keys(object1);
+									for (var i = 0; i < keys.length; i++) {
+												newObject[keys[i]] = object1[keys[i]];
+									}
+									keys = Object.keys(object2);
+									for (i = 0; i < keys.length; i++) {
+												newObject[keys[i]] = object2[keys[i]];
+									}
+									return newObject;
+						}
+			}, {
+						key: "initTouchSwipe",
+						value: function initTouchSwipe(data) {
+									$(document.body).css({ "margin": 0, "padding": 0, "background-color": "#fff", "font-size": "26px" });
+									$('div').css({ "margin": 0, "padding": 0, "background-color": "#fff", "font-size": "26px" });
 
-				var swipe_book = SwipeUtil.getSwipeBook();
-				if (currentStatus != this.status) {
-					if (currentStatus == "forward") {
-						swipe_book.nextStart(ration);
-					}
-					if (currentStatus == "back") {
-						swipe_book.prevStart(ration);
-					}
-					this.status = currentStatus;
-				}
+									var swipe_book = new SwipeBook(data, 0, "#swipe", "#swipe_back");
+									this.swipe_book = swipe_book;
+									this.ration = null;
+									$(window).resize(function () {
+												clearTimeout(window.resizedFinished);
+												window.resizedFinished = setTimeout(function () {
+															swipe_book.resize();
+												}, 250);
+									});
 
-				swipe_book.view(ration);
-			}
+									$.extend($.easing, {
+												swipe: function swipe(x, t, b, c, d) {
+															return Math.abs(SwipeUtil.getRation());
+												}
+									});
 
-			function stop_event(event, ration) {
-				if (ration > 0) {
-					go_ration(ration, 0.1);
-					this.status = null;
-				} else {
-					go_ration(ration, -0.1);
-					this.status = null;
-				}
-			}
+									SwipeTouch.init({
+												start_callback: SwipeUtil.start_event,
+												scroll_callback: SwipeUtil.scroll_event_handler,
+												stop_callback: SwipeUtil.stop_event
+									});
+						}
+			}, {
+						key: "getRation",
+						value: function getRation() {
+									return this.ration;
+						}
+			}, {
+						key: "setRation",
+						value: function setRation(ration) {
+									this.ration = ration;
+						}
+			}, {
+						key: "getStatus",
+						value: function getStatus() {
+									return this.status;
+						}
+			}, {
+						key: "setStatus",
+						value: function setStatus(status) {
+									this.status = status;
+						}
+			}, {
+						key: "start_event",
+						value: function start_event(event, ration) {
+									var swipe_book = SwipeUtil.getSwipeBook();
+									if (SwipeUtil.getStatus() == "stopping") {
+												SwipeUtil.stop();
+									}
+									this.ration = 0;
+									SwipeUtil.setStatus("start");
+						}
+			}, {
+						key: "scroll_event_handler",
+						value: function scroll_event_handler(event, ration) {
+									var currentStatus = "start";
+									SwipeUtil.setRation(ration);
+									if (ration > 0) {
+												currentStatus = "forward";
+									}
+									if (ration < 0) {
+												currentStatus = "back";
+									}
 
-			function go_ration(ration, delta) {
-				ration = ration + delta;
+									var swipe_book = SwipeUtil.getSwipeBook();
+									if (currentStatus != SwipeUtil.getStatus()) {
+												if (currentStatus == "forward") {
+															swipe_book.nextStart(ration);
+												}
+												if (currentStatus == "back") {
+															swipe_book.prevStart(ration);
+												}
+												SwipeUtil.setStatus(currentStatus);
+									}
 
-				var swipe_book = SwipeUtil.getSwipeBook();
-				SwipeTouch.setRation(ration);
+									swipe_book.view(ration);
+						}
+			}, {
+						key: "stop_event",
+						value: function stop_event(event, ration) {
+									SwipeUtil.setRation(ration);
+									if (ration > 0) {
+												SwipeUtil.setStatus("stopping");
+												SwipeUtil.go_ration(0.1);
+									} else {
+												SwipeUtil.setStatus("stopping");
+												SwipeUtil.go_ration(-0.1);
+									}
+						}
+			}, {
+						key: "stop",
+						value: function stop() {
+									var swipe_book = SwipeUtil.getSwipeBook();
+									SwipeUtil.setStatus("stop");
+									if (this.ration > 0) {
+												SwipeUtil.setRation(1);
+												swipe_book.nextEnd();
+									} else if (this.ration < 0) {
+												SwipeUtil.setRation(-1);
+												swipe_book.prevEnd();
+									}
+						}
+			}, {
+						key: "go_ration",
+						value: function go_ration(delta) {
+									console.log(SwipeUtil.getStatus());
+									if (SwipeUtil.getStatus() != "stopping") {
+												return;
+									}
+									this.ration = this.ration + delta;
 
-				if (ration > 1) {
-					ration = 1;
-					swipe_book.nextEnd();
-				} else if (ration < -1) {
-					ration = -1;
-					swipe_book.prevEnd();
-				} else {
-					var swipe_book = SwipeUtil.getSwipeBook();
-					swipe_book.view(ration);
+									var swipe_book = SwipeUtil.getSwipeBook();
+									if (Math.abs(this.ration) > 1) {
+												SwipeUtil.stop();
+									} else {
+												var swipe_book = SwipeUtil.getSwipeBook();
+												swipe_book.view(this.ration);
 
-					setTimeout(function () {
-						go_ration(ration, delta);
-					}, 10);
-				}
-			}
+												setTimeout(function () {
+															SwipeUtil.go_ration(delta);
+												}, 10);
+									}
+						}
+			}]);
 
-			function start_event(event, ration) {
-				var swipe_book = SwipeUtil.getSwipeBook();
-				this.status = null;
-			}
-
-			$.extend($.easing, {
-				swipe: function swipe(x, t, b, c, d) {
-					return Math.abs(SwipeTouch.getRation());
-				}
-			});
-
-			SwipeTouch.init({
-				start_callback: start_event,
-				scroll_callback: scroll_event_handler,
-				stop_callback: stop_event
-			});
-		}
-	}]);
-
-	return SwipeUtil;
+			return SwipeUtil;
 }();

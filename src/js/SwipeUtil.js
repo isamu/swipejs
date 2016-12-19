@@ -65,7 +65,7 @@ class SwipeUtil {
 
 	var swipe_book = new SwipeBook(data, 0, "#swipe", "#swipe_back");
 	this.swipe_book = swipe_book;
-    
+	this.ration = null;
 	$(window).resize(function() {
 	    clearTimeout(window.resizedFinished);
 	    window.resizedFinished = setTimeout(function(){
@@ -74,79 +74,110 @@ class SwipeUtil {
 	});
 	
 
-	function scroll_event_handler(event, ration) {
-	    //show_status(event, ration);
-	    var currentStatus = null;
-	    if (ration > 0) {
-		currentStatus = "forward";
-	    }
-	    if (ration < 0) {
-		currentStatus = "back";
-	    }
-	    
-	    var swipe_book = SwipeUtil.getSwipeBook();
-	    if (currentStatus != this.status) {
-		if (currentStatus == "forward") {
-		    swipe_book.nextStart(ration);
-		}
-		if (currentStatus == "back") {
-		    swipe_book.prevStart(ration);
-		}
-		this.status = currentStatus;
-	    }
-
-	    swipe_book.view(ration);
-	}
-	
-	function stop_event(event, ration){
-	    if (ration > 0) {
-		go_ration(ration, 0.1);
-		this.status = null;
-	    } else {
-		go_ration(ration, -0.1);
-		this.status = null;
-	    }
-	}
-	
-	function go_ration(ration, delta) {
-	    ration = ration + delta;
-	    
-	    var swipe_book = SwipeUtil.getSwipeBook();
-	    SwipeTouch.setRation(ration);
-
-	    if (ration > 1){
-		ration = 1;
-		swipe_book.nextEnd();
-	    } else if (ration < -1){
-		ration = -1;
-		swipe_book.prevEnd();
-	    } else {
-		var swipe_book = SwipeUtil.getSwipeBook();
-		swipe_book.view(ration);
-		
-		setTimeout(function(){
-		    go_ration(ration, delta);
-		}, 10);
-	    }
-	}
-	
-	function start_event(event, ration){
-	    var swipe_book = SwipeUtil.getSwipeBook();
-	    this.status = null;
-	}
 	
 	$.extend($.easing,
 		 {
 		     swipe: function (x, t, b, c, d) {
-			 return Math.abs(SwipeTouch.getRation());
+			 return Math.abs(SwipeUtil.getRation());
 		     }
 		 });
 	
 	SwipeTouch.init({
-	    start_callback: start_event,
-	    scroll_callback: scroll_event_handler,
-	    stop_callback: stop_event
-			});
+	    start_callback: SwipeUtil.start_event,
+	    scroll_callback: SwipeUtil.scroll_event_handler,
+	    stop_callback: SwipeUtil.stop_event
+	});
 	
     }
+    static getRation(){
+	return  this.ration;
+    }
+    static setRation(ration){
+	this.ration = ration;
+    }
+
+    static getStatus(){
+	return this.status;
+    }
+    static setStatus(status){
+	this.status = status;
+    }
+    
+    static start_event(event, ration){
+	var swipe_book = SwipeUtil.getSwipeBook();
+	if (SwipeUtil.getStatus() == "stopping") {
+	    SwipeUtil.stop();
+	}
+	this.ration = 0;
+	SwipeUtil.setStatus("start");
+    }
+
+    static scroll_event_handler(event, ration) {
+	var currentStatus = "start";
+	SwipeUtil.setRation(ration);
+	if (ration > 0) {
+	    currentStatus = "forward";
+	}
+	if (ration < 0) {
+	    currentStatus = "back";
+	}
+	
+	var swipe_book = SwipeUtil.getSwipeBook();
+	if (currentStatus != SwipeUtil.getStatus()) {
+	    if (currentStatus == "forward") {
+		swipe_book.nextStart(ration);
+	    }
+	    if (currentStatus == "back") {
+		swipe_book.prevStart(ration);
+	    }
+	    SwipeUtil.setStatus(currentStatus);
+	}
+	
+	swipe_book.view(ration);
+    }
+	
+    static stop_event(event, ration){
+	SwipeUtil.setRation(ration);
+	if (ration > 0) {
+	    SwipeUtil.setStatus("stopping");
+	    SwipeUtil.go_ration(0.1);
+	} else {
+	    SwipeUtil.setStatus("stopping");
+	    SwipeUtil.go_ration(-0.1);
+	}
+    }
+
+    static stop(){
+	var swipe_book = SwipeUtil.getSwipeBook();
+	SwipeUtil.setStatus("stop");
+	if (this.ration > 0){
+	    SwipeUtil.setRation(1);
+	    swipe_book.nextEnd();
+	} else if (this.ration < 0){
+	    SwipeUtil.setRation(-1);
+	    swipe_book.prevEnd();
+	}
+    }
+
+    static go_ration(delta) {
+	console.log( SwipeUtil.getStatus());
+	if( SwipeUtil.getStatus() != "stopping") {
+	    return ;
+	}
+	this.ration = this.ration + delta;
+	    
+	var swipe_book = SwipeUtil.getSwipeBook();
+	if (Math.abs(this.ration) > 1){
+	    SwipeUtil.stop();
+	} else {
+	    var swipe_book = SwipeUtil.getSwipeBook();
+	    swipe_book.view(this.ration);
+	    
+	    setTimeout(function(){
+		SwipeUtil.go_ration(delta);
+	    }, 10);
+	}
+    }
+	
+    
 }
