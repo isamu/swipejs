@@ -109,6 +109,7 @@ class SwipeUtil {
 	    SwipeUtil.stop();
 	}
 	this.ration = 0;
+	console.log("start ration " + String(ration));
 	SwipeUtil.setStatus("start");
     }
 

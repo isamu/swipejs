@@ -509,64 +509,23 @@ class SwipeBook {
 	if (mode == "forward") {
 	    // transition 
 	    if (nextTransition == "fadeIn") {
-		this.pages[nextStep].finShow();
 		$("#page_" + nextStep ).css({ "opacity": ration });
 	    }else if (nextTransition == "replace") {
 		$("#page_" + nextStep ).css({ "opacity": 1 });
-		
 	    }else if (nextTransition == "scroll") {
 		this.pageSlide2("in", nextStep, ration);
 	    } else {
 		console.log("wrong transition in step " + String(nextStep));
 	    }
-
-	    /*
-	    if (!loaded) {
-		if (currentTransition == "fadeIn") {
-		    $("#page_" + currentStep ).css({ "opacity": ration });
-		}else if (currentTransition == "replace") {
-		    //setTimeout(function(){
-		    //	$("#page_" + currentStep ).css({ "opacity": 0 });
-		    //}, SwipeBook.pageInDuration());     
-		} else if (currentTransition == "scroll") {
-		    this.pageSlide("out", currentStep);
-		}
-	    }
-	    */
 	} else { // in case back
 	    console.log("back");
 	    // transition 
 	    if (nextTransition == "fadeIn") {
-		$("#page_" + nextStep).css({"opacity": SwipeBook.pageInDuration() * ration});
-	    } else if (nextTransition == "replace") {
-		if (currentTransition == "replace" ) {
-		    //setTimeout(function(){
-			// $("#page_" + nextStep).css({"opacity": 1});
-		    // }, SwipeBook.pageInDuration());
-		} else {
-		    // $("#page_" + nextStep).css({"opacity": 1});
-		}
-		// setTimeout(function(){
-//		    instance.pages[nextStep].doLoopProcess();
-//		}, SwipeBook.pageInDuration());
-	    } else if (nextTransition == "scroll" && currentTransition == "scroll") {
-		$("#page_" + nextStep).css({"opacity": 1});
-		this.pageSlide2("out_back", nextStep, ration);
-	    } else {
-		$("#page_" + nextStep).css({"top": 0, "left" :0})
-		$("#page_" + nextStep).css({"opacity": 1});
-		//setTimeout(function(){
-//		    instance.pages[nextStep].doLoopProcess();
-//		}, SwipeBook.pageInDuration());
-	    }		
+		$("#page_" + nextStep).css({"opacity": Math.abs(ration)});
+	    }
 	    
 	    if (currentTransition == "fadeIn") {
-		$("#page_" + currentStep).css({"opacity": (1 - ration)});
-	    } else if (currentTransition == "replace" ) {
-		//this.pages[currentStep].back();
-		//setTimeout(function(){
-//		    $("#page_" + currentStep ).css({"opacity": 0});
-//		}, SwipeBook.pageInDuration());
+		$("#page_" + currentStep).css({"opacity": (1 - Math.abs(ration))});
 	    } else if (currentTransition == "scroll") {
 		this.pageSlide2("in_back", currentStep, ration);
 	    }		
@@ -574,21 +533,36 @@ class SwipeBook {
 	}
 	
     }
-    nextStart(){
+    nextStart(ration){
 	if (this.step + 1 >= this.pages.length) {
 	    return 0;
 	}
-	$("#page_" + String(this.step + 1)).css("opacity", 1);
+	var nextPlayStyle = this.pages[this.step + 1 ].getPlayStyle();
+	
 	this.pages[this.step + 1].prevShow();
-	this.pages[this.step + 1].animateShow();
+	if (nextPlayStyle == "scroll") {
+	    $("#page_" + String(this.step + 1)).css("opacity", 1);
+	    this.pages[this.step + 1].animateShow();
+	} 
     }
-    prevStart(){
+
+    prevStart(ration){
 	if (this.step <= 0) {
 	    return 0;
 	}
+	var prevPlayStyle = this.pages[this.step - 1 ].getPlayStyle();
+	var currentPlayStyle = this.pages[this.step].getPlayStyle();
+
 	$("#page_" + String(this.step - 1)).css("opacity", 1);
-	this.pages[this.step].finShow();
-	this.pages[this.step].animateShowBack();
+	if (prevPlayStyle == "always") {
+	    this.pages[this.step - 1].prevShow();
+	} else {
+	    this.pages[this.step - 1].finShow();
+	}
+	if (currentPlayStyle == "scroll") {
+	    this.pages[this.step].finShow();
+	    this.pages[this.step].animateShowBack();
+	}
 
     }
     nextHide() {
@@ -608,7 +582,12 @@ class SwipeBook {
 	$("#page_" +  (nextStep) ).css("top", 0 );
 	$("#page_" +  (nextStep) ).css("left", 0 );
 	$("#page_" +  (nextStep) ).css("opacity", 1);
-	this.pages[nextStep].finShow();
+	var nextPlayStyle = this.pages[nextStep].getPlayStyle();
+	if (nextPlayStyle == "scroll") {
+	    this.pages[nextStep].finShow();
+	} else if (nextPlayStyle == "auto" || nextPlayStyle == "always") {
+	    this.pages[nextStep].show();
+	}
 	this.step = nextStep;
 	location.hash = nextStep;
     }
@@ -629,13 +608,16 @@ class SwipeBook {
 	$("#page_" +  (nextStep) ).css("opacity", 1);
 	$("#page_" +  (nextStep) ).css("top", 0 );
 	$("#page_" +  (nextStep) ).css("left", 0 );
-	this.pages[nextStep].finShow();
+	var nextPlayStyle = this.pages[nextStep].getPlayStyle();
+	if (nextPlayStyle == "always") {
+	    this.pages[nextStep].show();
+	} else {
+	    this.pages[nextStep].finShow();
+	}
 	this.step = nextStep;
 	location.hash = nextStep;
     }
     pageSlide2(mode, step, ration) {
-	// console.log("pageSlide2");
-	// console.log(mode);
 	
 	if (mode == "in") {
 	    $("#page_" + step ).css("opacity", 1);

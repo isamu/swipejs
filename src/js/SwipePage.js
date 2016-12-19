@@ -58,7 +58,9 @@ class SwipePage {
     getTransition() {
 	return this.transition;
     }
-    
+    getPlayStyle() {
+	return this.play_style;
+    }
     initElement(index) {
 	var indexes = index.split("-");
 	if (indexes.length == 1) {
