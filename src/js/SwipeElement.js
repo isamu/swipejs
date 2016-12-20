@@ -640,14 +640,14 @@ class SwipeElement {
 	    var instance = this;
 
 	    // todo back
-	    /*
 	    if (instance.angle != instance.to_angle) {
-		console.log(do_duration);
 		$("#" + instance.css_id).rotate({
-		    angle: instance.angle, animateTo: instance.to_angle, duration: do_duration,
+		    angle: instance.angle,
+		    animateTo: instance.to_angle,
+		    easing: $.easing.swipeangle
 		})
 	    }
-	    */
+
 	    console.log(instance.css_id);
 	    $("#" + instance.css_id).animate(instance.convCssPos(instance.finPos),
 					 {

@@ -79,7 +79,11 @@ class SwipeUtil {
 		 {
 		     swipe: function (x, t, b, c, d) {
 			 return Math.abs(SwipeUtil.getRation());
+		     },
+		     swipeangle: function (x, t, b, c, d) {
+			 return b + Math.abs(SwipeUtil.getRation()) * c
 		     }
+		     
 		 });
 	
 	SwipeTouch.init({

@@ -1490,14 +1490,14 @@ var SwipeElement = function () {
 				var instance = this;
 
 				// todo back
-				/*
-    if (instance.angle != instance.to_angle) {
-    console.log(do_duration);
-    $("#" + instance.css_id).rotate({
-     angle: instance.angle, animateTo: instance.to_angle, duration: do_duration,
-    })
-    }
-    */
+				if (instance.angle != instance.to_angle) {
+					$("#" + instance.css_id).rotate({
+						angle: instance.angle,
+						animateTo: instance.to_angle,
+						easing: $.easing.swipeangle
+					});
+				}
+
 				console.log(instance.css_id);
 				$("#" + instance.css_id).animate(instance.convCssPos(instance.finPos), {
 					duration: 100000000,
@@ -3206,7 +3206,11 @@ var SwipeUtil = function () {
 									$.extend($.easing, {
 												swipe: function swipe(x, t, b, c, d) {
 															return Math.abs(SwipeUtil.getRation());
+												},
+												swipeangle: function swipeangle(x, t, b, c, d) {
+															return b + Math.abs(SwipeUtil.getRation()) * c;
 												}
+
 									});
 
 									SwipeTouch.init({
