@@ -362,8 +362,13 @@ class SwipeBook {
 	    }		
 
 	}
-	// this.pages[nextStep].play();
-	
+
+	if (this.pages[nextStep].getPlayStyle() == "auto") {
+	    this.pages[nextStep].play();
+	}
+	if (loaded && this.pages[currentStep].getPlayStyle() == "auto") {
+	    this.pages[currentStep].play();
+	}
 	this.step = nextStep;
 	location.hash = nextStep;
     }
@@ -500,6 +505,11 @@ class SwipeBook {
 	}
 	//this.pages[currentStep].inactive()
 	//this.pages[nextStep].active();
+
+	if (this.pages[nextStep].getPlayStyle() == "scroll") {
+	    // for video
+	    this.pages[nextStep].playing(ration);
+	}
 	
 	var transition = this.pages[Math.max(currentStep, nextStep)].getTransition();
 	var currentTransition = this.pages[currentStep].getTransition();

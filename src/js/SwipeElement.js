@@ -751,7 +751,17 @@ class SwipeElement {
 	    */
 	}
     }
-    
+    playing(ration) {
+	if (this.elements) {
+	    this.elements.forEach(function(element, elem_index){
+		element. playing(ration);
+	    });
+	}
+	if (this.isVideo()){                                                                                                                                                                        
+            $("#" + this.css_id + "-video")[0].currentTime = ration
+            $("#" + this.css_id + "-video")[0].pause();
+	}
+    }
     // calculate position
     updatePosition(data, to){
 	var ret = Object.assign({}, data);
@@ -969,7 +979,7 @@ class SwipeElement {
 	    var attrs = this.defaultAttr('element video_element');
 	    var attr_str = this.getAttrStr(attrs);
 	    return  "<div " + attr_str + ">" +
-		"<video id='" + this.css_id + "-video' ><source type='video/mp4' src='" + this.info.video + "'  /></video>" +
+		"<video id='" + this.css_id + "-video'  webkit-playsinline playsinline><source type='video/mp4' src='" + this.info.video + "'  /></video>" +
 		child_html + "</div>";
 	} else if (this.isPath()) {
 	    return  '<svg class="element svg_element" id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id +  '" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"></svg>';

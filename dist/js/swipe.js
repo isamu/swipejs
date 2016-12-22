@@ -414,8 +414,13 @@ var SwipeBook = function () {
 					this.pageSlide("in_back", currentStep);
 				}
 			}
-			// this.pages[nextStep].play();
 
+			if (this.pages[nextStep].getPlayStyle() == "auto") {
+				this.pages[nextStep].play();
+			}
+			if (loaded && this.pages[currentStep].getPlayStyle() == "auto") {
+				this.pages[currentStep].play();
+			}
 			this.step = nextStep;
 			location.hash = nextStep;
 		}
@@ -554,6 +559,11 @@ var SwipeBook = function () {
 			}
 			//this.pages[currentStep].inactive()
 			//this.pages[nextStep].active();
+
+			if (this.pages[nextStep].getPlayStyle() == "scroll") {
+				// for video
+				this.pages[nextStep].playing(ration);
+			}
 
 			var transition = this.pages[Math.max(currentStep, nextStep)].getTransition();
 			var currentTransition = this.pages[currentStep].getTransition();
@@ -1599,7 +1609,19 @@ var SwipeElement = function () {
     */
 			}
 		}
-
+	}, {
+		key: "playing",
+		value: function playing(ration) {
+			if (this.elements) {
+				this.elements.forEach(function (element, elem_index) {
+					element.playing(ration);
+				});
+			}
+			if (this.isVideo()) {
+				$("#" + this.css_id + "-video")[0].currentTime = ration;
+				$("#" + this.css_id + "-video")[0].pause();
+			}
+		}
 		// calculate position
 
 	}, {
@@ -1839,7 +1861,7 @@ var SwipeElement = function () {
 			} else if (this.isVideo()) {
 				var attrs = this.defaultAttr('element video_element');
 				var attr_str = this.getAttrStr(attrs);
-				return "<div " + attr_str + ">" + "<video id='" + this.css_id + "-video' ><source type='video/mp4' src='" + this.info.video + "'  /></video>" + child_html + "</div>";
+				return "<div " + attr_str + ">" + "<video id='" + this.css_id + "-video'  webkit-playsinline playsinline><source type='video/mp4' src='" + this.info.video + "'  /></video>" + child_html + "</div>";
 			} else if (this.isPath()) {
 				return '<svg class="element svg_element" id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id + '" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"></svg>';
 			} else if (this.isDiv()) {
@@ -2638,6 +2660,13 @@ var SwipePage = function () {
 
 									this.elements.forEach(function (element, elem_index) {
 												element.play();
+									});
+						}
+			}, {
+						key: "playing",
+						value: function playing(ration) {
+									this.elements.forEach(function (element, elem_index) {
+												element.playing(ration);
 									});
 						}
 			}, {
