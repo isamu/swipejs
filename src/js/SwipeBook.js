@@ -362,7 +362,7 @@ class SwipeBook {
 	    }		
 
 	}
-	this.pages[nextStep].play();
+	// this.pages[nextStep].play();
 	
 	this.step = nextStep;
 	location.hash = nextStep;

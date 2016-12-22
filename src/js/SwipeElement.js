@@ -644,31 +644,38 @@ class SwipeElement {
 		$("#" + instance.css_id).rotate({
 		    angle: instance.angle,
 		    animateTo: instance.to_angle,
+		    step: function(s){
+			if (SwipeTouch.getStatus() == "stop") {
+			    $(this).stop(0);
+			}
+		    },
 		    easing: $.easing.swipeangle
 		})
 	    }
 
 	    console.log(instance.css_id);
-	    $("#" + instance.css_id).animate(instance.convCssPos(instance.finPos),
-					 {
-					     duration: 100000000, 
-					     step: function(s){
-						 //console.log(s);
-
-						 if (SwipeTouch.getStatus() == "stop") {
-						     $(this).stop(0);
-						 }
-					     },
-					     easing: "swipe"
-					 }
-					);
-	    /*
+	    $("#" + instance.css_id).animate(instance.convCssPos(instance.finPos), {
+		duration: 100000000, 
+		step: function(s){
+		    if (SwipeTouch.getStatus() == "stop") {
+			$(this).stop(0);
+		    }
+		},
+		easing: "swipe"
+	    });
 	    if (instance.isVideo()){
 		$("#" + instance.css_id + "-video").animate(instance.convCssPos(instance.finPos), {
-		    duration: do_duration
+		    duration: 100000000, 
+		    step: function(s){
+			if (SwipeTouch.getStatus() == "stop") {
+			    $(this).stop(0);
+			}
+		    },
+		    easing: "swipe"
 		});
+		
 	    }
-	    
+	    /*
 	    if (instance.isText()) {
 		$("#" + instance.css_id + "-body").animate(instance.finText, {
 		    duration: do_duration
