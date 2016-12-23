@@ -363,11 +363,19 @@ class SwipeBook {
 
 	}
 
-	if (this.pages[nextStep].getPlayStyle() == "auto" || this.pages[nextStep].getPlayStyle() == "scroll") {
+	if (this.pages[nextStep].getPlayStyle() == "auto") {
+	    console.log("AUTO NEXT");
 	    this.pages[nextStep].play();
 	}
-	if (loaded && (this.pages[currentStep].getPlayStyle() == "auto" || this.pages[currentStep].getPlayStyle() == "scroll")) {
+	if (this.pages[nextStep].getPlayStyle() == "scroll") {
+	    console.log("scroll NEXT");
+	    // this.pages[nextStep].playing(0);
+	}
+	if (loaded && this.pages[currentStep].getPlayStyle() == "auto") {
 	    this.pages[currentStep].play();
+	}
+	if (loaded && this.pages[currentStep].getPlayStyle() == "auto") {
+	    //this.pages[currentStep].playing(0);
 	}
 	this.step = nextStep;
 	location.hash = nextStep;
@@ -512,6 +520,7 @@ class SwipeBook {
 	}
 	if (this.pages[nextStep].getPlayStyle() == "pause") {
 	    // for video
+	    console.log("PAUSE");
 	    this.pages[nextStep].pause();
 	}
 	
@@ -558,7 +567,17 @@ class SwipeBook {
 	    $("#page_" + String(this.step + 1)).css("opacity", 1);
 	    this.pages[this.step + 1].animateShow();
 	}
-	this.pages[this.step + 1].play();
+
+	if (this.pages[this.step + 1].getPlayStyle() == "auto") {
+	    this.pages[this.step + 1].play();
+	}
+ 	if (this.pages[this.step + 1].getPlayStyle() == "scroll") {
+	    this.pages[this.step + 1].play();
+	}
+ 	if (this.pages[this.step + 1].getPlayStyle() == "pause") {
+	    this.pages[this.step + 1].play();
+	    this.pages[this.step + 1].pause();
+	}
     }
 
     prevStart(ration){
