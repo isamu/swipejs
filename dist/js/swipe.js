@@ -415,10 +415,10 @@ var SwipeBook = function () {
 				}
 			}
 
-			if (this.pages[nextStep].getPlayStyle() == "auto") {
+			if (this.pages[nextStep].getPlayStyle() == "auto" || this.pages[nextStep].getPlayStyle() == "scroll") {
 				this.pages[nextStep].play();
 			}
-			if (loaded && this.pages[currentStep].getPlayStyle() == "auto") {
+			if (loaded && (this.pages[currentStep].getPlayStyle() == "auto" || this.pages[currentStep].getPlayStyle() == "scroll")) {
 				this.pages[currentStep].play();
 			}
 			this.step = nextStep;
@@ -564,6 +564,10 @@ var SwipeBook = function () {
 				// for video
 				this.pages[nextStep].playing(ration);
 			}
+			if (this.pages[nextStep].getPlayStyle() == "pause") {
+				// for video
+				this.pages[nextStep].pause();
+			}
 
 			var transition = this.pages[Math.max(currentStep, nextStep)].getTransition();
 			var currentTransition = this.pages[currentStep].getTransition();
@@ -609,6 +613,7 @@ var SwipeBook = function () {
 				$("#page_" + String(this.step + 1)).css("opacity", 1);
 				this.pages[this.step + 1].animateShow();
 			}
+			this.pages[this.step + 1].play();
 		}
 	}, {
 		key: 'prevStart',
@@ -1618,7 +1623,20 @@ var SwipeElement = function () {
 				});
 			}
 			if (this.isVideo()) {
+				$("#" + this.css_id + "-video")[0].play();
 				$("#" + this.css_id + "-video")[0].currentTime = ration;
+				$("#" + this.css_id + "-video")[0].pause();
+			}
+		}
+	}, {
+		key: "pause",
+		value: function pause() {
+			if (this.elements) {
+				this.elements.forEach(function (element, elem_index) {
+					element.pause();
+				});
+			}
+			if (this.isVideo()) {
 				$("#" + this.css_id + "-video")[0].pause();
 			}
 		}
@@ -2667,6 +2685,13 @@ var SwipePage = function () {
 						value: function playing(ration) {
 									this.elements.forEach(function (element, elem_index) {
 												element.playing(ration);
+									});
+						}
+			}, {
+						key: "pause",
+						value: function pause() {
+									this.elements.forEach(function (element, elem_index) {
+												element.pause();
 									});
 						}
 			}, {

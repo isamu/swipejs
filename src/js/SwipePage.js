@@ -150,6 +150,12 @@ class SwipePage {
 	    element.playing(ration);
 	});
     }
+
+    pause() {
+	this.elements.forEach(function(element, elem_index){
+	    element.pause();
+	});
+    }
     
     
     doLoopProcess() {

@@ -363,10 +363,10 @@ class SwipeBook {
 
 	}
 
-	if (this.pages[nextStep].getPlayStyle() == "auto") {
+	if (this.pages[nextStep].getPlayStyle() == "auto" || this.pages[nextStep].getPlayStyle() == "scroll") {
 	    this.pages[nextStep].play();
 	}
-	if (loaded && this.pages[currentStep].getPlayStyle() == "auto") {
+	if (loaded && (this.pages[currentStep].getPlayStyle() == "auto" || this.pages[currentStep].getPlayStyle() == "scroll")) {
 	    this.pages[currentStep].play();
 	}
 	this.step = nextStep;
@@ -510,6 +510,10 @@ class SwipeBook {
 	    // for video
 	    this.pages[nextStep].playing(ration);
 	}
+	if (this.pages[nextStep].getPlayStyle() == "pause") {
+	    // for video
+	    this.pages[nextStep].pause();
+	}
 	
 	var transition = this.pages[Math.max(currentStep, nextStep)].getTransition();
 	var currentTransition = this.pages[currentStep].getTransition();
@@ -553,7 +557,8 @@ class SwipeBook {
 	if (nextPlayStyle == "scroll") {
 	    $("#page_" + String(this.step + 1)).css("opacity", 1);
 	    this.pages[this.step + 1].animateShow();
-	} 
+	}
+	this.pages[this.step + 1].play();
     }
 
     prevStart(ration){

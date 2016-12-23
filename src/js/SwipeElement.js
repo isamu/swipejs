@@ -757,8 +757,19 @@ class SwipeElement {
 		element. playing(ration);
 	    });
 	}
-	if (this.isVideo()){                                                                                                                                                                        
+	if (this.isVideo()){
+            $("#" + this.css_id + "-video")[0].play();
             $("#" + this.css_id + "-video")[0].currentTime = ration
+            $("#" + this.css_id + "-video")[0].pause();
+	}
+    }
+    pause() {
+	if (this.elements) {
+	    this.elements.forEach(function(element, elem_index){
+		element.pause();
+	    });
+	}
+	if (this.isVideo()){
             $("#" + this.css_id + "-video")[0].pause();
 	}
     }
