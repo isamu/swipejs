@@ -22,6 +22,7 @@ class SwipeElement {
 	this.angle = 0;
 	this.to_angle = 0;
 	this.scale = [1.0, 1.0];
+	this.to_scale = [1.0, 1.0];
 	this.no_size = false;
 
 	this.transition_timing = null;
@@ -583,18 +584,31 @@ class SwipeElement {
 	    var instance = this;
 	    setTimeout(function(){
 		// todo back
-		if (instance.angle != instance.to_angle) {
-		    console.log(do_duration);
-		    $("#" + instance.css_id).rotate({
-			angle: instance.angle, animateTo: instance.to_angle, duration: do_duration,
-		    })
-		}
 		$("#" + instance.css_id).animate(instance.convCssPos(instance.finPos), {
-		    duration: do_duration
+		    duration: do_duration,
+		    progress: function(a, b) {
+			var transform = []
+			if (instance.scale != instance.to_scale) {
+			    var scale = [
+				instance.scale[0] * ( 1- b) + instance.to_scale[0] * b,
+				instance.scale[1] * ( 1- b) + instance.to_scale[1] * b
+				
+			    ]
+			    transform.push("scale("+ scale[0] + ", " + scale[1] + ")");
+			}
+			if (instance.angle != instance.to_angle) {
+			    var angle = instance.angle * ( 1- b) +  instance.to_angle * b ;
+			    transform.push("rotate("+ angle + "deg)");
+			}
+			if (transform.length > 0) {
+			    $("#" + instance.css_id).css("transform", transform.join(" ") );
+			    $("#" + instance.css_id).css("-moz-transform", transform.join(" ") );
+			    $("#" + instance.css_id).css("-webkit-transform", transform.join(" ") );
+			    $("#" + instance.css_id).css("-o-transform", transform.join(" ") );
+			    $("#" + instance.css_id).css("-ms-transform", transform.join(" ") );
+			}
+		    }
 		});
-		// setTimeout(function(){
-		    // $("#" + instance.css_id).css(instance.convCssPos(instance.finPos));
-		// },  do_duration);
 		if (instance.isVideo()){
 		    $("#" + instance.css_id + "-video").animate(instance.convCssPos(instance.finPos), {
 			duration: do_duration
@@ -638,10 +652,10 @@ class SwipeElement {
 		if (!this.isText()){
 		    ret = this.applyScale(ret);
 		}
+		this.to_scale =  this.getScale(to);
 	    }
 	}
 	if (Number.isInteger(Number(to["rotate"]))) {
-	    // ret[4] = this.getAngle(to["rotate"]);
 	    this.to_angle = this.getAngle(to["rotate"]);
 	}
 	return ret;
@@ -698,28 +712,11 @@ class SwipeElement {
 	    'opacity' : data[5]
 	};
     }
-    convBasicRotateCssPos(data) {
-	var ret = this.convBasicCssPos(data);
-	var rotate = this.getRotateTranform(data);
-	if (rotate) {
-	    ret = this.setTransform(ret, [rotate]);
-	}
-	return ret;
-    }
-    convScaleCssPos(data) {
-	var ret = {};
-
-	var scale = this.getScaleTransform(data);
-	if (scale) {
-	    ret =  this.setTransform(ret, [scale]);
-	}
-	return ret;
-    }
     convCssPos(data) {
 	var ret = this.convBasicCssPos(data);
 	var transform = [];
 
-	var rotate = this.getRotateTranform(data);
+	var rotate = this.getRotateTranform(data[4]);
 	if (rotate) {
 	    transform.push(rotate);
 	}
@@ -742,9 +739,9 @@ class SwipeElement {
 	}
 	return data;
     }
-    getRotateTranform(data) {
-	if (data[4]) {
-	    return "rotate(" + data[4] +"deg)";
+    getRotateTranform(angle) {
+	if (angle) {
+	    return "rotate(" + angle +"deg)";
 	}
 	return null;
     }
