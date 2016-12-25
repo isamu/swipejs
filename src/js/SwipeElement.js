@@ -595,10 +595,15 @@ class SwipeElement {
 				
 			    ]
 			    transform.push("scale("+ scale[0] + ", " + scale[1] + ")");
+			} else {
+			    transform.push("scale("+ instance.scale[0] + ", " + instance.scale[1] + ")");
 			}
+
 			if (instance.angle != instance.to_angle) {
 			    var angle = instance.angle * ( 1- b) +  instance.to_angle * b ;
 			    transform.push("rotate("+ angle + "deg)");
+			} else {
+			    transform.push("rotate("+ instance.angle + "deg)");
 			}
 			if (transform.length > 0) {
 			    $("#" + instance.css_id).css("transform", transform.join(" ") );
@@ -717,6 +722,7 @@ class SwipeElement {
 	var transform = [];
 
 	var rotate = this.getRotateTranform(data[4]);
+		    
 	if (rotate) {
 	    transform.push(rotate);
 	}
@@ -732,6 +738,7 @@ class SwipeElement {
     setTransform(data, transform) {
 	if (transform && transform.length > 0) {
 	    var tran = transform.join(" ")
+	    data["transform"] = tran;
 	    data["-moz-transform"] = tran;
 	    data["-webkit-transform"] = tran;
 	    data["-o-transform"] = tran;
