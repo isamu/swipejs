@@ -1296,6 +1296,7 @@ var SwipeElement = function () {
 				}
 			}
 			if (Number.isInteger(Number(to["rotate"]))) {
+				ret[4] = this.getAngle(to["rotate"]);
 				this.to_angle = this.getAngle(to["rotate"]);
 			}
 			return ret;
