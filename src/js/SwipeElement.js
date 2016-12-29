@@ -585,6 +585,32 @@ class SwipeElement {
 	}
     }
 
+    animateTransform(ration) {
+	var transform = []
+	if (this.scale != this.to_scale) {
+	    var scale = [
+		this.scale[0] * ( 1- ration) + this.to_scale[0] * ration,
+		this.scale[1] * ( 1- ration) + this.to_scale[1] * ration
+		
+	    ]
+	    transform.push("scale("+ scale[0] + ", " + scale[1] + ")");
+	} else {
+	    transform.push("scale("+ this.scale[0] + ", " + this.scale[1] + ")");
+	}
+	
+	if (this.angle != this.to_angle) {
+	    var angle = this.angle * ( 1- ration) +  this.to_angle * ration ;
+	    transform.push("rotate("+ angle + "deg)");
+	} else {
+	    transform.push("rotate("+ this.angle + "deg)");
+	}
+	$("#" + this.css_id).css("transform", transform.join(" ") );
+	$("#" + this.css_id).css("-moz-transform", transform.join(" ") );
+	$("#" + this.css_id).css("-webkit-transform", transform.join(" ") );
+	$("#" + this.css_id).css("-o-transform", transform.join(" ") );
+	$("#" + this.css_id).css("-ms-transform", transform.join(" ") );
+
+    }
     animateFinPos(){
 	if (this.hasTo()) {
 	    this.transition_timing = this.getTiming(this.info["to"], this.duration);
@@ -598,31 +624,7 @@ class SwipeElement {
 		$("#" + instance.css_id).animate(instance.convCssPos(instance.finPos), {
 		    duration: do_duration,
 		    progress: function(a, b) {
-			var transform = []
-			if (instance.scale != instance.to_scale) {
-			    var scale = [
-				instance.scale[0] * ( 1- b) + instance.to_scale[0] * b,
-				instance.scale[1] * ( 1- b) + instance.to_scale[1] * b
-				
-			    ]
-			    transform.push("scale("+ scale[0] + ", " + scale[1] + ")");
-			} else {
-			    transform.push("scale("+ instance.scale[0] + ", " + instance.scale[1] + ")");
-			}
-
-			if (instance.angle != instance.to_angle) {
-			    var angle = instance.angle * ( 1- b) +  instance.to_angle * b ;
-			    transform.push("rotate("+ angle + "deg)");
-			} else {
-			    transform.push("rotate("+ instance.angle + "deg)");
-			}
-			if (transform.length > 0) {
-			    $("#" + instance.css_id).css("transform", transform.join(" ") );
-			    $("#" + instance.css_id).css("-moz-transform", transform.join(" ") );
-			    $("#" + instance.css_id).css("-webkit-transform", transform.join(" ") );
-			    $("#" + instance.css_id).css("-o-transform", transform.join(" ") );
-			    $("#" + instance.css_id).css("-ms-transform", transform.join(" ") );
-			}
+			instance.animateTransform(b);
 		    }
 		});
 		if (instance.isVideo()){
@@ -897,7 +899,7 @@ class SwipeElement {
 	var ret = this.convBasicCssPos(data);
 	var transform = [];
 
-	var rotate = this.getRotateTranform(data[4]);
+ 	var rotate = this.getRotateTranform(data[4]);
 		    
 	if (rotate) {
 	    transform.push(rotate);
