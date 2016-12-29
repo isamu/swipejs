@@ -620,7 +620,6 @@ class SwipeElement {
 	    
 	    var instance = this;
 	    setTimeout(function(){
-		// todo back
 		$("#" + instance.css_id).animate(instance.convCssPos(instance.finPos), {
 		    duration: do_duration,
 		    progress: function(a, b) {
@@ -663,7 +662,6 @@ class SwipeElement {
 	    
 	    var instance = this;
 
-	    // todo back
 	    $("#" + instance.css_id).animate(instance.convCssPos(instance.finPos), {
 		duration: 100000000, 
 		step: function(s){
@@ -673,38 +671,8 @@ class SwipeElement {
 		},
 		easing: "swipe",
 		progress: function(a, b) {
-		    ration = SwipeUtil.getRation();
-		    console.log(b);
-		    var transform = []
-
-		    if (instance.scale != instance.to_scale) {
-			var scale = [
-			    instance.scale[0] * ( 1- ration) + instance.to_scale[0] * ration,
-			    instance.scale[1] * ( 1- ration) + instance.to_scale[1] * ration
-			    
-			]
-			transform.push("scale("+ scale[0] + ", " + scale[1] + ")");
-		    } else {
-			transform.push("scale("+ instance.scale[0] + ", " + instance.scale[1] + ")");
-		    }
-		    
-		    if (instance.angle != instance.to_angle) {
-			var angle = instance.angle * ( 1- ration) +  instance.to_angle * ration ;
-			transform.push("rotate("+ angle + "deg)");
-		    } else {
-			transform.push("rotate("+ instance.angle + "deg)");
-		    }
-		    console.log(transform);
-		    if (transform.length > 0) {
-			$("#" + instance.css_id).css("transform", transform.join(" ") );
-			$("#" + instance.css_id).css("-moz-transform", transform.join(" ") );
-			$("#" + instance.css_id).css("-webkit-transform", transform.join(" ") );
-			$("#" + instance.css_id).css("-o-transform", transform.join(" ") );
-			$("#" + instance.css_id).css("-ms-transform", transform.join(" ") );
-		    }
+		    instance.animateTransform(SwipeUtil.getRation());
 		}
-		    
-		
 	    });
 	    if (instance.isVideo()){
 		$("#" + instance.css_id + "-video").animate(instance.convCssPos(instance.finPos), {
@@ -749,26 +717,20 @@ class SwipeElement {
 	    var instance = this;
 
 	    // todo back
-	    /*
-	    if (instance.angle != instance.to_angle) {
-		console.log(do_duration);
-		$("#" + instance.css_id).rotate({
-		    angle: instance.angle, animateTo: instance.to_angle, duration: do_duration,
-		})
-	    }
-	    */
-	    $("#" + instance.css_id).animate(instance.convCssPos(instance.prevPos),
-					 {
-					     duration: 100000000, 
-					     step: function(s){
-						 //console.log(s);
-						 if (SwipeTouch.getStatus() == "stop") {
-						     $(this).stop(0);
-						 }
-					     },
-					     easing: "swipe"
-					 }
-					);
+	    $("#" + instance.css_id).animate(instance.convCssPos(instance.prevPos), {
+		duration: 100000000, 
+		step: function(s){
+		    //console.log(s);
+		    if (SwipeTouch.getStatus() == "stop") {
+			$(this).stop(0);
+		    }
+		},
+		easing: "swipe",
+		progress: function(a, b) {
+		    console.log(SwipeUtil.getRation());
+		    instance.animateTransform(Math.abs(1 + SwipeUtil.getRation()));
+		}
+	    });
 	    /*
 	    if (instance.isVideo()){
 		$("#" + instance.css_id + "-video").animate(instance.convCssPos(instance.finPos), {
