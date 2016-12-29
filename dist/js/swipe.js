@@ -676,6 +676,7 @@ var SwipeBook = function () {
 			$("#page_" + nextStep).css("left", 0);
 			$("#page_" + nextStep).css("opacity", 1);
 			var nextPlayStyle = this.pages[nextStep].getPlayStyle();
+
 			if (nextPlayStyle == "scroll") {
 				this.pages[nextStep].finShow();
 			} else if (nextPlayStyle == "auto" || nextPlayStyle == "always") {
@@ -1028,6 +1029,7 @@ var SwipeElement = function () {
 					// pos[0] = pos[0] + tmp_pos[0];
 					// pos[1] = pos[1] + tmp_pos[1];
 				}
+				console.log(SwipeUtil.merge(this.info, this.info["to"]));
 				return this.updatePosition(pos, SwipeUtil.merge(this.info, this.info["to"]));
 			} else {
 				return this.originalPrevPos;
@@ -1454,6 +1456,8 @@ var SwipeElement = function () {
 	}, {
 		key: "setFinPos",
 		value: function setFinPos() {
+			console.log(this.finPos);
+
 			$("#" + this.css_id).css(this.convCssPos(this.finPos));
 			if (this.isVideo()) {
 				this.setVideo(this.finPos);
@@ -1539,20 +1543,6 @@ var SwipeElement = function () {
 				var instance = this;
 
 				// todo back
-				if (instance.angle != instance.to_angle) {
-					$("#" + instance.css_id).rotate({
-						angle: instance.angle,
-						animateTo: instance.to_angle,
-						step: function step(s) {
-							if (SwipeTouch.getStatus() == "stop") {
-								$(this).stop(0);
-							}
-						},
-						easing: $.easing.swipeangle
-					});
-				}
-
-				console.log(instance.css_id);
 				$("#" + instance.css_id).animate(instance.convCssPos(instance.finPos), {
 					duration: 100000000,
 					step: function step(s) {
@@ -1560,7 +1550,35 @@ var SwipeElement = function () {
 							$(this).stop(0);
 						}
 					},
-					easing: "swipe"
+					easing: "swipe",
+					progress: function progress(a, b) {
+						ration = SwipeUtil.getRation();
+						console.log(b);
+						var transform = [];
+
+						if (instance.scale != instance.to_scale) {
+							var scale = [instance.scale[0] * (1 - ration) + instance.to_scale[0] * ration, instance.scale[1] * (1 - ration) + instance.to_scale[1] * ration];
+							transform.push("scale(" + scale[0] + ", " + scale[1] + ")");
+						} else {
+							transform.push("scale(" + instance.scale[0] + ", " + instance.scale[1] + ")");
+						}
+
+						if (instance.angle != instance.to_angle) {
+							var angle = instance.angle * (1 - ration) + instance.to_angle * ration;
+							transform.push("rotate(" + angle + "deg)");
+						} else {
+							transform.push("rotate(" + instance.angle + "deg)");
+						}
+						console.log(transform);
+						if (transform.length > 0) {
+							$("#" + instance.css_id).css("transform", transform.join(" "));
+							$("#" + instance.css_id).css("-moz-transform", transform.join(" "));
+							$("#" + instance.css_id).css("-webkit-transform", transform.join(" "));
+							$("#" + instance.css_id).css("-o-transform", transform.join(" "));
+							$("#" + instance.css_id).css("-ms-transform", transform.join(" "));
+						}
+					}
+
 				});
 				if (instance.isVideo()) {
 					$("#" + instance.css_id + "-video").animate(instance.convCssPos(instance.finPos), {
@@ -1766,6 +1784,7 @@ var SwipeElement = function () {
 				transform.push(rotate);
 			}
 			var scale = this.getScaleTransform(data);
+
 			if (scale) {
 				transform.push(scale);
 			}
@@ -1800,8 +1819,8 @@ var SwipeElement = function () {
 		value: function getScaleTransform(data) {
 			var scale = data[6];
 			if (scale && scale.length == 2) {
-				var direction_x = scale[0] < 0 ? "-1" : "1";
-				var direction_y = scale[1] < 0 ? "-1" : "1";
+				var direction_x = scale[0];
+				var direction_y = scale[1];
 
 				return "scale(" + direction_x + "," + direction_y + ")";
 			}

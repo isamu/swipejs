@@ -617,6 +617,7 @@ class SwipeBook {
 	$("#page_" +  (nextStep) ).css("left", 0 );
 	$("#page_" +  (nextStep) ).css("opacity", 1);
 	var nextPlayStyle = this.pages[nextStep].getPlayStyle();
+
 	if (nextPlayStyle == "scroll") {
 	    this.pages[nextStep].finShow();
 	} else if (nextPlayStyle == "auto" || nextPlayStyle == "always") {
