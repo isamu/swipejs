@@ -698,6 +698,9 @@ class SwipeElement {
 	if (info["scale"]) {
 	    if (SwipeParser.is("Array", info["scale"]) && info["scale"].length == 2){
 		scale = info["scale"];
+	    } else if (SwipeParser.is("Array", info["scale"]) && info["scale"].length == 4){
+		// this might inheritProperties issue. array is not update , just pushed.
+		scale = [info["scale"][2],  info["scale"][3]];
 	    } else if (SwipeParser.is("Number", info["scale"])){
 		scale = [info["scale"], info["scale"]];
 	    } else if (SwipeParser.is("String", info["scale"])){
