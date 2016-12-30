@@ -533,15 +533,26 @@ class SwipeElement {
     }
     
     animatePrevPos(){
+	/*
 	$("#" + this.css_id).animate(this.convCssPos(this.prevPos), {
 		duration: this.duration
 	});
+        */
 	if (this.hasTo()) {
+	    var instance = this;
+	    $("#" + instance.css_id).animate(instance.convCssPos(instance.prevPos), {
+		duration: this.duration,
+		progress: function(a, b) {
+		    instance.animateTransform(1 - b);
+		}
+	    });
+	    /*
 	    if (this.to_angle != this.angle ) {
 		$("#" + this.css_id).rotate({
 		    angle: this.to_angle, animateTo: this.angle, duration: this.duration,
 		});
 	    }
+	    */
 	    if (this.isText()) {
 		$("#" + this.css_id + "-body").animate(this.prevText, {
 		    duration: this.duration
@@ -585,8 +596,17 @@ class SwipeElement {
 	}
     }
 
+    // transform orders are rotate, scale.
     animateTransform(ration) {
 	var transform = []
+	
+	if (this.angle != this.to_angle) {
+	    var angle = this.angle * ( 1- ration) +  this.to_angle * ration ;
+	    transform.push("rotate("+ angle + "deg)");
+	} else {
+	    transform.push("rotate("+ this.angle + "deg)");
+	}
+
 	if (this.scale != this.to_scale) {
 	    var scale = [
 		this.scale[0] * ( 1- ration) + this.to_scale[0] * ration,
@@ -597,13 +617,7 @@ class SwipeElement {
 	} else {
 	    transform.push("scale("+ this.scale[0] + ", " + this.scale[1] + ")");
 	}
-	
-	if (this.angle != this.to_angle) {
-	    var angle = this.angle * ( 1- ration) +  this.to_angle * ration ;
-	    transform.push("rotate("+ angle + "deg)");
-	} else {
-	    transform.push("rotate("+ this.angle + "deg)");
-	}
+
 	$("#" + this.css_id).css("transform", transform.join(" ") );
 	$("#" + this.css_id).css("-moz-transform", transform.join(" ") );
 	$("#" + this.css_id).css("-webkit-transform", transform.join(" ") );
@@ -797,7 +811,7 @@ class SwipeElement {
 		ret[6] = this.getScale(to);
 		// todo skip path!?
 		if (!this.isText()){
-		    ret = this.applyScale(ret);
+		    // ret = this.applyScale(ret);
 		}
 		this.to_scale =  this.getScale(to);
 	    }
@@ -824,6 +838,9 @@ class SwipeElement {
 	if (info["scale"]) {
 	    if (SwipeParser.is("Array", info["scale"]) && info["scale"].length == 2){
 		scale = info["scale"];
+	    } else if (SwipeParser.is("Array", info["scale"]) && info["scale"].length == 4){
+		// this might inheritProperties issue. array is not update , just pushed.
+		scale = [info["scale"][2],  info["scale"][3]];
 	    } else if (SwipeParser.is("Number", info["scale"])){
 		scale = [info["scale"], info["scale"]];
 	    } else if (SwipeParser.is("String", info["scale"])){
