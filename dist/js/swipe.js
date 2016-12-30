@@ -568,10 +568,14 @@ var SwipeBook = function () {
 			//this.pages[currentStep].inactive()
 			//this.pages[nextStep].active();
 
-			if (this.pages[nextStep].getPlayStyle() == "scroll") {
+			if (mode == "forward" && this.pages[nextStep].getPlayStyle() == "scroll") {
 				// for video
 				this.pages[nextStep].playing(ration);
 			}
+			if (mode == "back" && this.pages[currentStep].getPlayStyle() == "scroll") {
+				this.pages[currentStep].playing(ration);
+			}
+
 			if (this.pages[nextStep].getPlayStyle() == "pause") {
 				// for video
 				console.log("PAUSE");
@@ -629,29 +633,12 @@ var SwipeBook = function () {
 			if (this.pages[this.step + 1].getPlayStyle() == "scroll") {
 				this.pages[this.step + 1].play();
 			}
+			if (this.pages[this.step + 1].getPlayStyle() == "always") {
+				this.pages[this.step + 1].play();
+			}
 			if (this.pages[this.step + 1].getPlayStyle() == "pause") {
 				this.pages[this.step + 1].play();
 				this.pages[this.step + 1].pause();
-			}
-		}
-	}, {
-		key: 'prevStart',
-		value: function prevStart(ration) {
-			if (this.step <= 0) {
-				return 0;
-			}
-			var prevPlayStyle = this.pages[this.step - 1].getPlayStyle();
-			var currentPlayStyle = this.pages[this.step].getPlayStyle();
-
-			$("#page_" + String(this.step - 1)).css("opacity", 1);
-			if (prevPlayStyle == "always") {
-				this.pages[this.step - 1].prevShow();
-			} else {
-				this.pages[this.step - 1].finShow();
-			}
-			if (currentPlayStyle == "scroll") {
-				this.pages[this.step].finShow();
-				this.pages[this.step].animateShowBack();
 			}
 		}
 	}, {
@@ -684,6 +671,28 @@ var SwipeBook = function () {
 			}
 			this.step = nextStep;
 			location.hash = nextStep;
+		}
+	}, {
+		key: 'prevStart',
+		value: function prevStart(ration) {
+			console.log("prevStart");
+			if (this.step <= 0) {
+				return 0;
+			}
+			var prevPlayStyle = this.pages[this.step - 1].getPlayStyle();
+			var currentPlayStyle = this.pages[this.step].getPlayStyle();
+
+			$("#page_" + String(this.step - 1)).css("opacity", 1);
+			if (prevPlayStyle == "always") {
+				this.pages[this.step - 1].prevShow();
+				this.pages[this.step - 1].play();
+			} else {
+				this.pages[this.step - 1].finShow();
+			}
+			if (currentPlayStyle == "scroll") {
+				this.pages[this.step].finShow();
+				this.pages[this.step].animateShowBack();
+			}
 		}
 	}, {
 		key: 'prevHide',
@@ -1647,7 +1656,10 @@ var SwipeElement = function () {
 				});
 			}
 			if (this.isVideo()) {
-				$("#" + this.css_id + "-video")[0].play();
+				// $("#" + this.css_id + "-video")[0].play();
+				if (ration < 0) {
+					ration = 1 + ration;
+				}
 				$("#" + this.css_id + "-video")[0].currentTime = ration;
 				$("#" + this.css_id + "-video")[0].pause();
 			}

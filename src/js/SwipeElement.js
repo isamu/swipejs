@@ -763,7 +763,10 @@ class SwipeElement {
 	    });
 	}
 	if (this.isVideo()){
-            $("#" + this.css_id + "-video")[0].play();
+            // $("#" + this.css_id + "-video")[0].play();
+	    if (ration < 0) {
+		ration = 1 + ration;
+	    }
             $("#" + this.css_id + "-video")[0].currentTime = ration
             $("#" + this.css_id + "-video")[0].pause();
 	}

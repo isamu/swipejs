@@ -514,10 +514,14 @@ class SwipeBook {
 	//this.pages[currentStep].inactive()
 	//this.pages[nextStep].active();
 
-	if (this.pages[nextStep].getPlayStyle() == "scroll") {
+	if (mode == "forward" && this.pages[nextStep].getPlayStyle() == "scroll") {
 	    // for video
 	    this.pages[nextStep].playing(ration);
 	}
+	if (mode == "back" && this.pages[currentStep].getPlayStyle() == "scroll") {
+	    this.pages[currentStep].playing(ration);
+	}
+
 	if (this.pages[nextStep].getPlayStyle() == "pause") {
 	    // for video
 	    console.log("PAUSE");
@@ -574,31 +578,15 @@ class SwipeBook {
  	if (this.pages[this.step + 1].getPlayStyle() == "scroll") {
 	    this.pages[this.step + 1].play();
 	}
+ 	if (this.pages[this.step + 1].getPlayStyle() == "always") {
+	    this.pages[this.step + 1].play();
+	}
  	if (this.pages[this.step + 1].getPlayStyle() == "pause") {
 	    this.pages[this.step + 1].play();
 	    this.pages[this.step + 1].pause();
 	}
     }
 
-    prevStart(ration){
-	if (this.step <= 0) {
-	    return 0;
-	}
-	var prevPlayStyle = this.pages[this.step - 1 ].getPlayStyle();
-	var currentPlayStyle = this.pages[this.step].getPlayStyle();
-
-	$("#page_" + String(this.step - 1)).css("opacity", 1);
-	if (prevPlayStyle == "always") {
-	    this.pages[this.step - 1].prevShow();
-	} else {
-	    this.pages[this.step - 1].finShow();
-	}
-	if (currentPlayStyle == "scroll") {
-	    this.pages[this.step].finShow();
-	    this.pages[this.step].animateShowBack();
-	}
-
-    }
     nextHide() {
 	var nextStep = this.step + 1;
 	if (nextStep >= this.pages.length) {
@@ -625,6 +613,26 @@ class SwipeBook {
 	}
 	this.step = nextStep;
 	location.hash = nextStep;
+    }
+    prevStart(ration){
+	console.log("prevStart");
+	if (this.step <= 0) {
+	    return 0;
+	}
+	var prevPlayStyle = this.pages[this.step - 1 ].getPlayStyle();
+	var currentPlayStyle = this.pages[this.step].getPlayStyle();
+
+	$("#page_" + String(this.step - 1)).css("opacity", 1);
+	if (prevPlayStyle == "always") {
+	    this.pages[this.step - 1].prevShow();
+	    this.pages[this.step - 1].play();
+	} else {
+	    this.pages[this.step - 1].finShow();
+	}
+	if (currentPlayStyle == "scroll") {
+	    this.pages[this.step].finShow();
+	    this.pages[this.step].animateShowBack();
+	}
     }
     prevHide(){
 	var nextStep = this.step - 1;
