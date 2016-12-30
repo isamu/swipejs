@@ -574,8 +574,17 @@ class SwipeElement {
 	}
     }
 
+    // transform orders are rotate, scale.
     animateTransform(ration) {
 	var transform = []
+	
+	if (this.angle != this.to_angle) {
+	    var angle = this.angle * ( 1- ration) +  this.to_angle * ration ;
+	    transform.push("rotate("+ angle + "deg)");
+	} else {
+	    transform.push("rotate("+ this.angle + "deg)");
+	}
+
 	if (this.scale != this.to_scale) {
 	    var scale = [
 		this.scale[0] * ( 1- ration) + this.to_scale[0] * ration,
@@ -586,13 +595,7 @@ class SwipeElement {
 	} else {
 	    transform.push("scale("+ this.scale[0] + ", " + this.scale[1] + ")");
 	}
-	
-	if (this.angle != this.to_angle) {
-	    var angle = this.angle * ( 1- ration) +  this.to_angle * ration ;
-	    transform.push("rotate("+ angle + "deg)");
-	} else {
-	    transform.push("rotate("+ this.angle + "deg)");
-	}
+
 	$("#" + this.css_id).css("transform", transform.join(" ") );
 	$("#" + this.css_id).css("-moz-transform", transform.join(" ") );
 	$("#" + this.css_id).css("-webkit-transform", transform.join(" ") );
@@ -657,7 +660,7 @@ class SwipeElement {
 		ret[6] = this.getScale(to);
 		// todo skip path!?
 		if (!this.isText()){
-		    ret = this.applyScale(ret);
+		    // ret = this.applyScale(ret);
 		}
 		this.to_scale =  this.getScale(to);
 	    }
