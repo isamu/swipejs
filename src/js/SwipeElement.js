@@ -524,15 +524,26 @@ class SwipeElement {
     }
     
     animatePrevPos(){
+	/*
 	$("#" + this.css_id).animate(this.convCssPos(this.prevPos), {
 		duration: this.duration
 	});
+        */
 	if (this.hasTo()) {
+	    var instance = this;
+	    $("#" + instance.css_id).animate(instance.convCssPos(instance.prevPos), {
+		duration: this.duration,
+		progress: function(a, b) {
+		    instance.animateTransform(1 - b);
+		}
+	    });
+	    /*
 	    if (this.to_angle != this.angle ) {
 		$("#" + this.css_id).rotate({
 		    angle: this.to_angle, animateTo: this.angle, duration: this.duration,
 		});
 	    }
+	    */
 	    if (this.isText()) {
 		$("#" + this.css_id + "-body").animate(this.prevText, {
 		    duration: this.duration
@@ -761,8 +772,8 @@ class SwipeElement {
     getScaleTransform(data) {
 	var scale = data[6];
 	if (scale && scale.length == 2) {
-	    var direction_x = (scale[0] < 0) ? "-1" : "1";
-	    var direction_y = (scale[1] < 0) ? "-1" : "1";
+	    var direction_x = scale[0];
+	    var direction_y = scale[1];
 	    
 	    return "scale(" + direction_x + "," + direction_y +")";
 	}
