@@ -465,7 +465,7 @@ class SwipeElement {
 	}
 	return color;
     }
-    transform(info, scale) {
+    transformPath(info, scale) {
 	let ret = []
 	let default_scale = [SwipeScreen.getRation(), SwipeScreen.getRation()];
 	let scale_array = [];
@@ -500,7 +500,7 @@ class SwipeElement {
 	return {
 	    path: {
 		d: this.info.path,
-		transform: this.transform(this.info, this.scale),
+		transform: this.transformPath(this.info, this.scale),
 		stroke: this.conv_rgba2rgb(strokeColor),
 		strokeWidth: line
 	    },
@@ -524,7 +524,7 @@ class SwipeElement {
 	return {
 	    path: {
 		d: info.path,
-		transform: this.transform(info, this.getScale(info)),
+		transform: this.transformPath(info, this.getScale(info)),
 		stroke: this.conv_rgba2rgb(strokeColor),
 		strokeWidth: line
 	    },
@@ -533,11 +533,6 @@ class SwipeElement {
     }
     
     animatePrevPos(){
-	/*
-	$("#" + this.css_id).animate(this.convCssPos(this.prevPos), {
-		duration: this.duration
-	});
-        */
 	if (this.hasTo()) {
 	    var instance = this;
 	    $("#" + instance.css_id).animate(instance.convCssPos(instance.prevPos), {
@@ -546,13 +541,6 @@ class SwipeElement {
 		    instance.animateTransform(1 - b);
 		}
 	    });
-	    /*
-	    if (this.to_angle != this.angle ) {
-		$("#" + this.css_id).rotate({
-		    angle: this.to_angle, animateTo: this.angle, duration: this.duration,
-		});
-	    }
-	    */
 	    if (this.isText()) {
 		$("#" + this.css_id + "-body").animate(this.prevText, {
 		    duration: this.duration
@@ -617,13 +605,7 @@ class SwipeElement {
 	} else {
 	    transform.push("scale("+ this.scale[0] + ", " + this.scale[1] + ")");
 	}
-
-	$("#" + this.css_id).css("transform", transform.join(" ") );
-	$("#" + this.css_id).css("-moz-transform", transform.join(" ") );
-	$("#" + this.css_id).css("-webkit-transform", transform.join(" ") );
-	$("#" + this.css_id).css("-o-transform", transform.join(" ") );
-	$("#" + this.css_id).css("-ms-transform", transform.join(" ") );
-
+	$("#" + this.css_id).css(this.getTransform(transform));
     }
     animateFinPos(){
 	if (this.hasTo()) {
@@ -809,10 +791,6 @@ class SwipeElement {
 	if (!this.isPath()) {
 	    if(to["scale"]) {
 		ret[6] = this.getScale(to);
-		// todo skip path!?
-		if (!this.isText()){
-		    // ret = this.applyScale(ret);
-		}
 		this.to_scale =  this.getScale(to);
 	    }
 	}
@@ -847,26 +825,8 @@ class SwipeElement {
 		scale = [Number(info["scale"]), Number(info["scale"])];
 	    }
 	}
-	// scale = [Math.abs(scale[0]), Math.abs(scale[1])];
 	return scale;
     }
-    applyScale(data) {
-	let scale = data[6];
-	if (scale && scale.length == 2 && scale[0] != 1 && scale[1] != 1){
-	    var scale_x = Math.abs(scale[0]);
-	    var scale_y = Math.abs(scale[1]);
-	    var new_w = data[2] * scale_x;
-	    var new_h = data[3] * scale_y;
-	    var new_x = data[0] - ( (new_w - data[2]) / 2);
-	    var new_y = data[1] - ( (new_h - data[3]) / 2);
-	    data[0] = new_x;
-	    data[1] = new_y;
-	    data[2] = new_w;
-	    data[3] = new_h;
-	}
-	return data;
-    }
-
     
     convBasicCssPos(data) {
 	return {
@@ -881,15 +841,13 @@ class SwipeElement {
 	var ret = this.convBasicCssPos(data);
 	var transform = [];
 
- 	var rotate = this.getRotateTranform(data[4]);
-		    
-	if (rotate) {
-	    transform.push(rotate);
+	var angle = data[4];
+	if (angle) {
+	    transform.push("rotate(" + angle +"deg)");
 	}
-	var scale = this.getScaleTransform(data);
-	
-	if (scale) {
-	    transform.push(scale);
+	var scale = data[6];
+	if (scale && scale.length == 2) {
+	    transform.push("scale(" + scale[0] + "," + scale[1] +")");
 	}
 	if (transform.length > 0) {
 	    ret =  this.setTransform(ret, transform);
@@ -898,32 +856,20 @@ class SwipeElement {
     }
     setTransform(data, transform) {
 	if (transform && transform.length > 0) {
-	    var tran = transform.join(" ")
-	    data["transform"] = tran;
-	    data["-moz-transform"] = tran;
-	    data["-webkit-transform"] = tran;
-	    data["-o-transform"] = tran;
-	    data["-ms-transform"] = tran;
+	    return SwipeUtil.merge(data, this.getTransform(transform));
 	}
 	return data;
     }
-    getRotateTranform(angle) {
-	if (angle) {
-	    return "rotate(" + angle +"deg)";
-	}
-	return null;
+    getTransform(transform) {
+	var data = {};
+	var tran = transform.join(" ")
+	data["transform"] = tran;
+	data["-moz-transform"] = tran;
+	data["-webkit-transform"] = tran;
+	data["-o-transform"] = tran;
+	data["-ms-transform"] = tran;
+	return data;
     }
-    getScaleTransform(data) {
-	var scale = data[6];
-	if (scale && scale.length == 2) {
-	    var direction_x = scale[0];
-	    var direction_y = scale[1];
-	    
-	    return "scale(" + direction_x + "," + direction_y +")";
-	}
-	return null;
-    }
-  
     type() {
 	if (this.info.img) {
 	    return "image";
