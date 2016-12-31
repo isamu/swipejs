@@ -283,7 +283,7 @@ class SwipeElement {
     }
 
     getAngle(data) {
-	if (jQuery.isArray(data)) {
+	if (SwipeParser.is("Array", data)) {
 	    return data[2];
 	} else {
 	    return data;
@@ -797,6 +797,9 @@ class SwipeElement {
 	if (Number.isInteger(Number(to["rotate"]))) {
 	    ret[4] =  this.getAngle(to["rotate"]);
 	    this.to_angle = this.getAngle(to["rotate"]);
+	} else if (to["rotate"] && SwipeParser.is("Array", to["rotate"]) && to["rotate"].length == 3 ){
+	    ret[4] =  to["rotate"][2];
+	    this.to_angle = to["rotate"][2];
 	}
 	return ret;
     }
@@ -842,11 +845,11 @@ class SwipeElement {
 	var transform = [];
 
 	var angle = data[4];
-	if (angle) {
+	if (Number.isInteger(angle)) {
 	    transform.push("rotate(" + angle +"deg)");
 	}
 	var scale = data[6];
-	if (scale && scale.length == 2) {
+	if (SwipeParser.is("Array", scale) && scale.length == 2) {
 	    transform.push("scale(" + scale[0] + "," + scale[1] +")");
 	}
 	if (transform.length > 0) {
