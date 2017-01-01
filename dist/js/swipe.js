@@ -98,8 +98,7 @@ var SwipeBook = function () {
 				}
 				if (page["template"] && (scene = _this2.templatePages[page["template"]])) {
 					scene = _this2.templatePages[page["template"]];
-				}
-				if (_this2.templatePages["*"]) {
+				} else if (_this2.templatePages["*"]) {
 					scene = _this2.templatePages["*"];
 				}
 				var pageInstance = new SwipePage(page, scene, index);
