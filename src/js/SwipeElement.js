@@ -4,6 +4,8 @@ class SwipeElement {
 	var css_id = "element-" + page_id + "-" + element_id;
 
 	this.info = this.mergeTemplate(info);
+	this.to_info = (this.info["to"]) ? SwipeUtil.merge(this.info, this.info["to"]) : null;
+
 	this.css_id = css_id;
 	this.page_id = page_id;
 	this.element_id = element_id;
@@ -19,10 +21,12 @@ class SwipeElement {
 
 	this.x = 0;
 	this.y = 0;
-	this.angle = 0;
-	this.to_angle = 0;
-	this.scale = [1.0, 1.0];
-	this.to_scale = [1.0, 1.0];
+
+	this.angle = (this.info["rotate"]) ? this.getAngle(this.info["rotate"]) : 0;
+	this.to_angle = (this.to_info && this.to_info["rotate"]) ? this.getAngle(this.to_info["rotate"]) : 0;
+
+	this.scale = this.getScale(this.info);
+	this.to_scale =  this.to_info  ? this.getScale(this.to_info) : [1.0, 1.0];
 	this.no_size = false;
 
 	this.transition_timing = null;
@@ -179,8 +183,7 @@ class SwipeElement {
 		// pos[0] = pos[0] + tmp_pos[0];
 		// pos[1] = pos[1] + tmp_pos[1];
 	    }
-	    console.log( SwipeUtil.merge(this.info, this.info["to"]) );
-	    return this.updatePosition(pos, SwipeUtil.merge(this.info, this.info["to"]));
+	    return this.updatePosition(pos, this.to_info)
 	} else {
 	    return this.originalPrevPos;
 	}
@@ -276,18 +279,15 @@ class SwipeElement {
 		this.y = SwipeParser.parseSize(this.info["y"], this.parentHeight(), 0);
 	    }
 	}
-	if (this.info["rotate"]) {
-	    this.angle = this.getAngle(this.info["rotate"]);
-	}
-	this.scale = this.getScale(this.info);
     }
 
     getAngle(data) {
 	if (SwipeParser.is("Array", data)) {
 	    return data[2];
-	} else {
+	} else if(data) {
 	    return data;
 	}
+	return 0;
     }
     
     getWidth() {
@@ -365,11 +365,8 @@ class SwipeElement {
     }
     setPrevPos(){
 	var instance = this;
-	if (this.isPath()){
-	    $("#" + this.css_id).css(this.convBasicCssPos(this.prevPos));
-	} else {
-	    $("#" + this.css_id).css(this.convCssPos(this.prevPos));
-	}
+	$("#" + this.css_id).css(this.convCssPos(this.prevPos));
+
 	if (this.isVideo()) {
 	    this.setVideo(this.prevPos);
 	}
@@ -483,11 +480,6 @@ class SwipeElement {
 	    ret.push("translate(" + String(cx) + "," + String(cy) + ")");
 	}
 	// todo position check
-	
-	if (info.rotate) {
-	    // todo 
-	    // ret.push("rotate("+ String(info.rotate) + "deg)");
-	}
 	ret.push("scale(" + scale_array.join(",") + ")");
 	return ret.join(" ");
     }
@@ -514,7 +506,6 @@ class SwipeElement {
 	    return this.prevPath;
 	}
 	let info = SwipeUtil.merge(this.info, this.info["to"]);
-
 	let line = info.lineWidth ? info.lineWidth : 1;
 	let strokeColor = info.strokeColor ? info.strokeColor : "black";
 	let fillColor = info.fillColor ?
@@ -573,11 +564,7 @@ class SwipeElement {
     }
     
     setFinPos() {
-	if (this.isPath()){
-	    $("#" + this.css_id).css(this.convBasicCssPos(this.finPos));
-	} else {
-	    $("#" + this.css_id).css(this.convCssPos(this.finPos));
-	}
+	$("#" + this.css_id).css(this.convCssPos(this.finPos));
 
 	if (this.isVideo()) {
 	    this.setVideo(this.finPos);
@@ -589,6 +576,7 @@ class SwipeElement {
     }
 
     // transform orders are rotate, scale.
+    // path is not scale here
     animateTransform(ration) {
 	var transform = []
 	
@@ -786,26 +774,17 @@ class SwipeElement {
     // calculate position
     updatePosition(data, to){
 	var ret = Object.assign({}, data);
-	if(to["opacity"] != null) {
-	    ret[5] = Number(to["opacity"]);
-	}
 	if(to["translate"]) {
 	    var translate = to["translate"];
 	    ret[0] = ret[0] + Number(translate[0]);
 	    ret[1] = ret[1] + Number(translate[1]);
 	}
-	if (!this.isPath()) {
-	    if(to["scale"]) {
-		ret[6] = this.getScale(to);
-		this.to_scale =  this.getScale(to);
-	    }
+	ret[4] =  this.getAngle(to["rotate"]);
+	if(to["opacity"] != null) {
+	    ret[5] = Number(to["opacity"]);
 	}
-	if (Number.isInteger(Number(to["rotate"]))) {
-	    ret[4] =  this.getAngle(to["rotate"]);
-	    this.to_angle = this.getAngle(to["rotate"]);
-	} else if (to["rotate"] && SwipeParser.is("Array", to["rotate"]) && to["rotate"].length == 3 ){
-	    ret[4] =  to["rotate"][2];
-	    this.to_angle = to["rotate"][2];
+	if(to["scale"]) {
+	    ret[6] = this.getScale(to);
 	}
 	return ret;
     }
@@ -850,18 +829,16 @@ class SwipeElement {
 	var ret = this.convBasicCssPos(data);
 	var transform = [];
 
-	if (this.isPath()){
-	    return ret;
-	}
-
-	
 	var angle = data[4];
-	if (Number.isInteger(angle)) {
+	if (isFinite(angle)) {
 	    transform.push("rotate(" + angle +"deg)");
 	}
-	var scale = data[6];
-	if (SwipeParser.is("Array", scale) && scale.length == 2) {
-	    transform.push("scale(" + scale[0] + "," + scale[1] +")");
+	// path is not apply default transform
+	if (!this.isPath()){
+	    var scale = data[6];
+	    if (SwipeParser.is("Array", scale) && scale.length == 2) {
+		transform.push("scale(" + scale[0] + "," + scale[1] +")");
+	    }
 	}
 	if (transform.length > 0) {
 	    ret =  this.setTransform(ret, transform);
