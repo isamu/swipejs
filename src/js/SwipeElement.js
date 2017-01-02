@@ -366,9 +366,10 @@ class SwipeElement {
     setPrevPos(){
 	var instance = this;
 	if (this.isPath()){
-	    // console.log(this.convCssPos(this.prevPos));
+	    $("#" + this.css_id).css(this.convBasicCssPos(this.prevPos));
+	} else {
+	    $("#" + this.css_id).css(this.convCssPos(this.prevPos));
 	}
-	$("#" + this.css_id).css(this.convCssPos(this.prevPos));
 	if (this.isVideo()) {
 	    this.setVideo(this.prevPos);
 	}
@@ -572,9 +573,12 @@ class SwipeElement {
     }
     
     setFinPos() {
-	console.log(this.finPos);
-	
-	$("#" + this.css_id).css(this.convCssPos(this.finPos));
+	if (this.isPath()){
+	    $("#" + this.css_id).css(this.convBasicCssPos(this.finPos));
+	} else {
+	    $("#" + this.css_id).css(this.convCssPos(this.finPos));
+	}
+
 	if (this.isVideo()) {
 	    this.setVideo(this.finPos);
 	}
@@ -595,15 +599,17 @@ class SwipeElement {
 	    transform.push("rotate("+ this.angle + "deg)");
 	}
 
-	if (this.scale != this.to_scale) {
-	    var scale = [
-		this.scale[0] * ( 1- ration) + this.to_scale[0] * ration,
-		this.scale[1] * ( 1- ration) + this.to_scale[1] * ration
-		
-	    ]
-	    transform.push("scale("+ scale[0] + ", " + scale[1] + ")");
-	} else {
-	    transform.push("scale("+ this.scale[0] + ", " + this.scale[1] + ")");
+	if (!this.isPath()) {
+	    if (this.scale != this.to_scale) {
+		var scale = [
+		    this.scale[0] * ( 1- ration) + this.to_scale[0] * ration,
+		    this.scale[1] * ( 1- ration) + this.to_scale[1] * ration
+		    
+		]
+		transform.push("scale("+ scale[0] + ", " + scale[1] + ")");
+	    } else {
+		transform.push("scale("+ this.scale[0] + ", " + this.scale[1] + ")");
+	    }
 	}
 	$("#" + this.css_id).css(this.getTransform(transform));
     }
@@ -844,6 +850,11 @@ class SwipeElement {
 	var ret = this.convBasicCssPos(data);
 	var transform = [];
 
+	if (this.isPath()){
+	    return ret;
+	}
+
+	
 	var angle = data[4];
 	if (Number.isInteger(angle)) {
 	    transform.push("rotate(" + angle +"deg)");
