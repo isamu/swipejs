@@ -320,6 +320,38 @@ var SwipeBook = function () {
 			this.pages[step].justShow();
 		}
 	}, {
+		key: 'nextAnimate',
+		value: function nextAnimate(nextStep) {
+			var play_style = this.pages[nextStep].getPlayStyle();
+
+			var play = null;
+			if (play_style == "auto") {
+				this.pages[nextStep].delayShow();
+			} else if (play_style == "scroll") {
+				this.pages[nextStep].show();
+			} else if (play_style == "always") {
+				this.pages[nextStep].delayShow();
+			} else if (play_style == "pause") {
+				this.pages[nextStep].finShow();
+			}
+		}
+	}, {
+		key: 'prevAnimate',
+		value: function prevAnimate(prevStep) {
+			var play_style = this.pages[prevStep].getPlayStyle();
+
+			var play = null;
+			if (play_style == "auto") {
+				this.pages[prevStep].finShow();
+			} else if (play_style == "scroll") {
+				this.pages[prevStep].show();
+			} else if (play_style == "always") {
+				this.pages[prevStep].delayShow();
+			} else if (play_style == "pause") {
+				this.pages[prevStep].finShow();
+			}
+		}
+	}, {
 		key: 'show',
 		value: function show(nextStep) {
 			var currentStep = this.step;
@@ -336,19 +368,15 @@ var SwipeBook = function () {
 			var instance = this;
 
 			if (mode == "forward") {
-				// transition
-
+				this.nextAnimate(nextStep);
 				if (nextTransition == "fadeIn") {
-					this.pages[nextStep].finShow();
 					$("#page_" + nextStep).animate({ "opacity": 1 }, {
 						duration: SwipeBook.pageInDuration()
 					});
 				} else if (nextTransition == "replace") {
-					this.pages[nextStep].show();
 					$("#page_" + nextStep).css({ "opacity": 1 });
 				} else if (nextTransition == "scroll") {
 					this.pageSlide("in", nextStep);
-					this.pages[nextStep].delayShow();
 				} else {
 					console.log("wrong transition in step " + String(nextStep));
 				}
@@ -369,9 +397,7 @@ var SwipeBook = function () {
 			} else {
 				// in case back
 				console.log("back");
-				// transition
-
-				this.pages[nextStep].finShow();
+				this.prevAnimate(nextStep);
 				if (nextTransition == "fadeIn") {
 					$("#page_" + nextStep).css({ "opacity": 0 });
 					$("#page_" + nextStep).animate({ "opacity": 1 }, {
@@ -422,11 +448,10 @@ var SwipeBook = function () {
 				console.log("scroll NEXT");
 				// this.pages[nextStep].playing(0);
 			}
-			if (loaded && this.pages[currentStep].getPlayStyle() == "auto") {
-				this.pages[currentStep].play();
-			}
-			if (loaded && this.pages[currentStep].getPlayStyle() == "auto") {
-				//this.pages[currentStep].playing(0);
+			if (loaded) {
+				if (this.pages[currentStep].getPlayStyle() == "auto") {
+					this.pages[currentStep].play();
+				}
 			}
 			this.step = nextStep;
 			location.hash = nextStep;
