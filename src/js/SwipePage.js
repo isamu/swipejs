@@ -58,7 +58,9 @@ class SwipePage {
     getTransition() {
 	return this.transition;
     }
-    
+    getPlayStyle() {
+	return this.play_style;
+    }
     initElement(index) {
 	var indexes = index.split("-");
 	if (indexes.length == 1) {
@@ -93,6 +95,16 @@ class SwipePage {
 	}, this.duration);
 	
     }
+    animateShow() {
+	this.elements.forEach(function(element, elem_index){
+	    element.animateShow();
+	});
+    }
+    animateShowBack() {
+	this.elements.forEach(function(element, elem_index){
+	    element.animateShowBack();
+	});
+    }
 
     delayShow(){
 	let instance = this;
@@ -119,6 +131,11 @@ class SwipePage {
 	    element.finShow();
 	});
     }
+    prevShow() {
+	this.elements.forEach(function(element, elem_index){
+	    element.prevShow();
+	});
+    }
     play() {
 	let media_player = SwipeMediaPlayer.getInstance();
 	media_player.page(this.index).play();
@@ -127,6 +144,20 @@ class SwipePage {
 	    element.play();
 	});
     }
+
+    playing(ration) {
+	this.elements.forEach(function(element, elem_index){
+	    element.playing(ration);
+	});
+    }
+
+    pause() {
+	this.elements.forEach(function(element, elem_index){
+	    element.pause();
+	});
+    }
+    
+    
     doLoopProcess() {
 	this.elements.forEach(function(element, elem_index){
 	    element.doLoopProcess();
