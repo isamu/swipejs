@@ -218,9 +218,11 @@ class SwipeElement {
 
     }	
     initVideo() {
+	this.videoStart = 0;
 	if (this.info["videoStart"]) {
 	    this.videoStart = this.info["videoStart"];
 	}
+	this.videoDuration = 1;
 	if (this.info["videoDuration"]) {
 	    this.videoDuration = this.info["videoDuration"];
 	}
@@ -757,8 +759,11 @@ class SwipeElement {
 	    if (ration < 0) {
 		ration = 1 + ration;
 	    }
-            $("#" + this.css_id + "-video")[0].currentTime = ration
-            $("#" + this.css_id + "-video")[0].pause();
+            $("#" + this.css_id + "-video")[0].currentTime = this.videoStart  + ration * this.videoDuration;
+	    if (!$("#" + this.css_id + "-video")[0].paused) {
+		$("#" + this.css_id + "-video")[0].pause();
+	
+	    }
 	}
     }
     pause() {
@@ -1255,6 +1260,7 @@ class SwipeElement {
 	this.setFinPos();
 	this.loopProcess();
     }
+    // this is not work. videoElement is not set.
     play() {
 	if (this.elements) {
             this.elements.forEach(function(element, elem_index){
@@ -1264,6 +1270,9 @@ class SwipeElement {
 	if (this.videoElement){
             this.videoElement.play();
 	}
+    }
+    setVideoElement(videoElement) {
+	this.videoElement = videoElement;
     }
     inactive(){
 	if (this.elements) {

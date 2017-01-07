@@ -44,6 +44,7 @@ var SwipeBook = function () {
 
 		$('head').prepend('<meta name="viewport" content="width = 640,user-scalable=no">');
 
+		this.first_touch = false;
 		this.data = data;
 		this.title = "Swipe";
 		this.pages = [];
@@ -229,14 +230,15 @@ var SwipeBook = function () {
 			});
 
 			$(".video_element").each(function (index, element) {
+				var __element = instance.pages[$(element).attr("__page_id")].getElement($(element).attr("__element_id"));
+
 				var player = new MediaElement($(element).attr("id") + "-video", {
 					flashName: 'flashmediaelement.swf',
 					loop: true,
 					success: function success(mediaElement, domObject) {
-						instance.videoElement = mediaElement;
+						__element.setVideoElement = mediaElement;
 					}
 				});
-				var __element = instance.pages[$(element).attr("__page_id")].getElement($(element).attr("__element_id"));
 
 				var media_player = SwipeMediaPlayer.getInstance();
 				var data = { media: player };
@@ -640,6 +642,13 @@ var SwipeBook = function () {
 	}, {
 		key: 'nextStart',
 		value: function nextStart(ration) {
+			if (!this.first_touch) {
+				$("video").each(function (video_index, video) {
+					video.load();
+				});
+				this.first_touch = true;
+			}
+
 			if (this.step + 1 >= this.pages.length) {
 				return 0;
 			}
@@ -1104,9 +1113,11 @@ var SwipeElement = function () {
 	}, {
 		key: "initVideo",
 		value: function initVideo() {
+			this.videoStart = 0;
 			if (this.info["videoStart"]) {
 				this.videoStart = this.info["videoStart"];
 			}
+			this.videoDuration = 1;
 			if (this.info["videoDuration"]) {
 				this.videoDuration = this.info["videoDuration"];
 			}
@@ -1677,8 +1688,10 @@ var SwipeElement = function () {
 				if (ration < 0) {
 					ration = 1 + ration;
 				}
-				$("#" + this.css_id + "-video")[0].currentTime = ration;
-				$("#" + this.css_id + "-video")[0].pause();
+				$("#" + this.css_id + "-video")[0].currentTime = this.videoStart + ration * this.videoDuration;
+				if (!$("#" + this.css_id + "-video")[0].paused) {
+					$("#" + this.css_id + "-video")[0].pause();
+				}
 			}
 		}
 	}, {
@@ -2212,6 +2225,8 @@ var SwipeElement = function () {
 			this.setFinPos();
 			this.loopProcess();
 		}
+		// this is not work. videoElement is not set.
+
 	}, {
 		key: "play",
 		value: function play() {
@@ -2223,6 +2238,11 @@ var SwipeElement = function () {
 			if (this.videoElement) {
 				this.videoElement.play();
 			}
+		}
+	}, {
+		key: "setVideoElement",
+		value: function setVideoElement(videoElement) {
+			this.videoElement = videoElement;
 		}
 	}, {
 		key: "inactive",
@@ -2676,6 +2696,13 @@ var SwipePage = function () {
 
 									this.elements.forEach(function (element, elem_index) {
 												element.play();
+									});
+						}
+			}, {
+						key: "loadVideo",
+						value: function loadVideo() {
+									this.elements.forEach(function (element, elem_index) {
+												element.loadVideo();
 									});
 						}
 			}, {

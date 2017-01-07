@@ -144,7 +144,12 @@ class SwipePage {
 	    element.play();
 	});
     }
-
+    loadVideo() {
+	this.elements.forEach(function(element, elem_index){
+	    element.loadVideo();
+	});
+    }
+    
     playing(ration) {
 	this.elements.forEach(function(element, elem_index){
 	    element.playing(ration);

@@ -17,6 +17,7 @@ class SwipeBook {
     constructor (data, defaultPage = 0, base_css_id, back_css_id) {
         $('head').prepend('<meta name="viewport" content="width = 640,user-scalable=no">');
 
+	this.first_touch = false;
 	this.data = data;
 	this.title = "Swipe";
 	this.pages = [];
@@ -186,14 +187,15 @@ class SwipeBook {
 	});
 	
 	$(".video_element").each(function(index, element) {
+	    var __element = instance.pages[$(element).attr("__page_id")].getElement( $(element).attr("__element_id"));
+
 	    let player = new MediaElement( $(element).attr("id") + "-video", {
 		flashName: 'flashmediaelement.swf',
 		loop: true,
 		success: function (mediaElement, domObject) { 
-		    instance.videoElement = mediaElement;
+		    __element.setVideoElement = mediaElement;
 		}
             });
-	    var __element = instance.pages[$(element).attr("__page_id")].getElement( $(element).attr("__element_id"));
 
 	    let media_player = SwipeMediaPlayer.getInstance();
 	    let data = {media: player};
@@ -582,6 +584,13 @@ class SwipeBook {
 	
     }
     nextStart(ration){
+	if (!this.first_touch){
+	    $("video").each(( video_index, video) => {
+		video.load();
+	    });
+	    this.first_touch = true;
+	}
+	
 	if (this.step + 1 >= this.pages.length) {
 	    return 0;
 	}
