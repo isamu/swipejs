@@ -50,6 +50,7 @@ var SwipeBook = function () {
 		this.pages = [];
 		this.base_css_id = base_css_id;
 		this.back_css_id = back_css_id;
+		this.media_player = SwipeMediaPlayer.getInstance();
 		if (data["type"] == "net.swipe.list") {
 			(function () {
 				var html = [];
@@ -240,15 +241,20 @@ var SwipeBook = function () {
 					}
 				});
 
-				var media_player = SwipeMediaPlayer.getInstance();
-				var data = { media: player };
+				this.media_player = SwipeMediaPlayer.getInstance();
+				var data = {
+					media: player,
+					canPlay: false,
+					currentTime: 0,
+					dom: $("#" + $(element).attr("id") + "-video")[0]
+				};
 				if (__element.videoStart) {
 					data["videoStart"] = __element.videoStart;
 				}
 				if (__element.videoDuration) {
 					data["videoDuration"] = __element.videoDuration;
 				}
-				media_player.page($(element).attr("__page_id")).push($(element).attr("id"), data);
+				this.media_player.page($(element).attr("__page_id")).push($(element).attr("id"), data);
 				instance.counterDecrease();
 			});
 
@@ -444,7 +450,7 @@ var SwipeBook = function () {
 
 			if (this.pages[nextStep].getPlayStyle() == "auto") {
 				console.log("AUTO NEXT");
-				this.pages[nextStep].play();
+				this.media_player.play(nextStep);
 			}
 			if (this.pages[nextStep].getPlayStyle() == "scroll") {
 				console.log("scroll NEXT");
@@ -452,7 +458,7 @@ var SwipeBook = function () {
 			}
 			if (loaded) {
 				if (this.pages[currentStep].getPlayStyle() == "auto") {
-					this.pages[currentStep].play();
+					this.media_player.play(currentStep);
 				}
 			}
 			this.step = nextStep;
@@ -596,15 +602,14 @@ var SwipeBook = function () {
 
 			if (mode == "forward" && this.pages[nextStep].getPlayStyle() == "scroll") {
 				// for video
-				this.pages[nextStep].playing(ration);
+				this.media_player.playing(ration);
 			}
 			if (mode == "back" && this.pages[currentStep].getPlayStyle() == "scroll") {
-				this.pages[currentStep].playing(ration);
+				this.media_player.playing(ration);
 			}
 
 			if (this.pages[nextStep].getPlayStyle() == "pause") {
 				// for video
-				console.log("PAUSE");
 				this.pages[nextStep].pause();
 			}
 
@@ -643,9 +648,13 @@ var SwipeBook = function () {
 		key: 'nextStart',
 		value: function nextStart(ration) {
 			if (!this.first_touch) {
-				$("video").each(function (video_index, video) {
-					video.load();
-				});
+				this.media_player.load();
+				/*
+    	    $("video").each(( video_index, video) => {
+    		// todo video
+    		video.load();
+    	    });
+    */
 				this.first_touch = true;
 			}
 
@@ -661,17 +670,17 @@ var SwipeBook = function () {
 			}
 
 			if (this.pages[this.step + 1].getPlayStyle() == "auto") {
-				this.pages[this.step + 1].play();
+				this.media_player.play(this.step + 1);
 			}
 			if (this.pages[this.step + 1].getPlayStyle() == "scroll") {
-				this.pages[this.step + 1].play();
+				this.media_player.play(this.step + 1);
 			}
 			if (this.pages[this.step + 1].getPlayStyle() == "always") {
-				this.pages[this.step + 1].play();
+				this.media_player.play(this.step + 1);
 			}
 			if (this.pages[this.step + 1].getPlayStyle() == "pause") {
-				this.pages[this.step + 1].play();
-				this.pages[this.step + 1].pause();
+				this.media_player.play(this.step + 1);
+				// todo
 			}
 		}
 	}, {
@@ -718,7 +727,7 @@ var SwipeBook = function () {
 			$("#page_" + String(this.step - 1)).css("opacity", 1);
 			if (prevPlayStyle == "always") {
 				this.pages[this.step - 1].prevShow();
-				this.pages[this.step - 1].play();
+				this.media_player.play(this.step - 1);
 			} else {
 				this.pages[this.step - 1].finShow();
 			}
@@ -898,7 +907,6 @@ var SwipeElement = function () {
 		this.parent = parent;
 
 		this.isActive = false;
-		this.videoElement = null;
 		this.videoStart = 0;
 		this.videoDuration = null;
 		this.isRepeat = Boolean(info["repeat"]);
@@ -1676,25 +1684,6 @@ var SwipeElement = function () {
 			}
 		}
 	}, {
-		key: "playing",
-		value: function playing(ration) {
-			if (this.elements) {
-				this.elements.forEach(function (element, elem_index) {
-					element.playing(ration);
-				});
-			}
-			if (this.isVideo()) {
-				// $("#" + this.css_id + "-video")[0].play();
-				if (ration < 0) {
-					ration = 1 + ration;
-				}
-				$("#" + this.css_id + "-video")[0].currentTime = this.videoStart + ration * this.videoDuration;
-				if (!$("#" + this.css_id + "-video")[0].paused) {
-					$("#" + this.css_id + "-video")[0].pause();
-				}
-			}
-		}
-	}, {
 		key: "pause",
 		value: function pause() {
 			if (this.elements) {
@@ -2228,18 +2217,6 @@ var SwipeElement = function () {
 		// this is not work. videoElement is not set.
 
 	}, {
-		key: "play",
-		value: function play() {
-			if (this.elements) {
-				this.elements.forEach(function (element, elem_index) {
-					element.play();
-				});
-			}
-			if (this.videoElement) {
-				this.videoElement.play();
-			}
-		}
-	}, {
 		key: "setVideoElement",
 		value: function setVideoElement(videoElement) {
 			this.videoElement = videoElement;
@@ -2430,94 +2407,154 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var SwipeMediaPlayer = function () {
-			_createClass(SwipeMediaPlayer, null, [{
-						key: "getInstance",
-						value: function getInstance() {
-									if (this.instance) {
-												return this.instance;
-									}
-									this.instance = new SwipeMediaPlayer();
-									return this.instance;
-						}
-			}]);
-
-			function SwipeMediaPlayer() {
-						_classCallCheck(this, SwipeMediaPlayer);
-
-						this.current_page = 0;
-						this.current_playing = null;
-						this.media = {};
+	_createClass(SwipeMediaPlayer, null, [{
+		key: "getInstance",
+		value: function getInstance() {
+			if (this.instance) {
+				return this.instance;
 			}
+			this.instance = new SwipeMediaPlayer();
+			return this.instance;
+		}
+	}]);
 
-			_createClass(SwipeMediaPlayer, [{
-						key: "page",
-						value: function page(num) {
-									this.current_page = num;
-									return this;
-						}
-			}, {
-						key: "push",
-						value: function push(key, media) {
-									if (!this.media[this.current_page]) {
-												this.media[this.current_page] = {};
-									}
-									console.log("push");
-									console.log(this.current_page);
+	function SwipeMediaPlayer() {
+		_classCallCheck(this, SwipeMediaPlayer);
 
-									this.media[this.current_page][key] = media;
-									return this;
-						}
-			}, {
-						key: "play",
-						value: function play() {
-									if (this.current_playing != this.current_page) {
-												this.stop();
-												if (this.media[this.current_page]) {
-															var page = this.media[this.current_page];
-															Object.keys(page).forEach(function (key) {
-																		var player = page[key].media;
-																		var start = 0;
-																		if (page[key] && page[key].videoStart) {
-																					start = page[key].videoStart;
-																					player.setCurrentTime(start);
-																		}
-																		player.play();
-																		if (page[key] && page[key].videoDuration) {
-																					var duration = page[key].videoDuration;
-																					setTimeout(function () {
-																								// accuracy of settimeout is not good. so I add  a second.
-																								if (player.currentTime + 1 > Number(start) + Number(duration)) {
-																											player.stop();
-																								}
-																					}, duration * 1000);
-																		}
-															});
-												}
-												this.current_playing = this.current_page;
-									}
-									return this;
-						}
-			}, {
-						key: "media",
-						value: function media() {
-									return this.media[this.current_page];
-						}
-			}, {
-						key: "stop",
-						value: function stop() {
-									if (this.current_playing !== null) {
-												if (this.media[this.current_playing]) {
-															var page = this.media[this.current_playing];
-															Object.keys(page).forEach(function (key) {
-																		page[key].media.stop();
-															});
-												}
-									}
-									this.current_playing = null;
-						}
-			}]);
+		this.current_page = 0;
+		this.current_playing = null;
+		this.media = {};
+	}
 
-			return SwipeMediaPlayer;
+	_createClass(SwipeMediaPlayer, [{
+		key: "page",
+		value: function page(num) {
+			this.current_page = num;
+			return this;
+		}
+	}, {
+		key: "push",
+		value: function push(key, media) {
+			if (!this.media[this.current_page]) {
+				this.media[this.current_page] = {};
+			}
+			this.media[this.current_page][key] = media;
+			return this;
+		}
+	}, {
+		key: "play",
+		value: function play() {
+			var page = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+
+			if (page) {
+				this.current_page = page;
+			}
+			var instance = this;
+			if (this.current_playing != this.current_page) {
+				this.stop();
+				if (this.media[this.current_page]) {
+					var page = this.media[this.current_page];
+					Object.keys(page).forEach(function (key) {
+						var data = page[key];
+						var player = data.media;
+						var start = 0;
+						if (page[key] && page[key].videoStart) {
+							start = page[key].videoStart;
+							player.setCurrentTime(start);
+						}
+						if (data["canPlay"]) {
+							player.play();
+						} else {
+							data["waitPlay"] = true;
+							instance.media[instance.current_page][key] = data;
+						}
+						if (page[key] && page[key].videoDuration) {
+							var duration = page[key].videoDuration;
+							setTimeout(function () {
+								// accuracy of settimeout is not good. so I add  a second.
+								if (player.currentTime + 1 > Number(start) + Number(duration)) {
+									player.stop();
+								}
+							}, duration * 1000);
+						}
+					});
+				}
+				this.current_playing = this.current_page;
+			}
+			return this;
+		}
+	}, {
+		key: "playing",
+		value: function playing(ration) {
+			if (ration < 0) {
+				ration = 1 + ration;
+			}
+			var instance = this;
+			if (this.media[this.current_page]) {
+				var page = this.media[this.current_page];
+				console.log("AAASS");
+				Object.keys(page).forEach(function (key) {
+					console.log("AAASS1");
+					var data = page[key];
+					var player = data.media;
+					var dom = page[key].dom;
+					var start = start = page[key] && page[key].videoStart ? page[key].videoStart : 0;
+					var duration = page[key] && page[key].videoDuration ? page[key].videoDuration : 1.0;
+
+					var currentTime = start + ration * duration;
+					console.log(currentTime);
+					console.log(Math.abs(data["currentTime"] - currentTime));
+					//player.setCurrentTime(currentTime);
+					if (Math.abs(data["currentTime"] - currentTime) > 0.05) {
+						console.log(currentTime);
+						dom.currentTime = currentTime;
+						data["currentTime"] = currentTime;
+						instance.media[instance.current_page][key] = data;
+					}
+				});
+			}
+		}
+	}, {
+		key: "load",
+		value: function load() {
+			var instance = this;
+			Object.keys(this.media).forEach(function (key) {
+				var page = instance.media[key];
+				Object.keys(page).forEach(function (key2) {
+					var data = page[key2];
+					var player = page[key2].media;
+					player.addEventListener('loadeddata', function () {
+						if (instance.media[key][key2]["waitPlay"]) {
+							player.play();
+						}
+						data["canPlay"] = true;
+						instance.media[key][key2] = data;
+					}, false);
+					player.load();
+				});
+			});
+		}
+	}, {
+		key: "media",
+		value: function media() {
+			return this.media[this.current_page];
+		}
+	}, {
+		key: "stop",
+		value: function stop() {
+			if (this.current_playing !== null) {
+				if (this.media[this.current_playing]) {
+					var page = this.media[this.current_playing];
+					Object.keys(page).forEach(function (key) {
+						page[key].media.stop();
+					});
+				}
+			}
+			this.current_playing = null;
+		}
+	}]);
+
+	return SwipeMediaPlayer;
 }();
 "use strict";
 
@@ -2686,30 +2723,6 @@ var SwipePage = function () {
 						value: function prevShow() {
 									this.elements.forEach(function (element, elem_index) {
 												element.prevShow();
-									});
-						}
-			}, {
-						key: "play",
-						value: function play() {
-									var media_player = SwipeMediaPlayer.getInstance();
-									media_player.page(this.index).play();
-
-									this.elements.forEach(function (element, elem_index) {
-												element.play();
-									});
-						}
-			}, {
-						key: "loadVideo",
-						value: function loadVideo() {
-									this.elements.forEach(function (element, elem_index) {
-												element.loadVideo();
-									});
-						}
-			}, {
-						key: "playing",
-						value: function playing(ration) {
-									this.elements.forEach(function (element, elem_index) {
-												element.playing(ration);
 									});
 						}
 			}, {

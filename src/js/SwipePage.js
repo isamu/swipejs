@@ -136,26 +136,6 @@ class SwipePage {
 	    element.prevShow();
 	});
     }
-    play() {
-	let media_player = SwipeMediaPlayer.getInstance();
-	media_player.page(this.index).play();
-
-	this.elements.forEach(function(element, elem_index){
-	    element.play();
-	});
-    }
-    loadVideo() {
-	this.elements.forEach(function(element, elem_index){
-	    element.loadVideo();
-	});
-    }
-    
-    playing(ration) {
-	this.elements.forEach(function(element, elem_index){
-	    element.playing(ration);
-	});
-    }
-
     pause() {
 	this.elements.forEach(function(element, elem_index){
 	    element.pause();

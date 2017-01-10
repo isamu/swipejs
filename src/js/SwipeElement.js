@@ -14,7 +14,6 @@ class SwipeElement {
 	this.parent = parent;
 
 	this.isActive = false;
-	this.videoElement = null;
 	this.videoStart = 0;
 	this.videoDuration = null;
 	this.isRepeat = Boolean(info["repeat"]);
@@ -748,24 +747,6 @@ class SwipeElement {
 	    */
 	}
     }
-    playing(ration) {
-	if (this.elements) {
-	    this.elements.forEach(function(element, elem_index){
-		element. playing(ration);
-	    });
-	}
-	if (this.isVideo()){
-            // $("#" + this.css_id + "-video")[0].play();
-	    if (ration < 0) {
-		ration = 1 + ration;
-	    }
-            $("#" + this.css_id + "-video")[0].currentTime = this.videoStart  + ration * this.videoDuration;
-	    if (!$("#" + this.css_id + "-video")[0].paused) {
-		$("#" + this.css_id + "-video")[0].pause();
-	
-	    }
-	}
-    }
     pause() {
 	if (this.elements) {
 	    this.elements.forEach(function(element, elem_index){
@@ -1261,16 +1242,6 @@ class SwipeElement {
 	this.loopProcess();
     }
     // this is not work. videoElement is not set.
-    play() {
-	if (this.elements) {
-            this.elements.forEach(function(element, elem_index){
-		element.play();
-            });
-	}
-	if (this.videoElement){
-            this.videoElement.play();
-	}
-    }
     setVideoElement(videoElement) {
 	this.videoElement = videoElement;
     }

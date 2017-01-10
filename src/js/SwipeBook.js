@@ -23,6 +23,7 @@ class SwipeBook {
 	this.pages = [];
 	this.base_css_id = base_css_id;
 	this.back_css_id = back_css_id;
+	this.media_player = SwipeMediaPlayer.getInstance();
 	if (data["type"] == "net.swipe.list") {
 	    let html = []
 	    this.data.items.forEach((item, item_index) => {
@@ -197,15 +198,20 @@ class SwipeBook {
 		}
             });
 
-	    let media_player = SwipeMediaPlayer.getInstance();
-	    let data = {media: player};
+	    this.media_player = SwipeMediaPlayer.getInstance();
+	    let data = {
+		media: player,
+		canPlay: false,
+		currentTime: 0,
+		dom: $("#" + $(element).attr("id") + "-video")[0]
+	    };
 	    if (__element.videoStart) {
 		data["videoStart"] = __element.videoStart;
 	    }
 	    if (__element.videoDuration) {
 		data["videoDuration"] = __element.videoDuration;
 	    }
-	    media_player.page($(element).attr("__page_id")).push($(element).attr("id"), data);
+	    this.media_player.page($(element).attr("__page_id")).push($(element).attr("id"), data);
 	    instance.counterDecrease();
 	    
 	});
@@ -389,7 +395,7 @@ class SwipeBook {
 
 	if (this.pages[nextStep].getPlayStyle() == "auto") {
 	    console.log("AUTO NEXT");
-	    this.pages[nextStep].play();
+	    this.media_player.play(nextStep);
 	}
 	if (this.pages[nextStep].getPlayStyle() == "scroll") {
 	    console.log("scroll NEXT");
@@ -397,7 +403,7 @@ class SwipeBook {
 	}
 	if (loaded) {
 	    if (this.pages[currentStep].getPlayStyle() == "auto") {
-		this.pages[currentStep].play();
+		this.media_player.play(currentStep);
 	    }
 	}
 	this.step = nextStep;
@@ -539,15 +545,14 @@ class SwipeBook {
 
 	if (mode == "forward" && this.pages[nextStep].getPlayStyle() == "scroll") {
 	    // for video
-	    this.pages[nextStep].playing(ration);
+	    this.media_player.playing(ration);
 	}
 	if (mode == "back" && this.pages[currentStep].getPlayStyle() == "scroll") {
-	    this.pages[currentStep].playing(ration);
+	    this.media_player.playing(ration);
 	}
 
 	if (this.pages[nextStep].getPlayStyle() == "pause") {
 	    // for video
-	    console.log("PAUSE");
 	    this.pages[nextStep].pause();
 	}
 	
@@ -585,9 +590,13 @@ class SwipeBook {
     }
     nextStart(ration){
 	if (!this.first_touch){
+	    this.media_player.load();
+/*
 	    $("video").each(( video_index, video) => {
+		// todo video
 		video.load();
 	    });
+*/
 	    this.first_touch = true;
 	}
 	
@@ -603,17 +612,17 @@ class SwipeBook {
 	}
 
 	if (this.pages[this.step + 1].getPlayStyle() == "auto") {
-	    this.pages[this.step + 1].play();
+	    this.media_player.play(this.step + 1);
 	}
  	if (this.pages[this.step + 1].getPlayStyle() == "scroll") {
-	    this.pages[this.step + 1].play();
+	    this.media_player.play(this.step + 1);
 	}
  	if (this.pages[this.step + 1].getPlayStyle() == "always") {
-	    this.pages[this.step + 1].play();
+	    this.media_player.play(this.step + 1);
 	}
  	if (this.pages[this.step + 1].getPlayStyle() == "pause") {
-	    this.pages[this.step + 1].play();
-	    this.pages[this.step + 1].pause();
+	    this.media_player.play(this.step + 1);
+	    // todo
 	}
     }
 
@@ -655,7 +664,7 @@ class SwipeBook {
 	$("#page_" + String(this.step - 1)).css("opacity", 1);
 	if (prevPlayStyle == "always") {
 	    this.pages[this.step - 1].prevShow();
-	    this.pages[this.step - 1].play();
+	    this.media_player.play(this.step - 1);
 	} else {
 	    this.pages[this.step - 1].finShow();
 	}
