@@ -902,11 +902,11 @@ class SwipeElement {
 	    return element.html();
 	}).join("");
 	if (this.isImage()) {
-	    return "<div id='" + this.css_id + "' class='image_box'><div id='" + this.css_id + "_inner'>" +
+	    return "<div id='" + this.css_id + "' class='image_box'><div id='" + this.css_id + "_inner' class='image_inner'>" +
 		"<img src='" + this.info.img + "' class='image_element' id='" + this.css_id + "_image' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" +
 		child_html + "</img></div></div>";
 	} else if (this.isSprite()) {
-	    return "<div id='" + this.css_id + "' class='image_box'><div id='" + this.css_id + "_inner'>" +
+	    return "<div id='" + this.css_id + "' class='image_box'><div id='" + this.css_id + "_inner' class='image_inner'>" +
 		"<img src='" + this.info.sprite+ "' class='image_element' id='" + this.css_id + "_sprite' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" +
 		child_html + "</img></div></div>";
 	} else if (this.isText()) {
@@ -1074,60 +1074,72 @@ class SwipeElement {
 	    repeat = defaultRepeat;
 	}
 
+	var target_id = "#" + instance.css_id + "_inner";
 	setTimeout(function(){
 	    switch(data["style"]){
 	    case "vibrate" :
 		var delta = instance.valueFrom(data, "delta", 10);
 		var orgPos = instance.originalFinPos;
 		var timing = duration / defaultRepeat / 4;
-		$("#" + instance.css_id).animate({
-		    left: parseInt(SwipeScreen.virtualX(orgPos[0] - delta)) + "px", top: SwipeScreen.virtualY(orgPos[1]) + "px"
-		}, { duration: timing });
-		setTimeout(function(){
-		    $("#" + instance.css_id).animate({
-			left: parseInt(SwipeScreen.virtualX(orgPos[0] + delta)) + "px", top: SwipeScreen.virtualY(orgPos[1]) + "px"
-		    }, { duration: timing * 2 });
-		    setTimeout(function(){
-			$("#" + instance.css_id).animate({
-			    left: parseInt(SwipeScreen.virtualX(orgPos[0])) + "px", top: SwipeScreen.virtualY(orgPos[1]) + "px"
-			}, { duration: timing });
-
-			setTimeout(function(){
-			    repeat --;
-			    if (repeat > 0) {
-				instance.loop(instance, repeat);
-			    } else if(instance.isRepeat && instance.isActive){
-				repeat = defaultRepeat;
-				instance.loop(instance, repeat);
-			    }
-			}, timing);
-		    }, timing * 2);
-		}, timing);
+		$(target_id).animate(
+		    {
+			left: parseInt(SwipeScreen.virtualX( - delta)) + "px"
+		    },
+		    {
+			duration: timing,
+			complete: function(){
+			    $(target_id).animate(
+				{
+				    left: parseInt(SwipeScreen.virtualX(delta)) + "px"
+				},
+				{
+				    duration: timing * 2,
+				    complete: function(){
+					$(target_id).animate(
+					    {
+						left: "0px"
+					    },
+					    {
+						duration: timing,
+						complete: function(){
+						    repeat --;
+						    if (repeat > 0) {
+							instance.loop(instance, repeat);
+						    } else if(instance.isRepeat && instance.isActive){
+							repeat = defaultRepeat;
+							instance.loop(instance, repeat);
+						    }
+						}
+					    })
+				    }
+				})
+			}
+		    }
+		);
 		break;
-
             case "shift":
 		var dir;
 		var orgPos = instance.originalFinPos;
 		switch(data["direction"]){
 		case "n" :
-		    dir = { left: parseInt(SwipeScreen.virtualX(data[0])) + "px", top: SwipeScreen.virtualY(data[1] - instance.h) + "px" }; break;
+		    dir = { top: SwipeScreen.virtualY(- instance.h) + "px" }; break;
 		case "e" :
-		    dir = { left: parseInt(SwipeScreen.virtualX(data[0] + instance.w)) + "px", top: SwipeScreen.virtualY(data[1]) + "px" }; break;
+		    dir = { left: parseInt(SwipeScreen.virtualX( instance.w)) + "px" }; break;
 		case "w" :
-		    dir = { left: parseInt(SwipeScreen.virtualX(data[0] - instance.w)) + "px", top: SwipeScreen.virtualY(data[1]) + "px" }; break;
+		    dir = { left: parseInt(SwipeScreen.virtualX( - instance.w)) + "px" }; break;
 		default :
-		    dir = { left: parseInt(SwipeScreen.virtualX(data[0])) + "px", top: SwipeScreen.virtualY(data[1] - instance.h) + "px" }; break;
+		    dir = { top: SwipeScreen.virtualY( instance.h) + "px" }; break;
 		}
 		var timing = duration / defaultRepeat;
 
 		instance.setPrevPos();
 
-		$("#" + instance.css_id).animate(
+		$(target_id).animate(
 		    dir,
 		    { duration: timing,
 		      complete: function(){
-			  $("#" + instance.css_id).animate(
-			      instance.convCssPos(orgPos, 1),
+			  $(target_id).animate(
+			      instance.convCssPos(orgPos),
 			      { duration: 0,
 				complete: function(){
 				    instance.moreloop(instance, repeat, defaultRepeat);
@@ -1141,11 +1153,11 @@ class SwipeElement {
 		console.log("blink");
 
 		var timing = duration / defaultRepeat / 4;
-		$("#" + instance.css_id).css({opacity: 1});
+		$(target_id).css({opacity: 1});
 		setTimeout(function(){
-		    $("#" + instance.css_id).css({opacity: 0});
+		    $(target_id).css({opacity: 0});
 		    setTimeout(function(){
-			$("#" + instance.css_id).css({opacity: 1});
+			$(target_id).css({opacity: 1});
 			setTimeout(function(){
 			    instance.moreloop(instance, repeat, defaultRepeat);
 			}, timing);
@@ -1155,7 +1167,7 @@ class SwipeElement {
             case "spin":
 		console.log("spin");
 		var timing = duration / defaultRepeat;
-		$("#" + instance.css_id).rotate({
+		$(target_id).rotate({
 		    angle:0, animateTo: 360, duration: timing,
 		    callback: function(){
 			instance.moreloop(instance, repeat, defaultRepeat);
@@ -1166,13 +1178,13 @@ class SwipeElement {
 		console.log("wiggle");
 		var angle = instance.valueFrom(data, "delta", 15);
 		var timing = duration / defaultRepeat / 4
-		$("#" + instance.css_id).rotate({
+		$(target_id).rotate({
 		    angle:0, animateTo: angle, duration: timing,
 		    callback: function(){
-			$("#" + instance.css_id).rotate({
+			$(target_id).rotate({
 			    angle:angle, animateTo: -angle, duration: timing * 2,
 			    callback: function(){
-				$("#" + instance.css_id).rotate({
+				$(target_id).rotate({
 				    angle:-angle, animateTo: 0, duration: timing,
 				    callback: function(){
 					instance.moreloop(instance, repeat, defaultRepeat);
