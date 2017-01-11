@@ -69,9 +69,7 @@ class SwipeMediaPlayer {
 	var instance = this;
 	if (this.media[this.current_page]) {
 	    var page = this.media[this.current_page];
-	    console.log("AAASS");
 	    Object.keys(page).forEach(function (key) {
-		console.log("AAASS1");
 		var data =  page[key];
 		var player = data.media;
 		var dom = page[key].dom;
@@ -79,11 +77,8 @@ class SwipeMediaPlayer {
 		var duration = (page[key] && page[key].videoDuration) ? page[key].videoDuration : 1.0;
 
 		var currentTime = start  + ration * duration;
-		console.log(currentTime);
-		console.log(Math.abs(data["currentTime"] - currentTime));
 		//player.setCurrentTime(currentTime);
 		if (Math.abs(data["currentTime"] - currentTime) > 0.05) {
-		    console.log(currentTime);
 		    dom.currentTime = currentTime;
 		    data["currentTime"] = currentTime;
 		    instance.media[instance.current_page][key] = data;
