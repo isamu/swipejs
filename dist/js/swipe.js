@@ -265,9 +265,7 @@ var SwipeBook = function () {
 			$(".page").css({ "position": "absolute" });
 			$(".image_element").css({ "position": "absolute" });
 			$(".image_box").css({ "position": "absolute" });
-			// $(".image_box").css({"overflow": "hidden"});
 			$(".element_inner").css({
-				"overflow": "hidden",
 				"position": "relative",
 				"height": "100%",
 				"width": "inherit"
@@ -275,7 +273,9 @@ var SwipeBook = function () {
 
 			$(".video_element").css({ "position": "absolute" });
 			$(".text_element").css({ "position": "absolute" });
-			$(".svg_element").css({ "position": "absolute" });
+			$(".svg_element").css({
+				"position": "absolute"
+			});
 		}
 	}, {
 		key: 'counterDecrease',
@@ -299,6 +299,8 @@ var SwipeBook = function () {
 	}, {
 		key: 'initData',
 		value: function initData(page_id, element_id) {
+			console.log(page_id);
+			console.log(element_id);
 			this.pages[page_id].initElement(element_id);
 		}
 	}, {
@@ -1015,7 +1017,7 @@ var SwipeElement = function () {
 				}
 			}
 			if (this.isPath()) {
-				this.snap = Snap("#" + this.css_id);
+				this.snap = Snap("#" + this.css_id + "_svg");
 				this.path = this.snap.path();
 			}
 			if (this.isVideo()) {
@@ -1471,6 +1473,9 @@ var SwipeElement = function () {
 					duration: this.duration,
 					progress: function progress(a, b) {
 						instance.animateTransform(1 - b);
+						if (instance.isPath()) {
+							$("#" + instance.css_id).css("overflow", "visible");
+						}
 					}
 				});
 				if (this.isText()) {
@@ -1557,6 +1562,9 @@ var SwipeElement = function () {
 						duration: do_duration,
 						progress: function progress(a, b) {
 							instance.animateTransform(b);
+							if (instance.isPath()) {
+								$("#" + instance.css_id).css("overflow", "visible");
+							}
 						}
 					});
 					if (instance.isVideo()) {
@@ -1606,6 +1614,9 @@ var SwipeElement = function () {
 					easing: "swipe",
 					progress: function progress(a, b) {
 						instance.animateTransform(SwipeUtil.getRation());
+						if (instance.isPath()) {
+							$("#" + instance.css_id).css("overflow", "visible");
+						}
 					}
 				});
 				if (instance.isVideo()) {
@@ -1650,19 +1661,19 @@ var SwipeElement = function () {
 			if (this.hasTo()) {
 				var instance = this;
 
-				// todo back
 				$("#" + instance.css_id).animate(instance.convCssPos(instance.prevPos), {
 					duration: 100000000,
 					step: function step(s) {
-						//console.log(s);
 						if (SwipeTouch.getStatus() == "stop") {
 							$(this).stop(0);
 						}
 					},
 					easing: "swipe",
 					progress: function progress(a, b) {
-						console.log(SwipeUtil.getRation());
 						instance.animateTransform(Math.abs(1 + SwipeUtil.getRation()));
+						if (instance.isPath()) {
+							$("#" + instance.css_id).css("overflow", "visible");
+						}
 					}
 				});
 				/*
@@ -1888,7 +1899,7 @@ var SwipeElement = function () {
 				var attr_str = this.getAttrStr(attrs);
 				return "<div " + attr_str + "><div id='" + this.css_id + "_inner' class='element_inner'>" + "<video id='" + this.css_id + "-video'  webkit-playsinline playsinline><source type='video/mp4' src='" + this.info.video + "'  /></video>" + child_html + "</div></div>";
 			} else if (this.isPath()) {
-				return '<svg class="element svg_element" id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id + '" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"></svg>';
+				return '<div id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id + '" class="element svg_element"><div id="' + this.css_id + '_inner" class="element_inner"><svg id="' + this.css_id + '_svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"></svg></div></div>';
 			} else if (this.isDiv()) {
 				return "<div class='element boxelement-" + this.page_id + "' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>";
 			} else {

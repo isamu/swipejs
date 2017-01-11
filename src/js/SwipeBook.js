@@ -223,9 +223,7 @@ class SwipeBook {
 	$(".page").css({"position": "absolute"});
 	$(".image_element").css({"position": "absolute"});
 	$(".image_box").css({"position": "absolute"});
-	// $(".image_box").css({"overflow": "hidden"});
 	$(".element_inner").css({
-	    "overflow": "hidden",
 	    "position" : "relative",
 	    "height": "100%",
 	    "width": "inherit"
@@ -233,7 +231,9 @@ class SwipeBook {
 
 	$(".video_element").css({"position": "absolute"});
 	$(".text_element").css({"position": "absolute"});
-	$(".svg_element").css({"position": "absolute"});
+	$(".svg_element").css({
+	    "position": "absolute"
+	});
     }
     counterDecrease(){
 	SwipeCounter.decrease();
@@ -252,6 +252,8 @@ class SwipeBook {
 	this.show(this.step);
     }
     initData(page_id, element_id){
+	console.log(page_id);
+	console.log(element_id);
 	this.pages[page_id].initElement(element_id);
     }
     

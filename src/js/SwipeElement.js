@@ -108,7 +108,7 @@ class SwipeElement {
 	    }
 	}
 	if (this.isPath()){
-	    this.snap = Snap("#" + this.css_id);
+	    this.snap = Snap("#" + this.css_id + "_svg");
 	    this.path = this.snap.path();
 	}
 	if (this.isVideo()){
@@ -532,6 +532,9 @@ class SwipeElement {
 		duration: this.duration,
 		progress: function(a, b) {
 		    instance.animateTransform(1 - b);
+		    if (instance.isPath()) {
+			$("#" + instance.css_id).css("overflow","visible");
+		    }
 		}
 	    });
 	    if (this.isText()) {
@@ -615,7 +618,10 @@ class SwipeElement {
 		    duration: do_duration,
 		    progress: function(a, b) {
 			instance.animateTransform(b);
-		    }
+			if (instance.isPath()) {
+			    $("#" + instance.css_id).css("overflow","visible");
+			}
+		    } 
 		});
 		if (instance.isVideo()){
 		    $("#" + instance.css_id + "-video").animate(instance.convCssPos(instance.finPos), {
@@ -663,6 +669,9 @@ class SwipeElement {
 		easing: "swipe",
 		progress: function(a, b) {
 		    instance.animateTransform(SwipeUtil.getRation());
+		    if (instance.isPath()) {
+			$("#" + instance.css_id).css("overflow","visible");
+		    }
 		}
 	    });
 	    if (instance.isVideo()){
@@ -707,19 +716,20 @@ class SwipeElement {
 	if (this.hasTo()) {
 	    var instance = this;
 
-	    // todo back
 	    $("#" + instance.css_id).animate(instance.convCssPos(instance.prevPos), {
 		duration: 100000000, 
 		step: function(s){
-		    //console.log(s);
 		    if (SwipeTouch.getStatus() == "stop") {
 			$(this).stop(0);
 		    }
 		},
 		easing: "swipe",
 		progress: function(a, b) {
-		    console.log(SwipeUtil.getRation());
 		    instance.animateTransform(Math.abs(1 + SwipeUtil.getRation()));
+		    if (instance.isPath()) {
+			$("#" + instance.css_id).css("overflow","visible");
+		    }
+		    
 		}
 	    });
 	    /*
@@ -928,7 +938,7 @@ class SwipeElement {
 		"<video id='" + this.css_id + "-video'  webkit-playsinline playsinline><source type='video/mp4' src='" + this.info.video + "'  /></video>" +
 		child_html + "</div></div>";
 	} else if (this.isPath()) {
-	    return  '<svg class="element svg_element" id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id +  '" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"></svg>';
+	    return  '<div id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id +  '" class="element svg_element"><div id="' + this.css_id + '_inner" class="element_inner"><svg id="' + this.css_id + '_svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"></svg></div></div>';
 	} else if (this.isDiv()) {
 	    return "<div class='element boxelement-" + this.page_id + "' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>" ;
 	} else {
