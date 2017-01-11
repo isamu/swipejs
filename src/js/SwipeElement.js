@@ -930,7 +930,7 @@ class SwipeElement {
 	    let md_array = this.parseMarkdown(this.info.markdown);
 	    this.md_css = md_array[1];
 	    return  "<div class='element markdown_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" +
-		"<div class='markdown_wrap' id='md_" + this.css_id + "'>" + md_array[0] + child_html + "</div></div>";
+		"<div id='" + this.css_id + "_inner' class='element_inner'><div class='markdown_wrap' id='md_" + this.css_id + "'>" + md_array[0] + child_html + "</div></div></div>";
 	} else if (this.isVideo()) {
 	    var attrs = this.defaultAttr('element video_element');
 	    var attr_str = this.getAttrStr(attrs);
