@@ -24,6 +24,7 @@ class SwipeBook {
 	this.base_css_id = base_css_id;
 	this.back_css_id = back_css_id;
 	this.media_player = SwipeMediaPlayer.getInstance();
+	this.finish_callback = null;
 	if (data["type"] == "net.swipe.list") {
 	    let html = []
 	    this.data.items.forEach((item, item_index) => {
@@ -251,6 +252,9 @@ class SwipeBook {
 	this.isReady = true;
 	this.show(this.step);
     }
+    set_finish_callback(func) {
+	this.finish_callback = func;
+    }
     initData(page_id, element_id){
 	console.log(page_id);
 	console.log(element_id);
@@ -261,6 +265,10 @@ class SwipeBook {
 	if (this.isReady) {
 	    if (this.step < this.pages.length - 1){
 		this.show(this.step + 1);
+	    } else {
+		if (this.finish_callback) {
+		    this.finish_callback();
+		}
 	    }
 	}
     }
@@ -610,6 +618,9 @@ class SwipeBook {
 	}
 	
 	if (this.step + 1 >= this.pages.length) {
+	        if (this.finish_callback) {
+		    this.finish_callback();
+		}
 	    return 0;
 	}
 	var nextPlayStyle = this.pages[this.step + 1 ].getPlayStyle();
