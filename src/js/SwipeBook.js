@@ -224,11 +224,11 @@ class SwipeBook {
 	$(".image_element").css({"position": "absolute"});
 	$(".image_box").css({"position": "absolute"});
 	// $(".image_box").css({"overflow": "hidden"});
-	$(".image_inner").css({
+	$(".element_inner").css({
 	    "overflow": "hidden",
 	    "position" : "relative",
 	    "height": "100%",
-	    "width": "100%"
+	    "width": "inherit"
 	});
 
 	$(".video_element").css({"position": "absolute"});

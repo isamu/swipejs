@@ -266,11 +266,11 @@ var SwipeBook = function () {
 			$(".image_element").css({ "position": "absolute" });
 			$(".image_box").css({ "position": "absolute" });
 			// $(".image_box").css({"overflow": "hidden"});
-			$(".image_inner").css({
+			$(".element_inner").css({
 				"overflow": "hidden",
 				"position": "relative",
 				"height": "100%",
-				"width": "100%"
+				"width": "inherit"
 			});
 
 			$(".video_element").css({ "position": "absolute" });
@@ -1871,14 +1871,14 @@ var SwipeElement = function () {
 				return element.html();
 			}).join("");
 			if (this.isImage()) {
-				return "<div id='" + this.css_id + "' class='image_box'><div id='" + this.css_id + "_inner' class='image_inner'>" + "<img src='" + this.info.img + "' class='image_element' id='" + this.css_id + "_image' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" + child_html + "</img></div></div>";
+				return "<div id='" + this.css_id + "' class='image_box'><div id='" + this.css_id + "_inner' class='element_inner'>" + "<img src='" + this.info.img + "' class='image_element' id='" + this.css_id + "_image' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" + child_html + "</img></div></div>";
 			} else if (this.isSprite()) {
-				return "<div id='" + this.css_id + "' class='image_box'><div id='" + this.css_id + "_inner' class='image_inner'>" + "<img src='" + this.info.sprite + "' class='image_element' id='" + this.css_id + "_sprite' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" + child_html + "</img></div></div>";
+				return "<div id='" + this.css_id + "' class='image_box'><div id='" + this.css_id + "_inner' class='element_inner'>" + "<img src='" + this.info.sprite + "' class='image_element' id='" + this.css_id + "_sprite' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" + child_html + "</img></div></div>";
 			} else if (this.isText()) {
 				var attrs = this.defaultAttr('element text_element');
 				var attr_str = this.getAttrStr(attrs);
 
-				return "<div " + attr_str + ">" + "<div class='text_body' id='" + this.css_id + "-body'><span>" + this.parseText(this.info.text) + child_html + "</span></div>" + "</div>";
+				return "<div " + attr_str + "><div id='" + this.css_id + "_inner' class='element_inner'>" + "<div class='text_body' id='" + this.css_id + "-body'><span>" + this.parseText(this.info.text) + child_html + "</span></div>" + "</div></div>";
 			} else if (this.isMarkdown()) {
 				var md_array = this.parseMarkdown(this.info.markdown);
 				this.md_css = md_array[1];
@@ -1886,7 +1886,7 @@ var SwipeElement = function () {
 			} else if (this.isVideo()) {
 				var attrs = this.defaultAttr('element video_element');
 				var attr_str = this.getAttrStr(attrs);
-				return "<div " + attr_str + ">" + "<video id='" + this.css_id + "-video'  webkit-playsinline playsinline><source type='video/mp4' src='" + this.info.video + "'  /></video>" + child_html + "</div>";
+				return "<div " + attr_str + "><div id='" + this.css_id + "_inner' class='element_inner'>" + "<video id='" + this.css_id + "-video'  webkit-playsinline playsinline><source type='video/mp4' src='" + this.info.video + "'  /></video>" + child_html + "</div></div>";
 			} else if (this.isPath()) {
 				return '<svg class="element svg_element" id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id + '" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"></svg>';
 			} else if (this.isDiv()) {
@@ -2504,9 +2504,7 @@ var SwipeMediaPlayer = function () {
 			var instance = this;
 			if (this.media[this.current_page]) {
 				var page = this.media[this.current_page];
-				console.log("AAASS");
 				Object.keys(page).forEach(function (key) {
-					console.log("AAASS1");
 					var data = page[key];
 					var player = data.media;
 					var dom = page[key].dom;
@@ -2514,11 +2512,8 @@ var SwipeMediaPlayer = function () {
 					var duration = page[key] && page[key].videoDuration ? page[key].videoDuration : 1.0;
 
 					var currentTime = start + ration * duration;
-					console.log(currentTime);
-					console.log(Math.abs(data["currentTime"] - currentTime));
 					//player.setCurrentTime(currentTime);
 					if (Math.abs(data["currentTime"] - currentTime) > 0.05) {
-						console.log(currentTime);
 						dom.currentTime = currentTime;
 						data["currentTime"] = currentTime;
 						instance.media[instance.current_page][key] = data;
