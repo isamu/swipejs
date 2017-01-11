@@ -42,6 +42,7 @@ class SwipeBook {
 	    this.setScreen();
 	    this.paging = this.getPaging();
 	    this.isReady = false;
+	    this.isFinished = false;
 	    this.load();
 	    if (this.step > this.pages.length) {
 		this.step = this.pages.length - 1;
@@ -266,8 +267,9 @@ class SwipeBook {
 	    if (this.step < this.pages.length - 1){
 		this.show(this.step + 1);
 	    } else {
+		this.isFinished = true;
 		if (this.finish_callback) {
-		    this.finish_callback();
+		    this.finish_callback(true);
 		}
 	    }
 	}
@@ -277,6 +279,13 @@ class SwipeBook {
 	if (this.isReady) {
 	    if (this.step > 0){
 		this.show(this.step - 1);
+		if (this.isFinished) {
+		    if (this.finish_callback) {
+			this.finish_callback(false);
+		    }
+		    
+		    this.isFinished = false;
+		}
 	    }
 	}
     }
@@ -618,8 +627,9 @@ class SwipeBook {
 	}
 	
 	if (this.step + 1 >= this.pages.length) {
+		this.isFinished = true;
 	        if (this.finish_callback) {
-		    this.finish_callback();
+		    this.finish_callback(true);
 		}
 	    return 0;
 	}
@@ -678,6 +688,13 @@ class SwipeBook {
 	if (this.step <= 0) {
 	    return 0;
 	}
+	if (this.isFinished) {
+	    if (this.finish_callback) {
+		this.finish_callback(false);
+	    }
+	    this.isFinished = false;
+	}
+	
 	var prevPlayStyle = this.pages[this.step - 1 ].getPlayStyle();
 	var currentPlayStyle = this.pages[this.step].getPlayStyle();
 
