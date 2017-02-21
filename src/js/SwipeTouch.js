@@ -18,12 +18,11 @@ class SwipeTouch {
 	    SwipeTouch.start_event(e);
 	}).on(scroll_event, function(e){
 	    e.preventDefault();
-	    
 	    var delta = e.originalEvent.deltaY ? -(e.originalEvent.deltaY) : e.originalEvent.wheelDelta ? e.originalEvent.wheelDelta : -(e.originalEvent.detail);
 	    self.currentY = self.currentY - delta;
 	    self.diff =  self.currentY - self.startY;
 	    self.ration =   (self.diff / $(window).innerHeight());
-	    
+
 	    if (self.ration > 1){ self.ration = 1;}
 	    if (self.ration < -1){ self.ration = -1;}
 
@@ -35,7 +34,6 @@ class SwipeTouch {
 	    SwipeTouch.start_event(e);
 	}).on('touchmove.noScroll', function(e) {
 	    e.preventDefault();
-	    
 	    self.diff = self.startY - e.originalEvent.pageY;
 	    self.ration = self.diff / $(window).innerHeight()      
 
@@ -45,7 +43,6 @@ class SwipeTouch {
 	    SwipeTouch.stop_event(e);
 	});
     }	     
-    
     
     static scroll_event_handler(event, ration) {
 	console.log("scroll");
@@ -66,7 +63,7 @@ class SwipeTouch {
     static getRation() {
 	return this.ration;
     }
-    static start_event(){
+    static start_event(event){
 	this.ration = 0;
 	console.log("start");
 	this.status = "start";

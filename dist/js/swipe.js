@@ -184,6 +184,7 @@ var SwipeBook = function () {
 		value: function resize() {
 			this.setScreen();
 			for (var i = 0; i < this.pages.length; i++) {
+				this.pages[i].resize();
 				this.justShow(i);
 			}
 			this.setPageSize();
@@ -351,6 +352,11 @@ var SwipeBook = function () {
 			return this.pages;
 		}
 	}, {
+		key: 'getPageSize',
+		value: function getPageSize() {
+			return this.pages.length;
+		}
+	}, {
 		key: 'justShow',
 		value: function justShow(step) {
 			this.pages[step].justShow();
@@ -491,11 +497,6 @@ var SwipeBook = function () {
 			}
 			this.step = nextStep;
 			location.hash = nextStep;
-		}
-	}, {
-		key: 'getStep',
-		value: function getStep() {
-			return this.step;
 		}
 	}, {
 		key: 'pageSlide',
@@ -1066,23 +1067,7 @@ var SwipeElement = function () {
 			}
 
 			if (this.isImage()) {
-				var div_ration = this.w / this.h;
-				var w = $("#" + this.css_id + "_image").attr("__default_width");
-				var h = $("#" + this.css_id + "_image").attr("__default_height");
-				var image_ration = w / h;
-
-				if (div_ration < image_ration) {
-					$("#" + this.css_id + "_image").css("height", "100%");
-					$("#" + this.css_id + "_image").css("width", "auto");
-				} else {
-					$("#" + this.css_id + "_image").css("height", "auth");
-					$("#" + this.css_id + "_image").css("width", "100%");
-				}
-				$("#" + this.css_id + "_image").css("top", "50%");
-				$("#" + this.css_id + "_image").css("left", "50%");
-				$("#" + this.css_id + "_image").css("transform", "translate(-50%,-50%)");
-				$("#" + this.css_id + "_image").css("-webkit-transform", "translateY(-50%) translateX(-50%)");
-				$("#" + this.css_id + "_image").css("-moz-transform", "translate(-50%,-50%)");
+				this.setImageCss();
 			}
 
 			this.initAllData();
@@ -1095,6 +1080,27 @@ var SwipeElement = function () {
 
 			// set md wrap
 			this.markdown_position();
+		}
+	}, {
+		key: "setImageCss",
+		value: function setImageCss() {
+			var div_ration = this.w / this.h;
+			var w = $("#" + this.css_id + "_image").attr("__default_width");
+			var h = $("#" + this.css_id + "_image").attr("__default_height");
+			var image_ration = w / h;
+
+			if (div_ration < image_ration) {
+				$("#" + this.css_id + "_image").css("height", "100%");
+				$("#" + this.css_id + "_image").css("width", "auto");
+			} else {
+				$("#" + this.css_id + "_image").css("height", "auth");
+				$("#" + this.css_id + "_image").css("width", "100%");
+			}
+			$("#" + this.css_id + "_image").css("top", "50%");
+			$("#" + this.css_id + "_image").css("left", "50%");
+			$("#" + this.css_id + "_image").css("transform", "translate(-50%,-50%)");
+			$("#" + this.css_id + "_image").css("-webkit-transform", "translateY(-50%) translateX(-50%)");
+			$("#" + this.css_id + "_image").css("-moz-transform", "translate(-50%,-50%)");
 		}
 	}, {
 		key: "initAllData",
@@ -1550,6 +1556,10 @@ var SwipeElement = function () {
 				var text_css = this.textLayout(this.info, this.originalFinPos);
 				$("#" + this.css_id + "-body").css(text_css);
 			}
+			if (this.isPath()) {
+				this.path.attr(this.finPath.path);
+				this.path.attr({ fill: this.finPath.fill });
+			}
 		}
 
 		// transform orders are rotate, scale.
@@ -1952,6 +1962,25 @@ var SwipeElement = function () {
 			return Object.keys(attrs).map(function (key) {
 				return key + "='" + attrs[key] + "'";
 			}).join(" ");
+		}
+	}, {
+		key: "resize",
+		value: function resize() {
+			if (this.elements) {
+				this.elements.forEach(function (element, elem_index) {
+					element.resize();
+				});
+			}
+			if (this.isImage()) {
+				this.setImageCss();
+			}
+			this.initAllData();
+			if (this.isPath()) {
+				this.prevPath = this.parsePath();
+				this.finPath = this.parseFinPath();
+			}
+			// set md wrap
+			this.markdown_position();
 		}
 	}, {
 		key: "justShow",
@@ -2704,6 +2733,13 @@ var SwipePage = function () {
 									}
 						}
 			}, {
+						key: "resize",
+						value: function resize() {
+									this.elements.forEach(function (element, elem_index) {
+												element.resize();
+									});
+						}
+			}, {
 						key: "justShow",
 						value: function justShow() {
 									this.elements.forEach(function (element, elem_index) {
@@ -3189,7 +3225,6 @@ var SwipeTouch = function () {
 												SwipeTouch.start_event(e);
 									}).on(scroll_event, function (e) {
 												e.preventDefault();
-
 												var delta = e.originalEvent.deltaY ? -e.originalEvent.deltaY : e.originalEvent.wheelDelta ? e.originalEvent.wheelDelta : -e.originalEvent.detail;
 												self.currentY = self.currentY - delta;
 												self.diff = self.currentY - self.startY;
@@ -3210,7 +3245,6 @@ var SwipeTouch = function () {
 												SwipeTouch.start_event(e);
 									}).on('touchmove.noScroll', function (e) {
 												e.preventDefault();
-
 												self.diff = self.startY - e.originalEvent.pageY;
 												self.ration = self.diff / $(window).innerHeight();
 
@@ -3245,7 +3279,7 @@ var SwipeTouch = function () {
 						}
 			}, {
 						key: 'start_event',
-						value: function start_event() {
+						value: function start_event(event) {
 									this.ration = 0;
 									console.log("start");
 									this.status = "start";
@@ -3315,6 +3349,27 @@ var SwipeUtil = function () {
 															swipe_book.resize();
 												}, 250);
 									});
+
+									if (SwipeUtil.getParameterByName("autoplay") === "1") {
+												var autoplayDuration = SwipeUtil.getParameterByName("autoplayDuration") || 1000;
+												console.log("duatio " + autoplayDuration);
+												var autoplay = function autoplay() {
+															setTimeout(function () {
+																		swipe_book.next();
+																		var current = Number(location.hash.substr(1));
+																		console.log(swipe_book.getPageSize());
+																		if (swipe_book.getPageSize() > current + 1) {
+																					autoplay();
+																		} else if (SwipeUtil.getParameterByName("autoloop") === "1") {
+																					setTimeout(function () {
+																								swipe_book.show(0);
+																								autoplay();
+																					}, autoplayDuration);
+																		}
+															}, autoplayDuration);
+												};
+												autoplay();
+									}
 						}
 			}, {
 						key: "getSwipeBook",

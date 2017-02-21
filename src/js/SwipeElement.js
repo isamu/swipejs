@@ -127,24 +127,7 @@ class SwipeElement {
 	}
 
 	if (this.isImage()) {
-	    let div_ration = this.w/this.h;
-	    let w = $("#" + this.css_id + "_image").attr("__default_width");
-	    let h = $("#" + this.css_id + "_image").attr("__default_height");
-	    let image_ration = w/h;
-	    
-	    if (div_ration < image_ration) {
-		$("#" + this.css_id + "_image").css("height", "100%");
-		$("#" + this.css_id + "_image").css("width", "auto");
-	    } else {
-		$("#" + this.css_id + "_image").css("height", "auth");
-		$("#" + this.css_id + "_image").css("width", "100%");
-	    }
-	    $("#" + this.css_id + "_image").css("top", "50%");
-	    $("#" + this.css_id + "_image").css("left", "50%");
-	    $("#" + this.css_id + "_image").css("transform", "translate(-50%,-50%)");
-	    $("#" + this.css_id + "_image").css("-webkit-transform", "translateY(-50%) translateX(-50%)");
-	    $("#" + this.css_id + "_image").css("-moz-transform", "translate(-50%,-50%)");
-
+	    this.setImageCss();
 	}
 
 	this.initAllData();
@@ -157,6 +140,26 @@ class SwipeElement {
 
 	// set md wrap
 	this.markdown_position();
+    }
+
+    setImageCss() {
+	let div_ration = this.w/this.h;
+	let w = $("#" + this.css_id + "_image").attr("__default_width");
+	let h = $("#" + this.css_id + "_image").attr("__default_height");
+	let image_ration = w/h;
+	
+	if (div_ration < image_ration) {
+	    $("#" + this.css_id + "_image").css("height", "100%");
+	    $("#" + this.css_id + "_image").css("width", "auto");
+	} else {
+	    $("#" + this.css_id + "_image").css("height", "auth");
+	    $("#" + this.css_id + "_image").css("width", "100%");
+	}
+	$("#" + this.css_id + "_image").css("top", "50%");
+	$("#" + this.css_id + "_image").css("left", "50%");
+	$("#" + this.css_id + "_image").css("transform", "translate(-50%,-50%)");
+	$("#" + this.css_id + "_image").css("-webkit-transform", "translateY(-50%) translateX(-50%)");
+	$("#" + this.css_id + "_image").css("-moz-transform", "translate(-50%,-50%)");
     }
 
     initAllData(){
@@ -577,6 +580,11 @@ class SwipeElement {
 	    var text_css = this.textLayout(this.info, this.originalFinPos);
 	    $("#" + this.css_id + "-body").css(text_css);
 	}
+	if (this.isPath()){
+	    this.path.attr(this.finPath.path);
+	    this.path.attr({fill: this.finPath.fill});
+	}
+	
     }
 
     // transform orders are rotate, scale.
@@ -958,8 +966,25 @@ class SwipeElement {
 	    return key + "='" + attrs[key] + "'";
 	}).join(" ");
     }
-
     
+    resize() {
+	if (this.elements) {
+	    this.elements.forEach(function(element, elem_index){
+		element.resize();
+	    });
+	}
+	if (this.isImage()) {
+	    this.setImageCss();
+	}
+	this.initAllData();
+	if (this.isPath()){
+	    this.prevPath = this.parsePath();
+	    this.finPath = this.parseFinPath();
+	}
+	// set md wrap
+	this.markdown_position();
+
+    }
     justShow(){
 	console.log("justShow");
 	if (this.elements) {

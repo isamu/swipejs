@@ -144,7 +144,8 @@ class SwipeBook {
     resize() {
 	this.setScreen();
 	for (var i = 0; i < this.pages.length; i++) {
-	    this.justShow(i);
+	    this.pages[i].resize();
+            this.justShow(i);
 	}
 	this.setPageSize();
     }
@@ -295,11 +296,13 @@ class SwipeBook {
     getPages() {
 	return this.pages;
     }
+    getPageSize() {
+	return this.pages.length;
+    }
     
     justShow(step) {
 	this.pages[step].justShow();
     }	
-
     nextAnimate(nextStep) {
 	var play_style = this.pages[nextStep].getPlayStyle();
 	
@@ -436,10 +439,6 @@ class SwipeBook {
 	location.hash = nextStep;
     }
 
-    getStep() {
-	return this.step;
-    }
-    
     pageSlide(mode, step) {
 	console.log("pageSlide");
 	

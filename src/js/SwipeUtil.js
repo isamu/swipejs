@@ -38,6 +38,27 @@ class SwipeUtil {
 		swipe_book.resize();
 	    }, 250);
 	});
+
+	if (SwipeUtil.getParameterByName("autoplay") === "1") {
+	    var autoplayDuration  = SwipeUtil.getParameterByName("autoplayDuration")  || 1000;
+	    console.log("duatio " +autoplayDuration);
+	    var autoplay = function() {
+		setTimeout(function(){
+		    swipe_book.next();
+		    var current = Number(location.hash.substr(1));
+		    console.log(swipe_book.getPageSize());
+		    if (swipe_book.getPageSize() >  current + 1) {
+			autoplay();
+		    } else if (SwipeUtil.getParameterByName("autoloop") === "1") {
+			setTimeout(function(){
+			    swipe_book.show(0);
+			    autoplay();
+			}, autoplayDuration);
+		    }
+		}, autoplayDuration)
+	    };
+	    autoplay();
+	}
 	
     };
 
@@ -72,8 +93,6 @@ class SwipeUtil {
 		swipe_book.resize();
 	    }, 250);
 	});
-	
-
 	
 	$.extend($.easing,
 		 {

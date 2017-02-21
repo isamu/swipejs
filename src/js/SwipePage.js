@@ -78,7 +78,11 @@ class SwipePage {
 	    return this.elements[indexes.shift()].getElement(indexes.join("-"));
 	}
     }
-    
+    resize() {
+	this.elements.forEach(function(element, elem_index){
+	    element.resize();
+	});
+    }
     justShow() {
 	this.elements.forEach(function(element, elem_index){
 	    element.justShow();
