@@ -1299,7 +1299,7 @@ var SwipeElement = function () {
 		key: "setVideo",
 		value: function setVideo(data) {
 			var instance = this;
-			$("#" + this.css_id + "-video").css(this.convCssPos(data));
+			$("#" + this.css_id + "-video").css(this.convCssPos(data, true));
 		}
 	}, {
 		key: "getSpritePos",
@@ -1812,6 +1812,8 @@ var SwipeElement = function () {
 	}, {
 		key: "convCssPos",
 		value: function convCssPos(data) {
+			var skip_transform = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
 			var ret = this.convBasicCssPos(data);
 			var transform = [];
 
@@ -1820,7 +1822,8 @@ var SwipeElement = function () {
 				transform.push("rotate(" + angle + "deg)");
 			}
 			// path is not apply default transform
-			if (!this.isPath()) {
+			console.log(skip_transform);
+			if (!this.isPath() && !skip_transform) {
 				var scale = data[6];
 				if (SwipeParser.is("Array", scale) && scale.length == 2) {
 					transform.push("scale(" + scale[0] + "," + scale[1] + ")");

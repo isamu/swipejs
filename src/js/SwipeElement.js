@@ -341,7 +341,7 @@ class SwipeElement {
     // set or animate position
     setVideo(data) {
 	var instance = this;
-	$("#" + this.css_id + "-video").css(this.convCssPos(data));
+	$("#" + this.css_id + "-video").css(this.convCssPos(data, true));
     }
     getSpritePos() {
 	let w = this.prevPos[2];
@@ -829,7 +829,7 @@ class SwipeElement {
 	    'opacity' : data[5]
 	};
     }
-    convCssPos(data) {
+    convCssPos(data, skip_transform=false) {
 	var ret = this.convBasicCssPos(data);
 	var transform = [];
 
@@ -838,7 +838,8 @@ class SwipeElement {
 	    transform.push("rotate(" + angle +"deg)");
 	}
 	// path is not apply default transform
-	if (!this.isPath()){
+	console.log(skip_transform);
+	if (!this.isPath() && !skip_transform){
 	    var scale = data[6];
 	    if (SwipeParser.is("Array", scale) && scale.length == 2) {
 		transform.push("scale(" + scale[0] + "," + scale[1] +")");
