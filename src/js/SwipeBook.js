@@ -167,10 +167,11 @@ class SwipeBook {
 	});
 	
 	$(this.base_css_id).html(pages.join(""));
-	
+
 	this.setPageSize();
 	$(".page").css("opacity", 0);
 	$("#page_" + this.step).css("opacity", 1);
+	$("#debug").css({position: "absolute", "z-index": 100})
 
 	this.pages[this.step].active();
 
