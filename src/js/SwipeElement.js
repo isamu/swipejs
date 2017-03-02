@@ -838,7 +838,6 @@ class SwipeElement {
 	    transform.push("rotate(" + angle +"deg)");
 	}
 	// path is not apply default transform
-	console.log(skip_transform);
 	if (!this.isPath() && !skip_transform){
 	    var scale = data[6];
 	    if (SwipeParser.is("Array", scale) && scale.length == 2) {

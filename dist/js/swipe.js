@@ -405,6 +405,10 @@ var SwipeBook = function () {
 				this.pages[currentStep].inactive();
 				this.pages[nextStep].active();
 			}
+			if (!this.first_touch) {
+				this.media_player.load();
+				this.first_touch = true;
+			}
 			var transition = this.pages[Math.max(currentStep, nextStep)].getTransition();
 			var currentTransition = this.pages[currentStep].getTransition();
 			var nextTransition = this.pages[nextStep].getTransition();
@@ -483,13 +487,15 @@ var SwipeBook = function () {
 				}
 			}
 
-			if (this.pages[nextStep].getPlayStyle() == "auto") {
-				console.log("AUTO NEXT");
-				this.media_player.play(nextStep);
-			}
-			if (this.pages[nextStep].getPlayStyle() == "scroll") {
-				console.log("scroll NEXT");
-				// this.pages[nextStep].playing(0);
+			if (!loaded) {
+				if (this.pages[nextStep].getPlayStyle() == "auto") {
+					console.log("AUTO NEXT");
+					this.media_player.play(nextStep);
+				}
+				if (this.pages[nextStep].getPlayStyle() == "scroll") {
+					console.log("scroll NEXT");
+					this.media_player.play(nextStep);
+				}
 			}
 			if (loaded) {
 				if (this.pages[currentStep].getPlayStyle() == "auto") {
@@ -1822,7 +1828,6 @@ var SwipeElement = function () {
 				transform.push("rotate(" + angle + "deg)");
 			}
 			// path is not apply default transform
-			console.log(skip_transform);
 			if (!this.isPath() && !skip_transform) {
 				var scale = data[6];
 				if (SwipeParser.is("Array", scale) && scale.length == 2) {
@@ -2550,6 +2555,9 @@ var SwipeMediaPlayer = function () {
 						}
 						if (data["canPlay"]) {
 							player.play();
+							player.addEventListener('ended', function () {
+								instance.current_playing = null;
+							});
 						} else {
 							data["waitPlay"] = true;
 							instance.media[instance.current_page][key] = data;

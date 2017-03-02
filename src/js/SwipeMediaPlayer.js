@@ -43,6 +43,9 @@ class SwipeMediaPlayer {
 		    }
 		    if (data["canPlay"]) {
 			player.play();
+			player.addEventListener('ended', function() {
+			    instance.current_playing = null;
+			});
 		    } else {
 			data["waitPlay"] = true;
 			instance.media[instance.current_page][key] = data;

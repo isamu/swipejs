@@ -343,6 +343,10 @@ class SwipeBook {
 	    this.pages[currentStep].inactive()
 	    this.pages[nextStep].active();
 	}
+	if (!this.first_touch){
+	    this.media_player.load();
+	    this.first_touch = true;
+	}
 	var transition = this.pages[Math.max(currentStep, nextStep)].getTransition();
 	var currentTransition = this.pages[currentStep].getTransition();
 	var nextTransition = this.pages[nextStep].getTransition();
@@ -423,13 +427,15 @@ class SwipeBook {
 	    }		
 	}
 
-	if (this.pages[nextStep].getPlayStyle() == "auto") {
-	    console.log("AUTO NEXT");
-	    this.media_player.play(nextStep);
-	}
-	if (this.pages[nextStep].getPlayStyle() == "scroll") {
-	    console.log("scroll NEXT");
-	    // this.pages[nextStep].playing(0);
+	if (!loaded) {
+	    if (this.pages[nextStep].getPlayStyle() == "auto") {
+		console.log("AUTO NEXT");
+		this.media_player.play(nextStep);
+	    }
+	    if (this.pages[nextStep].getPlayStyle() == "scroll") {
+		console.log("scroll NEXT");
+		this.media_player.play(nextStep);
+	    }
 	}
 	if (loaded) {
 	    if (this.pages[currentStep].getPlayStyle() == "auto") {
