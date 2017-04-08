@@ -1988,7 +1988,7 @@ var SwipeElement = function () {
 				this.md_css = md_array[1];
 				return "<div class='element markdown_element element_page_" + this.page_id + "'  id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + "<div id='" + this.css_id + "_inner' class='element_inner'><div class='markdown_wrap' id='md_" + this.css_id + "'>" + md_array[0] + child_html + "</div></div></div>";
 			} else if (this.isVideo()) {
-				var attrs = this.defaultAttr('element video_element element_page_' + this.page_id + 'video_element_' + this.page_id);
+				var attrs = this.defaultAttr('element video_element element_page_' + this.page_id + ' video_element_' + this.page_id);
 				var attr_str = this.getAttrStr(attrs);
 				return "<div " + attr_str + "><div id='" + this.css_id + "_inner' class='element_inner'>" + "<video id='" + this.css_id + "-video'  webkit-playsinline playsinline muted><source type='video/mp4' src='" + this.info.video + "'  /></video>" + child_html + "</div></div>";
 			} else if (this.isPath()) {
