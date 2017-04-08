@@ -42,6 +42,7 @@ class SwipeBook {
 	    this.setScreen();
 	    this.paging = this.getPaging();
       this.isLoaded = {};
+      this.isReady = false;
 	    this.isFinished = false;
 	    this.load();
 	    if (this.step > this.pages.length) {
@@ -297,7 +298,8 @@ class SwipeBook {
   }
   
   loadFinish(){
-	  $("#loading").remove();
+    this.isReady = true;
+	  // $("#loading").remove();
   }
   set_finish_callback(func) {
 	  this.finish_callback = func;
@@ -385,7 +387,7 @@ class SwipeBook {
 	    this.pages[currentStep].inactive()
 	    this.pages[nextStep].active();
 	  }
-	  if (!this.first_touch){
+	  if (!this.first_touch && this.isReady){
 	    this.media_player.load();
 	    this.first_touch = true;
 	  }
@@ -663,7 +665,7 @@ class SwipeBook {
 	  
   }
   nextStart(ration){
-	  if (!this.first_touch){
+	  if (!this.first_touch && this.isReady){
 	    this.media_player.load();
       /*
 	      $("video").each(( video_index, video) => {
