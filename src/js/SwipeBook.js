@@ -41,7 +41,7 @@ class SwipeBook {
 	    this.templatePages = this.getTemplatePages();
 	    this.setScreen();
 	    this.paging = this.getPaging();
-	    this.isReady = false;
+      this.isLoaded = {};
 	    this.isFinished = false;
 	    this.load();
 	    if (this.step > this.pages.length) {
@@ -158,42 +158,42 @@ class SwipeBook {
 	    "width": SwipeScreen.virtualwidth()
 	  });
   }
-  domLoad() {
-	  var pages = [];
+  pageLoad(page, page_index) {
 	  var instance = this;
-	  this.pages.forEach((page, page_index) => {
-	    page.loadElement();
-	    pages.push(page.getHtml());
-	  });
-	  
-	  $(this.base_css_id).html(pages.join(""));
+	  page.loadElement();
+    let html = page.getHtml()
+    
+	  $(this.base_css_id).append(html);
+    
+    if (page_index == this.step) {
+	    $("#page_" + page_index).css("opacity", 1);
+	    page.active();
+    } else {
+	    $("#page_" + page_index).css("opacity", 0);
+    }
+	  var bc = page.getBc();
+	  $("#page_" + page_index).css({"background-color": bc});
 
-	  this.setPageSize();
-	  $(".page").css("opacity", 0);
-	  $("#page_" + this.step).css("opacity", 1);
-	  $("#debug").css({position: "absolute", "z-index": 100})
-
-	  this.pages[this.step].active();
-
-	  $(".image_element").load(function() {
+    $(".image_element_page_" + page_index).load( function() {
+      
 	    $(this).attr("__default_width", $(this).width());
 	    $(this).attr("__default_height", $(this).height());
-
+      
 	    $("#" + $(this).attr("__base_id")).attr("__default_width", $(this).width());
 	    $("#" + $(this).attr("__base_id")).attr("__default_height", $(this).height());
-
+      
 	    instance.initData($(this).attr("__page_id"), $(this).attr("__element_id"));
 	    instance.counterDecrease();
-	  });
-
-	  $(".element").each(function(index, element) {
+    });
+    
+	  $(".element_page_" + page_index ).each(function(index, element) {
 	    instance.initData($(element).attr("__page_id"), $(element).attr("__element_id"));
 	    instance.counterDecrease();
 	  });
-	  
-	  $(".video_element").each(function(index, element) {
+    
+	  $(".video_element_" + page_index ).each(function(index, element) {
 	    var __element = instance.pages[$(element).attr("__page_id")].getElement( $(element).attr("__element_id"));
-
+      
 	    let player = new MediaElement( $(element).attr("id") + "-video", {
 		    flashName: 'flashmediaelement.swf',
 		    loop: true,
@@ -201,7 +201,7 @@ class SwipeBook {
 		      __element.setVideoElement = mediaElement;
 		    }
       });
-
+      
 	    this.media_player = SwipeMediaPlayer.getInstance();
 	    let data = {
 		    media: player,
@@ -217,13 +217,24 @@ class SwipeBook {
 	    }
 	    this.media_player.page($(element).attr("__page_id")).push($(element).attr("id"), data);
 	    instance.counterDecrease();
-	    
 	  });
-	  
-	  this.pages.forEach((page, page_index) => {
-	    var bc = page.getBc();
-	    $("#page_" + page_index).css({"background-color": bc});
-	  });
+  }
+  
+  domLoad() {
+	  var instance = this;
+    this.loadingPage = 0;
+    
+    this.pageLoad(this.pages[this.loadingPage], this.loadingPage);
+	  // this.pages.forEach((page, page_index) => {
+    // instance.pageLoad(page, page_index);
+    // });
+
+	  $("#debug").css({position: "absolute", "z-index": 100})
+	  this.setPageSize();
+    this.updateCss();
+  }
+
+  updateCss(){
 	  $(".page").css({"position": "absolute"});
 	  $(".image_element").css({"position": "absolute"});
 	  $(".image_box").css({"position": "absolute"});
@@ -239,12 +250,27 @@ class SwipeBook {
 	    "position": "absolute"
 	  });
   }
+
   counterDecrease(){
 	  SwipeCounter.decrease();
 	  $("#counter").html(SwipeCounter.getCounter());
 
 	  if(SwipeCounter.getCounter() == 0){
-	    this.loadFinish();
+      if (this.loadingPage == this.step) {
+	      $("#loading").remove();
+	      this.show(this.step);
+      }
+      this.isLoaded[this.loadingPage] = true;
+      
+      this.loadingPage ++;
+      if (this.loadingPage < this.pages.length) {
+        console.log(this.loadingPage);
+        this.pageLoad(this.pages[this.loadingPage], this.loadingPage);
+	      this.setPageSize();
+        this.updateCss();
+      } else {
+	      this.loadFinish();
+      }
 	    console.log("OK!!!");
 	  }
 	  console.log(SwipeCounter.getCounter());
@@ -252,20 +278,16 @@ class SwipeBook {
   
   loadFinish(){
 	  $("#loading").remove();
-	  this.isReady = true;
-	  this.show(this.step);
   }
   set_finish_callback(func) {
 	  this.finish_callback = func;
   }
   initData(page_id, element_id){
-	  console.log(page_id);
-	  console.log(element_id);
 	  this.pages[page_id].initElement(element_id);
   }
   
   next(){
-	  if (this.isReady) {
+	  if (this.isLoaded[this.step + 1]) {
 	    if (this.step < this.pages.length - 1){
 		    this.show(this.step + 1);
 	    } else {
@@ -278,7 +300,7 @@ class SwipeBook {
   }
 
   back(){
-	  if (this.isReady) {
+	  if (this.isLoaded[this.step - 1]) {
 	    if (this.step > 0){
 		    this.show(this.step - 1);
 		    if (this.isFinished) {

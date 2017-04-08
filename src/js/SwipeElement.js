@@ -921,14 +921,14 @@ class SwipeElement {
 	  }).join("");
 	  if (this.isImage()) {
 	    return "<div id='" + this.css_id + "' class='image_box'><div id='" + this.css_id + "_inner' class='element_inner'>" +
-		    "<img src='" + this.info.img + "' class='image_element' id='" + this.css_id + "_image' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" +
+		    "<img src='" + this.info.img + "' class='image_element image_element_page_" +  this.page_id + "' id='" + this.css_id + "_image' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" +
 		    child_html + "</img></div></div>";
 	  } else if (this.isSprite()) {
 	    return "<div id='" + this.css_id + "' class='image_box'><div id='" + this.css_id + "_inner' class='element_inner'>" +
-		    "<img src='" + this.info.sprite+ "' class='image_element' id='" + this.css_id + "_sprite' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" +
+		    "<img src='" + this.info.sprite+ "' class='image_element image_element_page_" +  this.page_id + "' id='" + this.css_id + "_sprite' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" +
 		    child_html + "</img></div></div>";
 	  } else if (this.isText()) {
-	    var attrs = this.defaultAttr('element text_element');
+	    var attrs = this.defaultAttr('element text_element element_page_' +  this.page_id);
 	    var attr_str = this.getAttrStr(attrs);
 
 	    return  "<div "+ attr_str + "><div id='" + this.css_id + "_inner' class='element_inner'>" +
@@ -937,18 +937,18 @@ class SwipeElement {
 	  } else if (this.isMarkdown()){
 	    let md_array = this.parseMarkdown(this.info.markdown);
 	    this.md_css = md_array[1];
-	    return  "<div class='element markdown_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" +
+	    return  "<div class='element markdown_element element_page_" +  this.page_id +"'  id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" +
 		    "<div id='" + this.css_id + "_inner' class='element_inner'><div class='markdown_wrap' id='md_" + this.css_id + "'>" + md_array[0] + child_html + "</div></div></div>";
 	  } else if (this.isVideo()) {
-	    var attrs = this.defaultAttr('element video_element');
+	    var attrs = this.defaultAttr('element video_element element_page_' + this.page_id + 'video_element_' + this.page_id);
 	    var attr_str = this.getAttrStr(attrs);
 	    return  "<div " + attr_str + "><div id='" + this.css_id + "_inner' class='element_inner'>" + 
 		    "<video id='" + this.css_id + "-video'  webkit-playsinline playsinline muted><source type='video/mp4' src='" + this.info.video + "'  /></video>" +
 		    child_html + "</div></div>";
 	  } else if (this.isPath()) {
-	    return  '<div id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id +  '" class="element svg_element"><div id="' + this.css_id + '_inner" class="element_inner"><svg id="' + this.css_id + '_svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"></svg></div></div>';
+	    return  '<div id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id +  '" class="element svg_element element_page_' + this.page_id + '"><div id="' + this.css_id + '_inner" class="element_inner"><svg id="' + this.css_id + '_svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"></svg></div></div>';
 	  } else if (this.isDiv()) {
-	    return "<div class='element boxelement-" + this.page_id + "' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>" ;
+	    return "<div class='element boxelement-" + this.page_id + " element_page_" +  this.page_id + "' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>" ;
 	  } else {
 	    return "";
 	  }

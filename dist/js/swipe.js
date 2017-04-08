@@ -70,7 +70,7 @@ var SwipeBook = function () {
 			this.templatePages = this.getTemplatePages();
 			this.setScreen();
 			this.paging = this.getPaging();
-			this.isReady = false;
+			this.isLoaded = {};
 			this.isFinished = false;
 			this.load();
 			if (this.step > this.pages.length) {
@@ -200,25 +200,25 @@ var SwipeBook = function () {
 			});
 		}
 	}, {
-		key: 'domLoad',
-		value: function domLoad() {
-			var pages = [];
+		key: 'pageLoad',
+		value: function pageLoad(page, page_index) {
 			var instance = this;
-			this.pages.forEach(function (page, page_index) {
-				page.loadElement();
-				pages.push(page.getHtml());
-			});
+			page.loadElement();
+			var html = page.getHtml();
 
-			$(this.base_css_id).html(pages.join(""));
+			$(this.base_css_id).append(html);
 
-			this.setPageSize();
-			$(".page").css("opacity", 0);
-			$("#page_" + this.step).css("opacity", 1);
-			$("#debug").css({ position: "absolute", "z-index": 100 });
+			if (page_index == this.step) {
+				$("#page_" + page_index).css("opacity", 1);
+				page.active();
+			} else {
+				$("#page_" + page_index).css("opacity", 0);
+			}
+			var bc = page.getBc();
+			$("#page_" + page_index).css({ "background-color": bc });
 
-			this.pages[this.step].active();
+			$(".image_element_page_" + page_index).load(function () {
 
-			$(".image_element").load(function () {
 				$(this).attr("__default_width", $(this).width());
 				$(this).attr("__default_height", $(this).height());
 
@@ -229,12 +229,12 @@ var SwipeBook = function () {
 				instance.counterDecrease();
 			});
 
-			$(".element").each(function (index, element) {
+			$(".element_page_" + page_index).each(function (index, element) {
 				instance.initData($(element).attr("__page_id"), $(element).attr("__element_id"));
 				instance.counterDecrease();
 			});
 
-			$(".video_element").each(function (index, element) {
+			$(".video_element_" + page_index).each(function (index, element) {
 				var __element = instance.pages[$(element).attr("__page_id")].getElement($(element).attr("__element_id"));
 
 				var player = new MediaElement($(element).attr("id") + "-video", {
@@ -261,11 +261,25 @@ var SwipeBook = function () {
 				this.media_player.page($(element).attr("__page_id")).push($(element).attr("id"), data);
 				instance.counterDecrease();
 			});
+		}
+	}, {
+		key: 'domLoad',
+		value: function domLoad() {
+			var instance = this;
+			this.loadingPage = 0;
 
-			this.pages.forEach(function (page, page_index) {
-				var bc = page.getBc();
-				$("#page_" + page_index).css({ "background-color": bc });
-			});
+			this.pageLoad(this.pages[this.loadingPage], this.loadingPage);
+			// this.pages.forEach((page, page_index) => {
+			// instance.pageLoad(page, page_index);
+			// });
+
+			$("#debug").css({ position: "absolute", "z-index": 100 });
+			this.setPageSize();
+			this.updateCss();
+		}
+	}, {
+		key: 'updateCss',
+		value: function updateCss() {
 			$(".page").css({ "position": "absolute" });
 			$(".image_element").css({ "position": "absolute" });
 			$(".image_box").css({ "position": "absolute" });
@@ -288,7 +302,21 @@ var SwipeBook = function () {
 			$("#counter").html(SwipeCounter.getCounter());
 
 			if (SwipeCounter.getCounter() == 0) {
-				this.loadFinish();
+				if (this.loadingPage == this.step) {
+					$("#loading").remove();
+					this.show(this.step);
+				}
+				this.isLoaded[this.loadingPage] = true;
+
+				this.loadingPage++;
+				if (this.loadingPage < this.pages.length) {
+					console.log(this.loadingPage);
+					this.pageLoad(this.pages[this.loadingPage], this.loadingPage);
+					this.setPageSize();
+					this.updateCss();
+				} else {
+					this.loadFinish();
+				}
 				console.log("OK!!!");
 			}
 			console.log(SwipeCounter.getCounter());
@@ -297,8 +325,6 @@ var SwipeBook = function () {
 		key: 'loadFinish',
 		value: function loadFinish() {
 			$("#loading").remove();
-			this.isReady = true;
-			this.show(this.step);
 		}
 	}, {
 		key: 'set_finish_callback',
@@ -308,14 +334,12 @@ var SwipeBook = function () {
 	}, {
 		key: 'initData',
 		value: function initData(page_id, element_id) {
-			console.log(page_id);
-			console.log(element_id);
 			this.pages[page_id].initElement(element_id);
 		}
 	}, {
 		key: 'next',
 		value: function next() {
-			if (this.isReady) {
+			if (this.isLoaded[this.step + 1]) {
 				if (this.step < this.pages.length - 1) {
 					this.show(this.step + 1);
 				} else {
@@ -329,7 +353,7 @@ var SwipeBook = function () {
 	}, {
 		key: 'back',
 		value: function back() {
-			if (this.isReady) {
+			if (this.isLoaded[this.step - 1]) {
 				if (this.step > 0) {
 					this.show(this.step - 1);
 					if (this.isFinished) {
@@ -686,10 +710,10 @@ var SwipeBook = function () {
 			if (!this.first_touch) {
 				this.media_player.load();
 				/*
-    	    $("video").each(( video_index, video) => {
-    		// todo video
-    		video.load();
-    	    });
+     $("video").each(( video_index, video) => {
+    // todo video
+    video.load();
+     });
     */
 				this.first_touch = true;
 			}
@@ -894,38 +918,38 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var SwipeCounter = function () {
-			function SwipeCounter() {
-						_classCallCheck(this, SwipeCounter);
+	function SwipeCounter() {
+		_classCallCheck(this, SwipeCounter);
+	}
+
+	_createClass(SwipeCounter, null, [{
+		key: "increase",
+		value: function increase() {
+			if (this.counter === undefined) {
+				this.counter = 1;
+			} else {
+				this.counter++;
 			}
+			return this.counter;
+		}
+	}, {
+		key: "decrease",
+		value: function decrease() {
+			if (this.counter === undefined) {
+				this.counter = -1;
+			} else {
+				this.counter--;
+			}
+			return this.counter;
+		}
+	}, {
+		key: "getCounter",
+		value: function getCounter() {
+			return this.counter;
+		}
+	}]);
 
-			_createClass(SwipeCounter, null, [{
-						key: "increase",
-						value: function increase() {
-									if (this.counter === undefined) {
-												this.counter = 1;
-									} else {
-												this.counter++;
-									}
-									return this.counter;
-						}
-			}, {
-						key: "decrease",
-						value: function decrease() {
-									if (this.counter === undefined) {
-												this.counter = -1;
-									} else {
-												this.counter--;
-									}
-									return this.counter;
-						}
-			}, {
-						key: "getCounter",
-						value: function getCounter() {
-									return this.counter;
-						}
-			}]);
-
-			return SwipeCounter;
+	return SwipeCounter;
 }();
 "use strict";
 
@@ -1527,11 +1551,11 @@ var SwipeElement = function () {
 					});
 				}
 				/*
-    if (this.isVideo()){
-    $("#" + this.css_id + "-video").animate(this.convCssPos(this.prevPos), {
+      if (this.isVideo()){
+     $("#" + this.css_id + "-video").animate(this.convCssPos(this.prevPos), {
      duration: do_duration
-    });
-    }
+     });
+      }
     */
 				if (this.isPath()) {
 					var path = SwipeParser.clone(this.prevPath.path);
@@ -1678,21 +1702,21 @@ var SwipeElement = function () {
 					});
 				}
 				/*
-    if (instance.isText()) {
-    $("#" + instance.css_id + "-body").animate(instance.finText, {
+      if (instance.isText()) {
+     $("#" + instance.css_id + "-body").animate(instance.finText, {
      duration: do_duration
-               });
-    }
-    if (instance.isPath()) {
-    let path =  SwipeParser.clone(instance.finPath.path);
-    delete path.stroke;
-    instance.path.animate(path, do_duration);
-    if (instance.prevPath.fill !=  instance.finPath.fill) {
+       });
+      }
+      if (instance.isPath()) {
+     let path =  SwipeParser.clone(instance.finPath.path);
+     delete path.stroke;
+     instance.path.animate(path, do_duration);
+     if (instance.prevPath.fill !=  instance.finPath.fill) {
      setTimeout(function(){
     instance.path.attr({fill: instance.finPath.fill});
      }, do_duration);
-    }
-    }
+     }
+      }
     */
 			}
 		}
@@ -1724,27 +1748,27 @@ var SwipeElement = function () {
 					}
 				});
 				/*
-    if (instance.isVideo()){
-    $("#" + instance.css_id + "-video").animate(instance.convCssPos(instance.finPos), {
+      if (instance.isVideo()){
+     $("#" + instance.css_id + "-video").animate(instance.convCssPos(instance.finPos), {
      duration: do_duration
-    });
-    }
-    
-    if (instance.isText()) {
-    $("#" + instance.css_id + "-body").animate(instance.finText, {
+     });
+      }
+      
+      if (instance.isText()) {
+     $("#" + instance.css_id + "-body").animate(instance.finText, {
      duration: do_duration
-               });
-    }
-    if (instance.isPath()) {
-    let path =  SwipeParser.clone(instance.finPath.path);
-    delete path.stroke;
-    instance.path.animate(path, do_duration);
-    if (instance.prevPath.fill !=  instance.finPath.fill) {
+       });
+      }
+      if (instance.isPath()) {
+     let path =  SwipeParser.clone(instance.finPath.path);
+     delete path.stroke;
+     instance.path.animate(path, do_duration);
+     if (instance.prevPath.fill !=  instance.finPath.fill) {
      setTimeout(function(){
     instance.path.attr({fill: instance.finPath.fill});
      }, do_duration);
-    }
-    }
+     }
+      }
     */
 			}
 		}
@@ -1931,26 +1955,26 @@ var SwipeElement = function () {
 				return element.html();
 			}).join("");
 			if (this.isImage()) {
-				return "<div id='" + this.css_id + "' class='image_box'><div id='" + this.css_id + "_inner' class='element_inner'>" + "<img src='" + this.info.img + "' class='image_element' id='" + this.css_id + "_image' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" + child_html + "</img></div></div>";
+				return "<div id='" + this.css_id + "' class='image_box'><div id='" + this.css_id + "_inner' class='element_inner'>" + "<img src='" + this.info.img + "' class='image_element image_element_page_" + this.page_id + "' id='" + this.css_id + "_image' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" + child_html + "</img></div></div>";
 			} else if (this.isSprite()) {
-				return "<div id='" + this.css_id + "' class='image_box'><div id='" + this.css_id + "_inner' class='element_inner'>" + "<img src='" + this.info.sprite + "' class='image_element' id='" + this.css_id + "_sprite' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" + child_html + "</img></div></div>";
+				return "<div id='" + this.css_id + "' class='image_box'><div id='" + this.css_id + "_inner' class='element_inner'>" + "<img src='" + this.info.sprite + "' class='image_element image_element_page_" + this.page_id + "' id='" + this.css_id + "_sprite' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' __base_id='" + this.css_id + "' >" + child_html + "</img></div></div>";
 			} else if (this.isText()) {
-				var attrs = this.defaultAttr('element text_element');
+				var attrs = this.defaultAttr('element text_element element_page_' + this.page_id);
 				var attr_str = this.getAttrStr(attrs);
 
 				return "<div " + attr_str + "><div id='" + this.css_id + "_inner' class='element_inner'>" + "<div class='text_body' id='" + this.css_id + "-body'><span>" + this.parseText(this.info.text) + child_html + "</span></div>" + "</div></div>";
 			} else if (this.isMarkdown()) {
 				var md_array = this.parseMarkdown(this.info.markdown);
 				this.md_css = md_array[1];
-				return "<div class='element markdown_element' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + "<div id='" + this.css_id + "_inner' class='element_inner'><div class='markdown_wrap' id='md_" + this.css_id + "'>" + md_array[0] + child_html + "</div></div></div>";
+				return "<div class='element markdown_element element_page_" + this.page_id + "'  id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + "<div id='" + this.css_id + "_inner' class='element_inner'><div class='markdown_wrap' id='md_" + this.css_id + "'>" + md_array[0] + child_html + "</div></div></div>";
 			} else if (this.isVideo()) {
-				var attrs = this.defaultAttr('element video_element');
+				var attrs = this.defaultAttr('element video_element element_page_' + this.page_id + 'video_element_' + this.page_id);
 				var attr_str = this.getAttrStr(attrs);
 				return "<div " + attr_str + "><div id='" + this.css_id + "_inner' class='element_inner'>" + "<video id='" + this.css_id + "-video'  webkit-playsinline playsinline muted><source type='video/mp4' src='" + this.info.video + "'  /></video>" + child_html + "</div></div>";
 			} else if (this.isPath()) {
-				return '<div id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id + '" class="element svg_element"><div id="' + this.css_id + '_inner" class="element_inner"><svg id="' + this.css_id + '_svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"></svg></div></div>';
+				return '<div id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id + '" class="element svg_element element_page_' + this.page_id + '"><div id="' + this.css_id + '_inner" class="element_inner"><svg id="' + this.css_id + '_svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"></svg></div></div>';
 			} else if (this.isDiv()) {
-				return "<div class='element boxelement-" + this.page_id + "' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>";
+				return "<div class='element boxelement-" + this.page_id + " element_page_" + this.page_id + "' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>";
 			} else {
 				return "";
 			}
@@ -2652,225 +2676,225 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var SwipePage = function () {
-			function SwipePage(page, scene, index) {
-						_classCallCheck(this, SwipePage);
+	function SwipePage(page, scene, index) {
+		_classCallCheck(this, SwipePage);
 
-						if (scene) {
-									page = SwipeParser.inheritProperties(page, scene);
-						}
-						this.page = page;
-						this.scene = scene;
-						this.index = index;
-						this.elements = [];
-						this.duration = this.page["duration"] ? this.page["duration"] * 1000 : 200;
-						this.bc = this.page["bc"] || "#ffffff";
-						this.play_style = this.page["play"] || "auto";
-						this.transition = this.page["transition"] || (this.play_style == "scroll" ? "replace" : "scroll");
+		if (scene) {
+			page = SwipeParser.inheritProperties(page, scene);
+		}
+		this.page = page;
+		this.scene = scene;
+		this.index = index;
+		this.elements = [];
+		this.duration = this.page["duration"] ? this.page["duration"] * 1000 : 200;
+		this.bc = this.page["bc"] || "#ffffff";
+		this.play_style = this.page["play"] || "auto";
+		this.transition = this.page["transition"] || (this.play_style == "scroll" ? "replace" : "scroll");
+	}
+
+	_createClass(SwipePage, [{
+		key: "loadElement",
+		value: function loadElement() {
+			var instance = this;
+			var elems = [];
+			if (this.page["elements"]) {
+				this.page["elements"].forEach(function (element, elem_index) {
+					instance.elements.push(new SwipeElement(element, instance.index, elem_index, instance.play_style, instance.duration));
+				});
+			}
+		}
+	}, {
+		key: "elementLoad",
+		value: function elementLoad(element) {
+			var ret = [];
+			var instance = this;
+
+			ret.push(element);
+			if (element["elements"]) {
+				element["elements"].forEach(function (elem, elem_index) {
+					instance.elementLoad(elem).forEach(function (elem2, elem_index2) {
+						var copy_obj = Object.assign({}, element);
+						delete copy_obj.elements;
+						ret.push($.extend(true, copy_obj, elem2));
+					});
+				});
 			}
 
-			_createClass(SwipePage, [{
-						key: "loadElement",
-						value: function loadElement() {
-									var instance = this;
-									var elems = [];
-									if (this.page["elements"]) {
-												this.page["elements"].forEach(function (element, elem_index) {
-															instance.elements.push(new SwipeElement(element, instance.index, elem_index, instance.play_style, instance.duration));
-												});
-									}
-						}
-			}, {
-						key: "elementLoad",
-						value: function elementLoad(element) {
-									var ret = [];
-									var instance = this;
+			return ret;
+		}
+	}, {
+		key: "getHtml",
+		value: function getHtml() {
+			var instance = this;
+			var elems = [];
+			this.elements.forEach(function (element, elem_index) {
+				elems.push(element.html());
+			});
+			// todo snbinder
+			return "<div id='page_" + this.index + "' class='page' __page_id='" + this.index + "'>" + elems.join("") + "</div>";
+		}
+	}, {
+		key: "getBc",
+		value: function getBc() {
+			return this.bc;
+		}
+	}, {
+		key: "getTransition",
+		value: function getTransition() {
+			return this.transition;
+		}
+	}, {
+		key: "getPlayStyle",
+		value: function getPlayStyle() {
+			return this.play_style;
+		}
+	}, {
+		key: "initElement",
+		value: function initElement(index) {
+			var indexes = index.split("-");
+			if (indexes.length == 1) {
+				this.elements[index].initData();
+			} else {
+				this.elements[indexes.shift()].initData(indexes.join("-"));
+			}
+		}
+	}, {
+		key: "getElement",
+		value: function getElement(index) {
+			var indexes = index.split("-");
+			if (indexes.length == 1) {
+				return this.elements[index].getElement();
+			} else {
+				return this.elements[indexes.shift()].getElement(indexes.join("-"));
+			}
+		}
+	}, {
+		key: "resize",
+		value: function resize() {
+			this.elements.forEach(function (element, elem_index) {
+				element.resize();
+			});
+		}
+	}, {
+		key: "justShow",
+		value: function justShow() {
+			this.elements.forEach(function (element, elem_index) {
+				element.justShow();
+			});
+		}
+	}, {
+		key: "show",
+		value: function show() {
+			var instance = this;
+			this.elements.forEach(function (element, elem_index) {
+				element.show();
+			});
 
-									ret.push(element);
-									if (element["elements"]) {
-												element["elements"].forEach(function (elem, elem_index) {
-															instance.elementLoad(elem).forEach(function (elem2, elem_index2) {
-																		var copy_obj = Object.assign({}, element);
-																		delete copy_obj.elements;
-																		ret.push($.extend(true, copy_obj, elem2));
-															});
-												});
-									}
+			setTimeout(function () {
+				instance.speech(instance);
+			}, this.duration);
+		}
+	}, {
+		key: "animateShow",
+		value: function animateShow() {
+			this.elements.forEach(function (element, elem_index) {
+				element.animateShow();
+			});
+		}
+	}, {
+		key: "animateShowBack",
+		value: function animateShowBack() {
+			this.elements.forEach(function (element, elem_index) {
+				element.animateShowBack();
+			});
+		}
+	}, {
+		key: "delayShow",
+		value: function delayShow() {
+			var instance = this;
+			this.elements.forEach(function (element, elem_index) {
+				element.delayShow();
+			});
+			setTimeout(function () {
+				instance.speech(instance);
+			}, this.duration);
+		}
+	}, {
+		key: "back",
+		value: function back() {
+			var instance = this;
+			this.elements.forEach(function (element, elem_index) {
+				element.back();
+			});
+			setTimeout(function () {
+				instance.speech(instance);
+			}, this.duration);
+		}
+	}, {
+		key: "finShow",
+		value: function finShow() {
+			var instance = this;
+			this.elements.forEach(function (element, elem_index) {
+				element.finShow();
+			});
+		}
+	}, {
+		key: "prevShow",
+		value: function prevShow() {
+			this.elements.forEach(function (element, elem_index) {
+				element.prevShow();
+			});
+		}
+	}, {
+		key: "pause",
+		value: function pause() {
+			this.elements.forEach(function (element, elem_index) {
+				element.pause();
+			});
+		}
+	}, {
+		key: "doLoopProcess",
+		value: function doLoopProcess() {
+			this.elements.forEach(function (element, elem_index) {
+				element.doLoopProcess();
+			});
+		}
+	}, {
+		key: "getScene",
+		value: function getScene() {
+			return this.scene;
+		}
 
-									return ret;
-						}
-			}, {
-						key: "getHtml",
-						value: function getHtml() {
-									var instance = this;
-									var elems = [];
-									this.elements.forEach(function (element, elem_index) {
-												elems.push(element.html());
-									});
-									// todo snbinder
-									return "<div id='page_" + this.index + "' class='page' __page_id='" + this.index + "'>" + elems.join("") + "</div>";
-						}
-			}, {
-						key: "getBc",
-						value: function getBc() {
-									return this.bc;
-						}
-			}, {
-						key: "getTransition",
-						value: function getTransition() {
-									return this.transition;
-						}
-			}, {
-						key: "getPlayStyle",
-						value: function getPlayStyle() {
-									return this.play_style;
-						}
-			}, {
-						key: "initElement",
-						value: function initElement(index) {
-									var indexes = index.split("-");
-									if (indexes.length == 1) {
-												this.elements[index].initData();
-									} else {
-												this.elements[indexes.shift()].initData(indexes.join("-"));
-									}
-						}
-			}, {
-						key: "getElement",
-						value: function getElement(index) {
-									var indexes = index.split("-");
-									if (indexes.length == 1) {
-												return this.elements[index].getElement();
-									} else {
-												return this.elements[indexes.shift()].getElement(indexes.join("-"));
-									}
-						}
-			}, {
-						key: "resize",
-						value: function resize() {
-									this.elements.forEach(function (element, elem_index) {
-												element.resize();
-									});
-						}
-			}, {
-						key: "justShow",
-						value: function justShow() {
-									this.elements.forEach(function (element, elem_index) {
-												element.justShow();
-									});
-						}
-			}, {
-						key: "show",
-						value: function show() {
-									var instance = this;
-									this.elements.forEach(function (element, elem_index) {
-												element.show();
-									});
+		// todo locale
 
-									setTimeout(function () {
-												instance.speech(instance);
-									}, this.duration);
-						}
-			}, {
-						key: "animateShow",
-						value: function animateShow() {
-									this.elements.forEach(function (element, elem_index) {
-												element.animateShow();
-									});
-						}
-			}, {
-						key: "animateShowBack",
-						value: function animateShowBack() {
-									this.elements.forEach(function (element, elem_index) {
-												element.animateShowBack();
-									});
-						}
-			}, {
-						key: "delayShow",
-						value: function delayShow() {
-									var instance = this;
-									this.elements.forEach(function (element, elem_index) {
-												element.delayShow();
-									});
-									setTimeout(function () {
-												instance.speech(instance);
-									}, this.duration);
-						}
-			}, {
-						key: "back",
-						value: function back() {
-									var instance = this;
-									this.elements.forEach(function (element, elem_index) {
-												element.back();
-									});
-									setTimeout(function () {
-												instance.speech(instance);
-									}, this.duration);
-						}
-			}, {
-						key: "finShow",
-						value: function finShow() {
-									var instance = this;
-									this.elements.forEach(function (element, elem_index) {
-												element.finShow();
-									});
-						}
-			}, {
-						key: "prevShow",
-						value: function prevShow() {
-									this.elements.forEach(function (element, elem_index) {
-												element.prevShow();
-									});
-						}
-			}, {
-						key: "pause",
-						value: function pause() {
-									this.elements.forEach(function (element, elem_index) {
-												element.pause();
-									});
-						}
-			}, {
-						key: "doLoopProcess",
-						value: function doLoopProcess() {
-									this.elements.forEach(function (element, elem_index) {
-												element.doLoopProcess();
-									});
-						}
-			}, {
-						key: "getScene",
-						value: function getScene() {
-									return this.scene;
-						}
+	}, {
+		key: "speech",
+		value: function speech(instance) {
+			var userAgent = window.navigator.userAgent.toLowerCase();
+			if (userAgent.indexOf('chrome') != -1 || userAgent.indexOf('safari') != -1) {
+				if (instance.page["speech"]) {
+					speechSynthesis.speak(new SpeechSynthesisUtterance(instance.page["speech"]["text"]));
+				}
+			}
+		}
+	}, {
+		key: "active",
+		value: function active() {
+			this.elements.forEach(function (element, elem_index) {
+				element.active();
+			});
+		}
+	}, {
+		key: "inactive",
+		value: function inactive() {
+			var instance = this;
+			this.elements.forEach(function (element, elem_index) {
+				element.inactive();
+			});
+		}
+	}]);
 
-						// todo locale
-
-			}, {
-						key: "speech",
-						value: function speech(instance) {
-									var userAgent = window.navigator.userAgent.toLowerCase();
-									if (userAgent.indexOf('chrome') != -1 || userAgent.indexOf('safari') != -1) {
-												if (instance.page["speech"]) {
-															speechSynthesis.speak(new SpeechSynthesisUtterance(instance.page["speech"]["text"]));
-												}
-									}
-						}
-			}, {
-						key: "active",
-						value: function active() {
-									this.elements.forEach(function (element, elem_index) {
-												element.active();
-									});
-						}
-			}, {
-						key: "inactive",
-						value: function inactive() {
-									var instance = this;
-									this.elements.forEach(function (element, elem_index) {
-												element.inactive();
-									});
-						}
-			}]);
-
-			return SwipePage;
+	return SwipePage;
 }();
 "use strict";
 
@@ -2881,196 +2905,196 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var SwipeParser = function () {
-			function SwipeParser() {
-						var _handlers = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	function SwipeParser() {
+		var _handlers = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-						_classCallCheck(this, SwipeParser);
+		_classCallCheck(this, SwipeParser);
+	}
+
+	_createClass(SwipeParser, null, [{
+		key: "parseColor",
+		value: function parseColor(info, defaultColor) {
+			if (info && info["color"]) {
+				return info["color"];
+			}
+			if (info && info["textColor"]) {
+				return info["textColor"];
+			}
+			return defaultColor;
+		}
+	}, {
+		key: "transformedPath",
+		value: function transformedPath() {
+			// not implement
+		}
+	}, {
+		key: "parseTransform",
+		value: function parseTransform() {
+			// not implement
+		}
+	}, {
+		key: "is",
+		value: function is(type, obj) {
+			var clas = Object.prototype.toString.call(obj).slice(8, -1);
+			return obj !== undefined && obj !== null && clas === type;
+		}
+	}, {
+		key: "inheritProperties",
+		value: function inheritProperties(obj, tempObj) {
+			var ret = SwipeParser.clone(obj);
+			var idMap = {};
+			if (tempObj) {
+				var tempClone = SwipeParser.clone(tempObj);
+				$.each(tempClone, function (keyString, tempValue) {
+					var ret_val = SwipeParser.clone(tempValue);
+
+					if (ret[keyString] == null) {
+						ret[keyString] = ret_val;
+					} else {
+						if (SwipeParser.is("Array", ret[keyString]) && SwipeParser.is("Array", ret_val)) {
+							idMap = {};
+
+							$.each(ret_val, function (index, tempItem) {
+								if (SwipeParser.is("String", tempItem["id"])) {
+									idMap[tempItem["id"]] = index;
+								}
+							});
+							ret[keyString].forEach(function (objItem, key) {
+								if (SwipeParser.is("String", objItem["id"]) && (key = idMap[objItem["id"]]) != null) {
+									ret_val[key] = SwipeParser.inheritProperties(objItem, ret_val[key]);
+								} else {
+									ret_val.push(objItem);
+								}
+							});
+							ret[keyString] = ret_val;
+						}
+					}
+				});
+			}
+			return ret;
+		}
+	}, {
+		key: "localizedStringForKey",
+		value: function localizedStringForKey(key) {
+			// todo from page element
+			var pageinfo = {};
+
+			var strings;
+			if (strings = pageinfo["strings"]) {
+				var text = strings[key];
+				// todo localize
+				return SwipeParser.localizedString(text, "ja");
+			}
+			return "";
+		}
+	}, {
+		key: "localizedString",
+		value: function localizedString(params, langId) {
+			if (params[langId]) {
+				return params[langId];
+			} else {
+				return params["*"];
+			}
+			return "";
+		}
+	}, {
+		key: "parseFontSize",
+		value: function parseFontSize(info, full, defaultValue, markdown) {
+			var key = markdown ? "size" : "fontSize";
+
+			if (info[key]) {
+				return SwipeParser.parseSize(info[key], full, defaultValue);
+			}
+			return defaultValue;
+		}
+	}, {
+		key: "parseSize",
+		value: function parseSize(value, full, defaultValue) {
+			if (Number.isInteger(value)) {
+				return value;
+			}
+			if (isFinite(value)) {
+				return value;
+			}
+			return SwipeParser.parsePercent(value, full, defaultValue);
+		}
+	}, {
+		key: "parsePercent",
+		value: function parsePercent(value, full, defaultValue) {
+			var reg = /^([0-9][0-9\\.]*)%$/;
+			var match = value.match(reg);
+			if (match) {
+				return Math.floor(match[1]) / 100 * full;
+			}
+			return defaultValue;
+		}
+	}, {
+		key: "parseFontName",
+		value: function parseFontName(value, markdown) {
+			var key = markdown ? "name" : "fontName";
+			if (value) {
+				var name = value[key];
+				if (jQuery.type(name) === "string") {
+					return name;
+				} else if (jQuery.type(name) === "array") {
+					return name.join(",");
+				}
+			}
+			return "sans-serif, Helvetica";
+			// return [];
+		}
+	}, {
+		key: "parseShadow",
+		value: function parseShadow(info) {
+			var scale = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
+
+			var x = SwipeParser.parseSize((info["offset"] || [])[0], SwipeScreen.swipeheight(), 1) * scale;
+			x = SwipeScreen.virtualX(x);
+			var y = SwipeParser.parseSize((info["offset"] || [])[1], SwipeScreen.swipewidth(), 1) * scale;
+			y = SwipeScreen.virtualY(y);
+
+			var color = info["color"] || "black";
+
+			return x + "px " + y + "px 3px " + color;
+		}
+	}, {
+		key: "clone",
+		value: function clone(obj) {
+			var copy;
+
+			// Handle the 3 simple types, and null or undefined
+			if (null == obj || "object" != (typeof obj === "undefined" ? "undefined" : _typeof(obj))) return obj;
+
+			// Handle Date
+			if (obj instanceof Date) {
+				copy = new Date();
+				copy.setTime(obj.getTime());
+				return copy;
 			}
 
-			_createClass(SwipeParser, null, [{
-						key: "parseColor",
-						value: function parseColor(info, defaultColor) {
-									if (info && info["color"]) {
-												return info["color"];
-									}
-									if (info && info["textColor"]) {
-												return info["textColor"];
-									}
-									return defaultColor;
-						}
-			}, {
-						key: "transformedPath",
-						value: function transformedPath() {
-									// not implement
-						}
-			}, {
-						key: "parseTransform",
-						value: function parseTransform() {
-									// not implement
-						}
-			}, {
-						key: "is",
-						value: function is(type, obj) {
-									var clas = Object.prototype.toString.call(obj).slice(8, -1);
-									return obj !== undefined && obj !== null && clas === type;
-						}
-			}, {
-						key: "inheritProperties",
-						value: function inheritProperties(obj, tempObj) {
-									var ret = SwipeParser.clone(obj);
-									var idMap = {};
-									if (tempObj) {
-												var tempClone = SwipeParser.clone(tempObj);
-												$.each(tempClone, function (keyString, tempValue) {
-															var ret_val = SwipeParser.clone(tempValue);
+			// Handle Array
+			if (obj instanceof Array) {
+				copy = [];
+				for (var i = 0, len = obj.length; i < len; i++) {
+					copy[i] = SwipeParser.clone(obj[i]);
+				}
+				return copy;
+			}
 
-															if (ret[keyString] == null) {
-																		ret[keyString] = ret_val;
-															} else {
-																		if (SwipeParser.is("Array", ret[keyString]) && SwipeParser.is("Array", ret_val)) {
-																					idMap = {};
+			// Handle Object
+			if (obj instanceof Object) {
+				copy = {};
+				for (var attr in obj) {
+					if (obj.hasOwnProperty(attr)) copy[attr] = SwipeParser.clone(obj[attr]);
+				}
+				return copy;
+			}
 
-																					$.each(ret_val, function (index, tempItem) {
-																								if (SwipeParser.is("String", tempItem["id"])) {
-																											idMap[tempItem["id"]] = index;
-																								}
-																					});
-																					ret[keyString].forEach(function (objItem, key) {
-																								if (SwipeParser.is("String", objItem["id"]) && (key = idMap[objItem["id"]]) != null) {
-																											ret_val[key] = SwipeParser.inheritProperties(objItem, ret_val[key]);
-																								} else {
-																											ret_val.push(objItem);
-																								}
-																					});
-																					ret[keyString] = ret_val;
-																		}
-															}
-												});
-									}
-									return ret;
-						}
-			}, {
-						key: "localizedStringForKey",
-						value: function localizedStringForKey(key) {
-									// todo from page element
-									var pageinfo = {};
+			throw new Error("Unable to copy obj! Its type isn't supported.");
+		}
+	}]);
 
-									var strings;
-									if (strings = pageinfo["strings"]) {
-												var text = strings[key];
-												// todo localize
-												return SwipeParser.localizedString(text, "ja");
-									}
-									return "";
-						}
-			}, {
-						key: "localizedString",
-						value: function localizedString(params, langId) {
-									if (params[langId]) {
-												return params[langId];
-									} else {
-												return params["*"];
-									}
-									return "";
-						}
-			}, {
-						key: "parseFontSize",
-						value: function parseFontSize(info, full, defaultValue, markdown) {
-									var key = markdown ? "size" : "fontSize";
-
-									if (info[key]) {
-												return SwipeParser.parseSize(info[key], full, defaultValue);
-									}
-									return defaultValue;
-						}
-			}, {
-						key: "parseSize",
-						value: function parseSize(value, full, defaultValue) {
-									if (Number.isInteger(value)) {
-												return value;
-									}
-									if (isFinite(value)) {
-												return value;
-									}
-									return SwipeParser.parsePercent(value, full, defaultValue);
-						}
-			}, {
-						key: "parsePercent",
-						value: function parsePercent(value, full, defaultValue) {
-									var reg = /^([0-9][0-9\\.]*)%$/;
-									var match = value.match(reg);
-									if (match) {
-												return Math.floor(match[1]) / 100 * full;
-									}
-									return defaultValue;
-						}
-			}, {
-						key: "parseFontName",
-						value: function parseFontName(value, markdown) {
-									var key = markdown ? "name" : "fontName";
-									if (value) {
-												var name = value[key];
-												if (jQuery.type(name) === "string") {
-															return name;
-												} else if (jQuery.type(name) === "array") {
-															return name.join(",");
-												}
-									}
-									return "sans-serif, Helvetica";
-									// return [];
-						}
-			}, {
-						key: "parseShadow",
-						value: function parseShadow(info) {
-									var scale = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
-
-									var x = SwipeParser.parseSize((info["offset"] || [])[0], SwipeScreen.swipeheight(), 1) * scale;
-									x = SwipeScreen.virtualX(x);
-									var y = SwipeParser.parseSize((info["offset"] || [])[1], SwipeScreen.swipewidth(), 1) * scale;
-									y = SwipeScreen.virtualY(y);
-
-									var color = info["color"] || "black";
-
-									return x + "px " + y + "px 3px " + color;
-						}
-			}, {
-						key: "clone",
-						value: function clone(obj) {
-									var copy;
-
-									// Handle the 3 simple types, and null or undefined
-									if (null == obj || "object" != (typeof obj === "undefined" ? "undefined" : _typeof(obj))) return obj;
-
-									// Handle Date
-									if (obj instanceof Date) {
-												copy = new Date();
-												copy.setTime(obj.getTime());
-												return copy;
-									}
-
-									// Handle Array
-									if (obj instanceof Array) {
-												copy = [];
-												for (var i = 0, len = obj.length; i < len; i++) {
-															copy[i] = SwipeParser.clone(obj[i]);
-												}
-												return copy;
-									}
-
-									// Handle Object
-									if (obj instanceof Object) {
-												copy = {};
-												for (var attr in obj) {
-															if (obj.hasOwnProperty(attr)) copy[attr] = SwipeParser.clone(obj[attr]);
-												}
-												return copy;
-									}
-
-									throw new Error("Unable to copy obj! Its type isn't supported.");
-						}
-			}]);
-
-			return SwipeParser;
+	return SwipeParser;
 }();
 "use strict";
 
@@ -3079,129 +3103,129 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var SwipeScreen = function () {
-			function SwipeScreen() {
-						_classCallCheck(this, SwipeScreen);
+	function SwipeScreen() {
+		_classCallCheck(this, SwipeScreen);
+	}
+
+	_createClass(SwipeScreen, null, [{
+		key: "getSize",
+		value: function getSize() {
+			if (this.size) {
+				return this.size;
+			} else {
+				return 100;
+			}
+		}
+	}, {
+		key: "setSize",
+		value: function setSize(size) {
+			this.size = size;
+		}
+	}, {
+		key: "init",
+		value: function init(width, height) {
+			this.width = width;
+			this.height = height;
+
+			if (this.width == 0) {
+				this.width = this.height * $(window).width() / $(window).height();
+			}
+			if (this.height == 0) {
+				this.height = this.width * $(window).height() / $(window).width();
 			}
 
-			_createClass(SwipeScreen, null, [{
-						key: "getSize",
-						value: function getSize() {
-									if (this.size) {
-												return this.size;
-									} else {
-												return 100;
-									}
-						}
-			}, {
-						key: "setSize",
-						value: function setSize(size) {
-									this.size = size;
-						}
-			}, {
-						key: "init",
-						value: function init(width, height) {
-									this.width = width;
-									this.height = height;
+			SwipeScreen.setOriginalSize();
+			SwipeScreen.setVirtualSize();
+		}
+	}, {
+		key: "setOriginalSize",
+		value: function setOriginalSize() {
+			this.window_width = $(window).width();
+			this.window_height = $(window).height();
+		}
 
-									if (this.width == 0) {
-												this.width = this.height * $(window).width() / $(window).height();
-									}
-									if (this.height == 0) {
-												this.height = this.width * $(window).height() / $(window).width();
-									}
+		// todo
+		//  set vertical and horizontal mode
 
-									SwipeScreen.setOriginalSize();
-									SwipeScreen.setVirtualSize();
-						}
-			}, {
-						key: "setOriginalSize",
-						value: function setOriginalSize() {
-									this.window_width = $(window).width();
-									this.window_height = $(window).height();
-						}
+	}, {
+		key: "setVirtualSize",
+		value: function setVirtualSize() {
+			var real_ration = this.window_width / this.window_height;
+			var virtual_ration = this.width / this.height;
+			this.ration = 1.0;
 
-						// todo
-						//  set vertical and horizontal mode
+			if (real_ration / virtual_ration >= 1) {
+				this.virtual_height = $(window).height();
+				this.virtual_width = this.width / this.height * this.virtual_height;
+			} else {
+				this.virtual_width = $(window).width();
+				this.virtual_height = this.height / this.width * this.virtual_width;
+			}
+			if (this.size) {
+				this.virtual_width = this.virtual_width * this.size / 100;
+				this.virtual_height = this.virtual_height * this.size / 100;
+			}
+			this.ration = this.virtual_width / this.width;
+		}
+	}, {
+		key: "getRation",
+		value: function getRation() {
+			return this.ration;
+		}
+	}, {
+		key: "swipewidth",
+		value: function swipewidth() {
+			return this.width;
+		}
+	}, {
+		key: "swipeheight",
+		value: function swipeheight() {
+			return this.height;
+		}
+	}, {
+		key: "virtualwidth",
+		value: function virtualwidth() {
+			return this.virtual_width;
+		}
+	}, {
+		key: "virtualheight",
+		value: function virtualheight() {
+			return this.virtual_height;
+		}
+	}, {
+		key: "refresh",
+		value: function refresh() {
+			SwipeScreen.setOriginalSize();
+			SwipeScreen.setVirtualSize();
+		}
 
-			}, {
-						key: "setVirtualSize",
-						value: function setVirtualSize() {
-									var real_ration = this.window_width / this.window_height;
-									var virtual_ration = this.width / this.height;
-									this.ration = 1.0;
+		// width
 
-									if (real_ration / virtual_ration >= 1) {
-												this.virtual_height = $(window).height();
-												this.virtual_width = this.width / this.height * this.virtual_height;
-									} else {
-												this.virtual_width = $(window).width();
-												this.virtual_height = this.height / this.width * this.virtual_width;
-									}
-									if (this.size) {
-												this.virtual_width = this.virtual_width * this.size / 100;
-												this.virtual_height = this.virtual_height * this.size / 100;
-									}
-									this.ration = this.virtual_width / this.width;
-						}
-			}, {
-						key: "getRation",
-						value: function getRation() {
-									return this.ration;
-						}
-			}, {
-						key: "swipewidth",
-						value: function swipewidth() {
-									return this.width;
-						}
-			}, {
-						key: "swipeheight",
-						value: function swipeheight() {
-									return this.height;
-						}
-			}, {
-						key: "virtualwidth",
-						value: function virtualwidth() {
-									return this.virtual_width;
-						}
-			}, {
-						key: "virtualheight",
-						value: function virtualheight() {
-									return this.virtual_height;
-						}
-			}, {
-						key: "refresh",
-						value: function refresh() {
-									SwipeScreen.setOriginalSize();
-									SwipeScreen.setVirtualSize();
-						}
+	}, {
+		key: "virtualX",
+		value: function virtualX(x) {
+			if (x == undefined) {
+				return this.virtual_width;
+			}
+			if (this.width) {
+				return x / this.width * this.virtual_width;
+			}
+			return x;
+		}
+	}, {
+		key: "virtualY",
+		value: function virtualY(y) {
+			if (y == undefined) {
+				return this.virtual_height;
+			}
+			if (this.height) {
+				return y / this.height * this.virtual_height;
+			}
+			return y;
+		}
+	}]);
 
-						// width
-
-			}, {
-						key: "virtualX",
-						value: function virtualX(x) {
-									if (x == undefined) {
-												return this.virtual_width;
-									}
-									if (this.width) {
-												return x / this.width * this.virtual_width;
-									}
-									return x;
-						}
-			}, {
-						key: "virtualY",
-						value: function virtualY(y) {
-									if (y == undefined) {
-												return this.virtual_height;
-									}
-									if (this.height) {
-												return y / this.height * this.virtual_height;
-									}
-									return y;
-						}
-			}]);
-
-			return SwipeScreen;
+	return SwipeScreen;
 }();
 'use strict';
 
@@ -3210,116 +3234,116 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var SwipeTouch = function () {
-			function SwipeTouch() {
-						_classCallCheck(this, SwipeTouch);
+	function SwipeTouch() {
+		_classCallCheck(this, SwipeTouch);
+	}
+
+	_createClass(SwipeTouch, null, [{
+		key: 'init',
+		value: function init() {
+			var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+			this.startY = 0;
+			this.currentY = 0;
+			this.diff = 0;
+			this.ration = 0;
+			this.options = options;
+			this.status = "stop";
+
+			var dom = options.dom ? options.dom : window;
+
+			var scroll_event = 'onwheel' in document ? 'wheel' : 'onmousewheel' in document ? 'mousewheel' : 'DOMMouseScroll';
+
+			var self = this;
+			$(window).on("scrollstart", function (e) {
+				var current = e.originalEvent.clientY ? e.originalEvent.clientY : event.changedTouches[0].pageY;
+
+				self.currentY = current;
+				self.startY = current;
+				SwipeTouch.start_event(e);
+				//$("#debug").html("start" + current);
+			}).on(scroll_event, function (e) {
+				e.preventDefault();
+
+				var delta = e.originalEvent.deltaY ? -e.originalEvent.deltaY : e.originalEvent.wheelDelta ? e.originalEvent.wheelDelta : -e.originalEvent.detail;
+				if (delta || delta === 0) {
+					self.currentY = self.currentY - delta;
+				} else {
+					self.currentY = event.changedTouches[0].pageY;
+				}
+				//$("#debug").html("scroll" + self.currentY );
+				self.diff = self.currentY - self.startY;
+				self.ration = self.diff / $(window).innerHeight();
+
+				if (self.ration > 1) {
+					self.ration = 1;
+				}
+				if (self.ration < -1) {
+					self.ration = -1;
+				}
+
+				SwipeTouch.scroll_event_handler(e, self.ration);
+			}).on("scrollstop", function (e) {
+				//$("#debug").html("scroll stop");
+				SwipeTouch.stop_event(e);
+			}).on("touchstart", function (e) {
+				var current = e.originalEvent.clientY ? e.originalEvent.clientY : event.changedTouches[0].pageY;
+				self.startY = current;
+				SwipeTouch.start_event(e);
+			}).on('touchmove.noScroll', function (e) {
+				e.preventDefault();
+
+				var current = e.originalEvent && e.originalEvent.pageY ? e.originalEvent.pageY : event.changedTouches[0].pageY;
+				self.diff = self.startY - current;
+				self.ration = self.diff / $(window).innerHeight();
+				//$("#debug").html("touchmove" + self.startY +":" + current );
+				SwipeTouch.scroll_event_handler(e, self.ration);
+			}).on("touchend", function (e) {
+				//$("#debug").html("touchend");
+				SwipeTouch.stop_event(e);
+			});
+		}
+	}, {
+		key: 'scroll_event_handler',
+		value: function scroll_event_handler(event, ration) {
+			console.log("scroll");
+			this.status = "scroll";
+			if (this.options.scroll_callback) {
+				this.options.scroll_callback(event, ration);
 			}
+		}
+	}, {
+		key: 'stop_event',
+		value: function stop_event(event) {
+			console.log("stop");
+			this.status = "stop";
+			if (this.options.stop_callback) {
+				this.options.stop_callback(event, this.ration);
+			}
+		}
+	}, {
+		key: 'getRation',
+		value: function getRation() {
+			return this.ration;
+		}
+	}, {
+		key: 'start_event',
+		value: function start_event() {
+			this.ration = 0;
+			console.log("start");
+			this.status = "start";
+			if (this.options.start_callback) {
+				this.options.start_callback(event, this.ration);
+			}
+		}
+	}, {
+		key: 'getStatus',
+		value: function getStatus() {
+			return this.status;
+		}
+	}]);
 
-			_createClass(SwipeTouch, null, [{
-						key: 'init',
-						value: function init() {
-									var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-									this.startY = 0;
-									this.currentY = 0;
-									this.diff = 0;
-									this.ration = 0;
-									this.options = options;
-									this.status = "stop";
-
-									var dom = options.dom ? options.dom : window;
-
-									var scroll_event = 'onwheel' in document ? 'wheel' : 'onmousewheel' in document ? 'mousewheel' : 'DOMMouseScroll';
-
-									var self = this;
-									$(window).on("scrollstart", function (e) {
-												var current = e.originalEvent.clientY ? e.originalEvent.clientY : event.changedTouches[0].pageY;
-
-												self.currentY = current;
-												self.startY = current;
-												SwipeTouch.start_event(e);
-												//$("#debug").html("start" + current);
-									}).on(scroll_event, function (e) {
-												e.preventDefault();
-
-												var delta = e.originalEvent.deltaY ? -e.originalEvent.deltaY : e.originalEvent.wheelDelta ? e.originalEvent.wheelDelta : -e.originalEvent.detail;
-												if (delta || delta === 0) {
-															self.currentY = self.currentY - delta;
-												} else {
-															self.currentY = event.changedTouches[0].pageY;
-												}
-												//$("#debug").html("scroll" + self.currentY );
-												self.diff = self.currentY - self.startY;
-												self.ration = self.diff / $(window).innerHeight();
-
-												if (self.ration > 1) {
-															self.ration = 1;
-												}
-												if (self.ration < -1) {
-															self.ration = -1;
-												}
-
-												SwipeTouch.scroll_event_handler(e, self.ration);
-									}).on("scrollstop", function (e) {
-												//$("#debug").html("scroll stop");
-												SwipeTouch.stop_event(e);
-									}).on("touchstart", function (e) {
-												var current = e.originalEvent.clientY ? e.originalEvent.clientY : event.changedTouches[0].pageY;
-												self.startY = current;
-												SwipeTouch.start_event(e);
-									}).on('touchmove.noScroll', function (e) {
-												e.preventDefault();
-
-												var current = e.originalEvent && e.originalEvent.pageY ? e.originalEvent.pageY : event.changedTouches[0].pageY;
-												self.diff = self.startY - current;
-												self.ration = self.diff / $(window).innerHeight();
-												//$("#debug").html("touchmove" + self.startY +":" + current );
-												SwipeTouch.scroll_event_handler(e, self.ration);
-									}).on("touchend", function (e) {
-												//$("#debug").html("touchend");
-												SwipeTouch.stop_event(e);
-									});
-						}
-			}, {
-						key: 'scroll_event_handler',
-						value: function scroll_event_handler(event, ration) {
-									console.log("scroll");
-									this.status = "scroll";
-									if (this.options.scroll_callback) {
-												this.options.scroll_callback(event, ration);
-									}
-						}
-			}, {
-						key: 'stop_event',
-						value: function stop_event(event) {
-									console.log("stop");
-									this.status = "stop";
-									if (this.options.stop_callback) {
-												this.options.stop_callback(event, this.ration);
-									}
-						}
-			}, {
-						key: 'getRation',
-						value: function getRation() {
-									return this.ration;
-						}
-			}, {
-						key: 'start_event',
-						value: function start_event() {
-									this.ration = 0;
-									console.log("start");
-									this.status = "start";
-									if (this.options.start_callback) {
-												this.options.start_callback(event, this.ration);
-									}
-						}
-			}, {
-						key: 'getStatus',
-						value: function getStatus() {
-									return this.status;
-						}
-			}]);
-
-			return SwipeTouch;
+	return SwipeTouch;
 }();
 "use strict";
 
@@ -3328,234 +3352,234 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var SwipeUtil = function () {
-			function SwipeUtil() {
-						_classCallCheck(this, SwipeUtil);
+	function SwipeUtil() {
+		_classCallCheck(this, SwipeUtil);
+	}
+
+	_createClass(SwipeUtil, null, [{
+		key: "getParameterByName",
+		value: function getParameterByName(name, url) {
+			if (!url) url = window.location.href;
+			name = name.replace(/[\[\]]/g, "\\$&");
+			var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+			    results = regex.exec(url);
+			if (!results) return null;
+			if (!results[2]) return '';
+			return decodeURIComponent(results[2].replace(/\+/g, " "));
+		}
+	}, {
+		key: "initSwipe",
+		value: function initSwipe(data, css_id, back_css_id) {
+			$(document.body).css({ "margin": 0, "padding": 0, "background-color": "#fff", "font-size": "26px" });
+			$('div').css({ "margin": 0, "padding": 0, "background-color": "#fff", "font-size": "26px" });
+
+			var default_page = 0;
+
+			if (location.hash) {
+				default_page = Number(location.hash.substr(1));
 			}
 
-			_createClass(SwipeUtil, null, [{
-						key: "getParameterByName",
-						value: function getParameterByName(name, url) {
-									if (!url) url = window.location.href;
-									name = name.replace(/[\[\]]/g, "\\$&");
-									var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-									    results = regex.exec(url);
-									if (!results) return null;
-									if (!results[2]) return '';
-									return decodeURIComponent(results[2].replace(/\+/g, " "));
+			var swipe_book = new SwipeBook(data, default_page, css_id, back_css_id);
+			this.swipe_book = swipe_book;
+
+			$(css_id).on("click", function () {
+				swipe_book.next();
+			});
+
+			$(window).on('hashchange', function () {
+				if ("#" + swipe_book.getStep() != location.hash) {
+					swipe_book.show(Number(location.hash.substr(1)));
+				}
+			});
+
+			$(window).resize(function () {
+				clearTimeout(window.resizedFinished);
+				window.resizedFinished = setTimeout(function () {
+					swipe_book.resize();
+				}, 250);
+			});
+
+			if (SwipeUtil.getParameterByName("autoplay") === "1") {
+				var autoplayDuration = SwipeUtil.getParameterByName("autoplayDuration") || 1000;
+				console.log("duatio " + autoplayDuration);
+				var autoplay = function autoplay() {
+					setTimeout(function () {
+						swipe_book.next();
+						var current = Number(location.hash.substr(1));
+						console.log(swipe_book.getPageSize());
+						if (swipe_book.getPageSize() > current + 1) {
+							autoplay();
+						} else if (SwipeUtil.getParameterByName("autoloop") === "1") {
+							setTimeout(function () {
+								swipe_book.show(0);
+								autoplay();
+							}, autoplayDuration);
 						}
-			}, {
-						key: "initSwipe",
-						value: function initSwipe(data, css_id, back_css_id) {
-									$(document.body).css({ "margin": 0, "padding": 0, "background-color": "#fff", "font-size": "26px" });
-									$('div').css({ "margin": 0, "padding": 0, "background-color": "#fff", "font-size": "26px" });
+					}, autoplayDuration);
+				};
+				autoplay();
+			}
+		}
+	}, {
+		key: "getSwipeBook",
+		value: function getSwipeBook() {
+			return this.swipe_book;
+		}
+	}, {
+		key: "merge",
+		value: function merge(object1, object2) {
+			var newObject = {};
+			var keys = Object.keys(object1);
+			for (var i = 0; i < keys.length; i++) {
+				newObject[keys[i]] = object1[keys[i]];
+			}
+			keys = Object.keys(object2);
+			for (i = 0; i < keys.length; i++) {
+				newObject[keys[i]] = object2[keys[i]];
+			}
+			return newObject;
+		}
+	}, {
+		key: "initTouchSwipe",
+		value: function initTouchSwipe(data) {
+			$(document.body).css({ "margin": 0, "padding": 0, "background-color": "#fff", "font-size": "26px" });
+			$('div').css({ "margin": 0, "padding": 0, "background-color": "#fff", "font-size": "26px" });
+			$('#swipe_back').css({ "touch-action": "none" });
 
-									var default_page = 0;
+			var swipe_book = new SwipeBook(data, 0, "#swipe", "#swipe_back");
+			this.swipe_book = swipe_book;
+			this.ration = null;
+			$(window).resize(function () {
+				clearTimeout(window.resizedFinished);
+				window.resizedFinished = setTimeout(function () {
+					swipe_book.resize();
+				}, 250);
+			});
 
-									if (location.hash) {
-												default_page = Number(location.hash.substr(1));
-									}
+			$.extend($.easing, {
+				swipe: function swipe(x, t, b, c, d) {
+					return Math.abs(SwipeUtil.getRation());
+				},
+				swipeangle: function swipeangle(x, t, b, c, d) {
+					return b + Math.abs(SwipeUtil.getRation()) * c;
+				}
 
-									var swipe_book = new SwipeBook(data, default_page, css_id, back_css_id);
-									this.swipe_book = swipe_book;
+			});
 
-									$(css_id).on("click", function () {
-												swipe_book.next();
-									});
+			SwipeTouch.init({
+				start_callback: SwipeUtil.start_event,
+				scroll_callback: SwipeUtil.scroll_event_handler,
+				stop_callback: SwipeUtil.stop_event
+			});
+		}
+	}, {
+		key: "getRation",
+		value: function getRation() {
+			return this.ration;
+		}
+	}, {
+		key: "setRation",
+		value: function setRation(ration) {
+			this.ration = ration;
+		}
+	}, {
+		key: "getStatus",
+		value: function getStatus() {
+			return this.status;
+		}
+	}, {
+		key: "setStatus",
+		value: function setStatus(status) {
+			this.status = status;
+		}
+	}, {
+		key: "start_event",
+		value: function start_event(event, ration) {
+			var swipe_book = SwipeUtil.getSwipeBook();
+			if (SwipeUtil.getStatus() == "stopping") {
+				SwipeUtil.stop();
+			}
+			this.ration = 0;
+			console.log("start ration " + String(ration));
+			SwipeUtil.setStatus("start");
+		}
+	}, {
+		key: "scroll_event_handler",
+		value: function scroll_event_handler(event, ration) {
+			var currentStatus = "start";
+			SwipeUtil.setRation(ration);
+			if (ration > 0) {
+				currentStatus = "forward";
+			}
+			if (ration < 0) {
+				currentStatus = "back";
+			}
 
-									$(window).on('hashchange', function () {
-												if ("#" + swipe_book.getStep() != location.hash) {
-															swipe_book.show(Number(location.hash.substr(1)));
-												}
-									});
+			var swipe_book = SwipeUtil.getSwipeBook();
+			if (currentStatus != SwipeUtil.getStatus()) {
+				if (currentStatus == "forward") {
+					if (SwipeUtil.getStatus() == "back") {
+						swipe_book.prevHide();
+					}
+					swipe_book.nextStart(ration);
+				}
+				if (currentStatus == "back") {
+					if (SwipeUtil.getStatus() == "forward") {
+						swipe_book.nextHide();
+					}
+					swipe_book.prevStart(ration);
+				}
+				SwipeUtil.setStatus(currentStatus);
+			}
 
-									$(window).resize(function () {
-												clearTimeout(window.resizedFinished);
-												window.resizedFinished = setTimeout(function () {
-															swipe_book.resize();
-												}, 250);
-									});
+			swipe_book.view(ration);
+		}
+	}, {
+		key: "stop_event",
+		value: function stop_event(event, ration) {
+			SwipeUtil.setRation(ration);
+			if (ration > 0) {
+				SwipeUtil.setStatus("stopping");
+				SwipeUtil.go_ration(0.1);
+			} else {
+				SwipeUtil.setStatus("stopping");
+				SwipeUtil.go_ration(-0.1);
+			}
+		}
+	}, {
+		key: "stop",
+		value: function stop() {
+			var swipe_book = SwipeUtil.getSwipeBook();
+			SwipeUtil.setStatus("stop");
+			if (this.ration > 0) {
+				SwipeUtil.setRation(1);
+				swipe_book.nextEnd();
+			} else if (this.ration < 0) {
+				SwipeUtil.setRation(-1);
+				swipe_book.prevEnd();
+			}
+		}
+	}, {
+		key: "go_ration",
+		value: function go_ration(delta) {
+			if (SwipeUtil.getStatus() != "stopping") {
+				return;
+			}
+			this.ration = this.ration + delta;
 
-									if (SwipeUtil.getParameterByName("autoplay") === "1") {
-												var autoplayDuration = SwipeUtil.getParameterByName("autoplayDuration") || 1000;
-												console.log("duatio " + autoplayDuration);
-												var autoplay = function autoplay() {
-															setTimeout(function () {
-																		swipe_book.next();
-																		var current = Number(location.hash.substr(1));
-																		console.log(swipe_book.getPageSize());
-																		if (swipe_book.getPageSize() > current + 1) {
-																					autoplay();
-																		} else if (SwipeUtil.getParameterByName("autoloop") === "1") {
-																					setTimeout(function () {
-																								swipe_book.show(0);
-																								autoplay();
-																					}, autoplayDuration);
-																		}
-															}, autoplayDuration);
-												};
-												autoplay();
-									}
-						}
-			}, {
-						key: "getSwipeBook",
-						value: function getSwipeBook() {
-									return this.swipe_book;
-						}
-			}, {
-						key: "merge",
-						value: function merge(object1, object2) {
-									var newObject = {};
-									var keys = Object.keys(object1);
-									for (var i = 0; i < keys.length; i++) {
-												newObject[keys[i]] = object1[keys[i]];
-									}
-									keys = Object.keys(object2);
-									for (i = 0; i < keys.length; i++) {
-												newObject[keys[i]] = object2[keys[i]];
-									}
-									return newObject;
-						}
-			}, {
-						key: "initTouchSwipe",
-						value: function initTouchSwipe(data) {
-									$(document.body).css({ "margin": 0, "padding": 0, "background-color": "#fff", "font-size": "26px" });
-									$('div').css({ "margin": 0, "padding": 0, "background-color": "#fff", "font-size": "26px" });
-									$('#swipe_back').css({ "touch-action": "none" });
+			var swipe_book = SwipeUtil.getSwipeBook();
+			if (Math.abs(this.ration) > 1) {
+				SwipeUtil.stop();
+			} else {
+				var swipe_book = SwipeUtil.getSwipeBook();
+				swipe_book.view(this.ration);
 
-									var swipe_book = new SwipeBook(data, 0, "#swipe", "#swipe_back");
-									this.swipe_book = swipe_book;
-									this.ration = null;
-									$(window).resize(function () {
-												clearTimeout(window.resizedFinished);
-												window.resizedFinished = setTimeout(function () {
-															swipe_book.resize();
-												}, 250);
-									});
+				setTimeout(function () {
+					SwipeUtil.go_ration(delta);
+				}, 10);
+			}
+		}
+	}]);
 
-									$.extend($.easing, {
-												swipe: function swipe(x, t, b, c, d) {
-															return Math.abs(SwipeUtil.getRation());
-												},
-												swipeangle: function swipeangle(x, t, b, c, d) {
-															return b + Math.abs(SwipeUtil.getRation()) * c;
-												}
-
-									});
-
-									SwipeTouch.init({
-												start_callback: SwipeUtil.start_event,
-												scroll_callback: SwipeUtil.scroll_event_handler,
-												stop_callback: SwipeUtil.stop_event
-									});
-						}
-			}, {
-						key: "getRation",
-						value: function getRation() {
-									return this.ration;
-						}
-			}, {
-						key: "setRation",
-						value: function setRation(ration) {
-									this.ration = ration;
-						}
-			}, {
-						key: "getStatus",
-						value: function getStatus() {
-									return this.status;
-						}
-			}, {
-						key: "setStatus",
-						value: function setStatus(status) {
-									this.status = status;
-						}
-			}, {
-						key: "start_event",
-						value: function start_event(event, ration) {
-									var swipe_book = SwipeUtil.getSwipeBook();
-									if (SwipeUtil.getStatus() == "stopping") {
-												SwipeUtil.stop();
-									}
-									this.ration = 0;
-									console.log("start ration " + String(ration));
-									SwipeUtil.setStatus("start");
-						}
-			}, {
-						key: "scroll_event_handler",
-						value: function scroll_event_handler(event, ration) {
-									var currentStatus = "start";
-									SwipeUtil.setRation(ration);
-									if (ration > 0) {
-												currentStatus = "forward";
-									}
-									if (ration < 0) {
-												currentStatus = "back";
-									}
-
-									var swipe_book = SwipeUtil.getSwipeBook();
-									if (currentStatus != SwipeUtil.getStatus()) {
-												if (currentStatus == "forward") {
-															if (SwipeUtil.getStatus() == "back") {
-																		swipe_book.prevHide();
-															}
-															swipe_book.nextStart(ration);
-												}
-												if (currentStatus == "back") {
-															if (SwipeUtil.getStatus() == "forward") {
-																		swipe_book.nextHide();
-															}
-															swipe_book.prevStart(ration);
-												}
-												SwipeUtil.setStatus(currentStatus);
-									}
-
-									swipe_book.view(ration);
-						}
-			}, {
-						key: "stop_event",
-						value: function stop_event(event, ration) {
-									SwipeUtil.setRation(ration);
-									if (ration > 0) {
-												SwipeUtil.setStatus("stopping");
-												SwipeUtil.go_ration(0.1);
-									} else {
-												SwipeUtil.setStatus("stopping");
-												SwipeUtil.go_ration(-0.1);
-									}
-						}
-			}, {
-						key: "stop",
-						value: function stop() {
-									var swipe_book = SwipeUtil.getSwipeBook();
-									SwipeUtil.setStatus("stop");
-									if (this.ration > 0) {
-												SwipeUtil.setRation(1);
-												swipe_book.nextEnd();
-									} else if (this.ration < 0) {
-												SwipeUtil.setRation(-1);
-												swipe_book.prevEnd();
-									}
-						}
-			}, {
-						key: "go_ration",
-						value: function go_ration(delta) {
-									if (SwipeUtil.getStatus() != "stopping") {
-												return;
-									}
-									this.ration = this.ration + delta;
-
-									var swipe_book = SwipeUtil.getSwipeBook();
-									if (Math.abs(this.ration) > 1) {
-												SwipeUtil.stop();
-									} else {
-												var swipe_book = SwipeUtil.getSwipeBook();
-												swipe_book.view(this.ration);
-
-												setTimeout(function () {
-															SwipeUtil.go_ration(delta);
-												}, 10);
-									}
-						}
-			}]);
-
-			return SwipeUtil;
+	return SwipeUtil;
 }();
