@@ -201,8 +201,9 @@ var SwipeBook = function () {
 		}
 	}, {
 		key: 'pageLoad',
-		value: function pageLoad(page, page_index) {
+		value: function pageLoad(page_index) {
 			var instance = this;
+			var page = this.pages[page_index];
 			page.loadElement();
 			var html = page.getHtml();
 
@@ -268,10 +269,7 @@ var SwipeBook = function () {
 			var instance = this;
 			this.loadingPage = 0;
 
-			this.pageLoad(this.pages[this.loadingPage], this.loadingPage);
-			// this.pages.forEach((page, page_index) => {
-			// instance.pageLoad(page, page_index);
-			// });
+			this.pageLoad(this.loadingPage);
 
 			$("#debug").css({ position: "absolute", "z-index": 100 });
 			this.setPageSize();
@@ -296,6 +294,15 @@ var SwipeBook = function () {
 			});
 		}
 	}, {
+		key: 'nextLoadPage',
+		value: function nextLoadPage() {
+			this.loadingPage++;
+			if (this.loadingPage < this.pages.length) {
+				return this.loadingPage;
+			}
+			return null;
+		}
+	}, {
 		key: 'counterDecrease',
 		value: function counterDecrease() {
 			SwipeCounter.decrease();
@@ -308,10 +315,10 @@ var SwipeBook = function () {
 				}
 				this.isLoaded[this.loadingPage] = true;
 
-				this.loadingPage++;
-				if (this.loadingPage < this.pages.length) {
-					console.log(this.loadingPage);
-					this.pageLoad(this.pages[this.loadingPage], this.loadingPage);
+				var next_page = this.nextLoadPage();
+				if (next_page) {
+					console.log(next_page);
+					this.pageLoad(next_page);
 					this.setPageSize();
 					this.updateCss();
 				} else {

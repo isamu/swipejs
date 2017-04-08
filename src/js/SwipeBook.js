@@ -158,12 +158,16 @@ class SwipeBook {
 	    "width": SwipeScreen.virtualwidth()
 	  });
   }
-  pageLoad(page, page_index) {
+  pageLoad(page_index) {
 	  var instance = this;
+    var page = this.pages[page_index];
 	  page.loadElement();
-    let html = page.getHtml()
     
-	  $(this.base_css_id).append(html);
+    if (this.step > page_index) {
+      $(this.base_css_id).prepend(page.getHtml());
+    } else {
+	    $(this.base_css_id).append(page.getHtml());
+    }
     
     if (page_index == this.step) {
 	    $("#page_" + page_index).css("opacity", 1);
@@ -222,12 +226,10 @@ class SwipeBook {
   
   domLoad() {
 	  var instance = this;
-    this.loadingPage = 0;
+    this.loadingPage = this.step;
+    this.loadingPageOffset = 0;
     
-    this.pageLoad(this.pages[this.loadingPage], this.loadingPage);
-	  // this.pages.forEach((page, page_index) => {
-    // instance.pageLoad(page, page_index);
-    // });
+    this.pageLoad(this.loadingPage);
 
 	  $("#debug").css({position: "absolute", "z-index": 100})
 	  this.setPageSize();
@@ -251,6 +253,24 @@ class SwipeBook {
 	  });
   }
 
+  nextLoadPage() {
+    if ( (this.pages[this.step + Math.abs(this.loadingPageOffset)] === undefined) &&
+         (this.pages[this.step - Math.abs(this.loadingPageOffset)] === undefined)) {
+      return null;
+    }
+
+    this.loadingPageOffset = this.loadingPageOffset *	-1;
+    if (this.loadingPageOffset > -1) {
+      this.loadingPageOffset++;
+    }
+    
+    if (this.pages[this.step + this.loadingPageOffset]) {
+      this.loadingPage = this.step + this.loadingPageOffset;
+      return this.loadingPage;
+    }
+    return this.nextLoadPage();
+  }
+  
   counterDecrease(){
 	  SwipeCounter.decrease();
 	  $("#counter").html(SwipeCounter.getCounter());
@@ -262,10 +282,10 @@ class SwipeBook {
       }
       this.isLoaded[this.loadingPage] = true;
       
-      this.loadingPage ++;
-      if (this.loadingPage < this.pages.length) {
-        console.log(this.loadingPage);
-        this.pageLoad(this.pages[this.loadingPage], this.loadingPage);
+      var next_page = this.nextLoadPage();
+      if (next_page !== null) {
+        console.log("load ", next_page);
+        this.pageLoad(next_page);
 	      this.setPageSize();
         this.updateCss();
       } else {
