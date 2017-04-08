@@ -1,24 +1,24 @@
 class SwipeCounter {
-    
-    static increase(){
-	if(this.counter === undefined){
+  
+  static increase(){
+	  if(this.counter === undefined){
 	    this.counter = 1;
-	} else {
+	  } else {
 	    this.counter ++;
-	}
-	return this.counter;
-    }
+	  }
+	  return this.counter;
+  }
 
-    static decrease(){
-	if(this.counter === undefined){
+  static decrease(){
+	  if(this.counter === undefined){
 	    this.counter = -1;
-	} else {
+	  } else {
 	    this.counter --;
-	}
-	return this.counter;
-    }
+	  }
+	  return this.counter;
+  }
 
-    static getCounter(){
-	return this.counter;
-    }
+  static getCounter(){
+	  return this.counter;
+  }
 }
