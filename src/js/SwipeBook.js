@@ -164,13 +164,13 @@ class SwipeBook {
     var page = this.pages[page_index];
 	  page.loadElement();
     
-    if (this.step > page_index) {
+    if (this.loadingBasePage > page_index) {
       $(this.base_css_id).prepend(page.getHtml());
     } else {
 	    $(this.base_css_id).append(page.getHtml());
     }
     
-    if (page_index == this.step) {
+    if (page_index == this.loadingBasePage) {
 	    $("#page_" + page_index).css("opacity", 1);
 	    page.active();
     } else {
@@ -228,6 +228,7 @@ class SwipeBook {
   domLoad() {
 	  var instance = this;
     this.loadingPage = this.step;
+    this.loadingBasePage = this.step;
     this.loadingPageOffset = 0;
     
     this.pageLoad(this.loadingPage);
@@ -255,8 +256,8 @@ class SwipeBook {
   }
 
   nextLoadPage() {
-    if ( (this.pages[this.step + Math.abs(this.loadingPageOffset)] === undefined) &&
-         (this.pages[this.step - Math.abs(this.loadingPageOffset)] === undefined)) {
+    if ( (this.pages[this.loadingBasePage + Math.abs(this.loadingPageOffset)] === undefined) &&
+         (this.pages[this.loadingBasePage - Math.abs(this.loadingPageOffset)] === undefined)) {
       return null;
     }
 
@@ -265,8 +266,8 @@ class SwipeBook {
       this.loadingPageOffset++;
     }
     
-    if (this.pages[this.step + this.loadingPageOffset]) {
-      this.loadingPage = this.step + this.loadingPageOffset;
+    if (this.pages[this.loadingBasePage + this.loadingPageOffset]) {
+      this.loadingPage = this.loadingBasePage + this.loadingPageOffset;
       return this.loadingPage;
     }
     return this.nextLoadPage();
