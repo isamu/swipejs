@@ -1676,6 +1676,7 @@ var SwipeElement = function () {
 						var path = SwipeParser.clone(instance.finPath.path);
 						delete path.stroke;
 						instance.path.animate(path, do_duration);
+						// todo this
 						if (instance.prevPath.fill != instance.finPath.fill) {
 							setTimeout(function () {
 								instance.path.attr({ fill: instance.finPath.fill });
@@ -1688,6 +1689,7 @@ var SwipeElement = function () {
 	}, {
 		key: "animateShow",
 		value: function animateShow(ration) {
+			console.log("animateShow");
 			if (this.elements) {
 				this.elements.forEach(function (element, elem_index) {
 					element.animateShow(ration);
@@ -1724,6 +1726,19 @@ var SwipeElement = function () {
 						easing: "swipe"
 					});
 				}
+				// todo path.
+				if (instance.isPath()) {
+					var path = SwipeParser.clone(instance.finPath.path);
+					delete path.stroke;
+					instance.path.animate(path, 100000000, function (x, t, b, c, d) {
+						return Math.abs(SwipeUtil.getRation());
+					}, function () {
+						if (instance.prevPath.fill != instance.finPath.fill) {
+							instance.path.attr({ fill: instance.finPath.fill });
+						}
+					});
+				}
+
 				/*
       if (instance.isText()) {
      $("#" + instance.css_id + "-body").animate(instance.finText, {
@@ -1746,6 +1761,7 @@ var SwipeElement = function () {
 	}, {
 		key: "animateShowBack",
 		value: function animateShowBack(ration) {
+			console.log("animateShowBack");
 			if (this.elements) {
 				this.elements.forEach(function (element, elem_index) {
 					element.animateShowBack(ration);
@@ -1770,6 +1786,17 @@ var SwipeElement = function () {
 						}
 					}
 				});
+				if (this.isPath()) {
+					var path = SwipeParser.clone(this.prevPath.path);
+					delete path.stroke;
+					this.path.animate(path, 100000000, function (x, t, b, c, d) {
+						return Math.abs(SwipeUtil.getRation());
+					}, function () {
+						if (this.prevPath.fill != this.finPath.fill) {
+							this.path.attr({ fill: this.prevPath.fill });
+						}
+					});
+				}
 				/*
       if (instance.isVideo()){
      $("#" + instance.css_id + "-video").animate(instance.convCssPos(instance.finPos), {
