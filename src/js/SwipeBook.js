@@ -408,6 +408,8 @@ class SwipeBook {
 		    
 	    }else if (nextTransition == "scroll") {
 		    this.pageSlide("in", nextStep);
+	    }else if (nextTransition == "slide") {
+		    this.pageSlideDown("in", nextStep, loaded);
 	    } else {
 		    console.log("wrong transition in step " + String(nextStep));
 	    }
@@ -469,6 +471,8 @@ class SwipeBook {
 		    }, SwipeBook.pageInDuration());
 	    } else if (currentTransition == "scroll") {
 		    this.pageSlide("in_back", currentStep);
+      } else if (currentTransition == "slide") {
+		    this.pageSlideDown("back", currentStep, loaded);
 	    }		
 	  }
 
@@ -607,6 +611,95 @@ class SwipeBook {
 	  }
   }
 
+  pageSlideDown(mode, step, loaded) {
+	  console.log("pageSlideDown");
+	  
+	  if (mode == "in") {
+		  $("#page_" + step ).css({"opacity": 0});
+
+      let paging = this.paging;
+			setTimeout(function(){
+		    $("#page_" + step ).css({"opacity": 1});
+	      if (paging == "vertical") {
+          $("#page_" + step ).css("height", 0);
+          $("#page_" + step ).animate({
+            "height": SwipeScreen.virtualheight()
+          }, {
+            duration: SwipeBook.pageInDuration()
+          });
+        console.log("in vertical slide")
+	      } else if (paging == "leftToRight"){
+		      $("#page_" + step ).css({"left": 0, "width": 0});
+		      $("#page_" + step ).animate({
+		        "width":  SwipeScreen.virtualwidth()
+		      }, {
+		        duration: SwipeBook.pageInDuration()
+		      });
+	      } else if (paging == "rightToLeft"){
+          // not supported
+	      }
+      }, loaded ? 300 : 0);
+        
+    } else if (mode == "back") {
+      let option = {
+	      duration: SwipeBook.pageInDuration(),
+        complete: function(){
+          $("#page_" + step ).css({"opacity": 0});
+        }
+      };
+      if (this.paging == "vertical") {
+        $("#page_" + step ).css("height", SwipeScreen.virtualheight());
+	      setTimeout(function(){
+          $("#page_" + step ).animate({
+            "height": 0
+          }, {
+            duration: SwipeBook.pageInDuration()
+          });
+        }, loaded ? 200 : 0);
+        console.log("in_back vertical slide")
+	    } else if (this.paging == "leftToRight"){
+		    $("#page_" + step ).css({"left": 0, "width": SwipeScreen.virtualwidth()});
+		    $("#page_" + step ).animate({
+		      "width": 0
+		    }, {
+		      duration: SwipeBook.pageInDuration()
+		    });
+	    } else if (this.paging == "rightToLeft"){
+        // not supported
+	    }
+	    setTimeout(function(){
+		    $("#page_" + step ).css("opacity", 0);
+	    }, SwipeBook.pageInDuration());
+	  }
+  }
+
+  pageSlideDown2(mode, step, ration) {
+	  console.log("pageSlideDown");
+	  
+	  if (mode == "in") {
+		  $("#page_" + step ).css({"opacity": 1});
+	    if (this.paging == "vertical") {
+		    $("#page_" + step ).css({"top": 0, "height":  SwipeScreen.virtualheight() * ration});
+        console.log("in vertical slide")
+	    } else if (this.paging == "leftToRight"){
+		    $("#page_" + step ).css({"left": 0, "width":  SwipeScreen.virtualwidth() * ration});
+	    } else if (this.paging == "rightToLeft"){
+        // not supported
+	    }
+        
+    } else if (mode == "back") {
+      if (this.paging == "vertical") {
+		    $("#page_" + step ).css({"top": 0, "height": SwipeScreen.virtualheight() * (1 + ration)});
+        console.log("in_back vertical slide")
+	    } else if (this.paging == "leftToRight"){
+		    $("#page_" + step ).css({"left": 0, "width": SwipeScreen.virtualwidth() * (1 + ration)});
+	    } else if (this.paging == "rightToLeft"){
+        // not supported
+	    }
+	  }
+  }
+  
+
   // scroll
   
   view(ration) {
@@ -646,6 +739,8 @@ class SwipeBook {
 		    $("#page_" + nextStep ).css({ "opacity": 1 });
 	    }else if (nextTransition == "scroll") {
 		    this.pageSlide2("in", nextStep, ration);
+	    }else if (nextTransition == "slide") {
+		    this.pageSlideDown2("in", nextStep, ration);
 	    } else {
 		    console.log("wrong transition in step " + String(nextStep));
 	    }
@@ -660,6 +755,8 @@ class SwipeBook {
 		    $("#page_" + currentStep).css({"opacity": (1 - Math.abs(ration))});
 	    } else if (currentTransition == "scroll") {
 		    this.pageSlide2("in_back", currentStep, ration);
+	    } else if (currentTransition == "slide") {
+		    this.pageSlideDown2("back", currentStep, ration);
 	    }		
 
 	  }
@@ -724,6 +821,9 @@ class SwipeBook {
 	  $("#page_" +  (nextStep) ).css("top", 0 );
 	  $("#page_" +  (nextStep) ).css("left", 0 );
 	  $("#page_" +  (nextStep) ).css("opacity", 1);
+    $("#page_" +  (nextStep) ).css("width",  SwipeScreen.virtualwidth());
+    $("#page_" +  (nextStep) ).css("height",  SwipeScreen.virtualheight());
+    
 	  var nextPlayStyle = this.pages[nextStep].getPlayStyle();
 
 	  if (nextPlayStyle == "scroll") {
