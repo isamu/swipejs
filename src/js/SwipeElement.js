@@ -143,12 +143,12 @@ class SwipeElement {
   }
 
   setImageCss() {
-	  let div_ration = this.w/this.h;
+	  let div_ratio = this.w/this.h;
 	  let w = $("#" + this.css_id + "_image").attr("__default_width");
 	  let h = $("#" + this.css_id + "_image").attr("__default_height");
-	  let image_ration = w/h;
+	  let image_ratio = w/h;
 	  
-	  if (div_ration < image_ration) {
+	  if (div_ratio < image_ratio) {
 	    $("#" + this.css_id + "_image").css("height", "100%");
 	    $("#" + this.css_id + "_image").css("width", "auto");
 	  } else {
@@ -469,7 +469,7 @@ class SwipeElement {
   }
   transformPath(info, scale) {
 	  let ret = []
-	  let default_scale = [SwipeScreen.getRation(), SwipeScreen.getRation()];
+	  let default_scale = [SwipeScreen.getRatio(), SwipeScreen.getRatio()];
 	  let scale_array = [];
 	  
 	  let scale_x = Math.abs(scale[0]);
@@ -589,11 +589,11 @@ class SwipeElement {
 
   // transform orders are rotate, scale.
   // path is not scale here
-  animateTransform(ration) {
+  animateTransform(ratio) {
 	  var transform = []
 	  
 	  if (this.angle != this.to_angle) {
-	    var angle = this.angle * ( 1- ration) +  this.to_angle * ration ;
+	    var angle = this.angle * ( 1- ratio) +  this.to_angle * ratio ;
 	    transform.push("rotate("+ angle + "deg)");
 	  } else {
 	    transform.push("rotate("+ this.angle + "deg)");
@@ -602,8 +602,8 @@ class SwipeElement {
 	  if (!this.isPath()) {
 	    if (this.scale != this.to_scale) {
 		    var scale = [
-		      this.scale[0] * ( 1- ration) + this.to_scale[0] * ration,
-		      this.scale[1] * ( 1- ration) + this.to_scale[1] * ration
+		      this.scale[0] * ( 1- ratio) + this.to_scale[0] * ratio,
+		      this.scale[1] * ( 1- ratio) + this.to_scale[1] * ratio
 		      
 		    ]
 		    transform.push("scale("+ scale[0] + ", " + scale[1] + ")");
@@ -657,11 +657,11 @@ class SwipeElement {
 	  }
   }
 
-  animateShow(ration){
+  animateShow(ratio){
     console.log("animateShow");
 	  if (this.elements) {
 	    this.elements.forEach(function(element, elem_index){
-		    element.animateShow(ration);
+		    element.animateShow(ratio);
 	    });
 	  }
 
@@ -678,7 +678,7 @@ class SwipeElement {
 		    },
 		    easing: "swipe",
 		    progress: function(a, b) {
-		      instance.animateTransform(SwipeUtil.getRation());
+		      instance.animateTransform(SwipeUtil.getRatio());
 		      if (instance.isPath()) {
 			      $("#" + instance.css_id).css("overflow","visible");
 		      }
@@ -701,7 +701,7 @@ class SwipeElement {
 		    let path =  SwipeParser.clone(instance.finPath.path);
 		    delete path.stroke;
 		    instance.path.animate(path, 100000000, function (x, t, b, c, d) {
-			    return Math.abs(SwipeUtil.getRation());
+			    return Math.abs(SwipeUtil.getRatio());
 		    }, function(){
 		      if (instance.prevPath.fill !=  instance.finPath.fill) {
 			      instance.path.attr({fill: instance.finPath.fill});
@@ -730,11 +730,11 @@ class SwipeElement {
 	  }
   }
 
-  animateShowBack(ration){
+  animateShowBack(ratio){
     console.log("animateShowBack");
 	  if (this.elements) {
 	    this.elements.forEach(function(element, elem_index){
-		    element.animateShowBack(ration);
+		    element.animateShowBack(ratio);
 	    });
 	  }
 
@@ -750,7 +750,7 @@ class SwipeElement {
 		    },
 		    easing: "swipe",
 		    progress: function(a, b) {
-		      instance.animateTransform(Math.abs(1 + SwipeUtil.getRation()));
+		      instance.animateTransform(Math.abs(1 + SwipeUtil.getRatio()));
 		      if (instance.isPath()) {
 			      $("#" + instance.css_id).css("overflow","visible");
 		      }
@@ -761,7 +761,7 @@ class SwipeElement {
 		    let path =  SwipeParser.clone(this.prevPath.path);
 		    delete path.stroke;
 		    this.path.animate(path, 100000000, function (x, t, b, c, d) {
-			    return Math.abs(SwipeUtil.getRation());
+			    return Math.abs(SwipeUtil.getRatio());
 		    }, function(){
 		      if (this.prevPath.fill !=  this.finPath.fill) {
 		        this.path.attr({fill: this.prevPath.fill});

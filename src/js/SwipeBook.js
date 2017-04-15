@@ -673,25 +673,25 @@ class SwipeBook {
 	  }
   }
 
-  pageSlideDown2(mode, step, ration) {
+  pageSlideDown2(mode, step, ratio) {
 	  console.log("pageSlideDown");
 	  if (mode == "in") {
 		  $("#page_" + step ).css({"opacity": 1});
 	    if (this.paging == "vertical") {
-		    $("#page_" + step ).css({"top": 0, "height":  SwipeScreen.virtualheight() * ration});
+		    $("#page_" + step ).css({"top": 0, "height":  SwipeScreen.virtualheight() * ratio});
         console.log("in vertical slide")
 	    } else if (this.paging == "leftToRight"){
-		    $("#page_" + step ).css({"left": 0, "width":  SwipeScreen.virtualwidth() * ration});
+		    $("#page_" + step ).css({"left": 0, "width":  SwipeScreen.virtualwidth() * ratio});
 	    } else if (this.paging == "rightToLeft"){
         // not supported
 	    }
         
     } else if (mode == "back") {
       if (this.paging == "vertical") {
-		    $("#page_" + step ).css({"top": 0, "height": SwipeScreen.virtualheight() * (1 + ration)});
+		    $("#page_" + step ).css({"top": 0, "height": SwipeScreen.virtualheight() * (1 + ratio)});
         console.log("in_back vertical slide")
 	    } else if (this.paging == "leftToRight"){
-		    $("#page_" + step ).css({"left": 0, "width": SwipeScreen.virtualwidth() * (1 + ration)});
+		    $("#page_" + step ).css({"left": 0, "width": SwipeScreen.virtualwidth() * (1 + ratio)});
 	    } else if (this.paging == "rightToLeft"){
         // not supported
 	    }
@@ -701,8 +701,8 @@ class SwipeBook {
 
   // scroll
   
-  view(ration) {
-	  var nextStep = this.step + ((ration > 0) ? 1 : - 1);
+  view(ratio) {
+	  var nextStep = this.step + ((ratio > 0) ? 1 : - 1);
 	  var currentStep =  this.step;
 	  var mode = (nextStep >= currentStep) ? "forward" : "back";
 
@@ -714,10 +714,10 @@ class SwipeBook {
 
 	  if (mode == "forward" && this.pages[nextStep].getPlayStyle() == "scroll") {
 	    // for video
-	    this.media_player.playing(ration);
+	    this.media_player.playing(ratio);
 	  }
 	  if (mode == "back" && this.pages[currentStep].getPlayStyle() == "scroll") {
-	    this.media_player.playing(ration);
+	    this.media_player.playing(ratio);
 	  }
 
 	  if (this.pages[nextStep].getPlayStyle() == "pause") {
@@ -733,13 +733,13 @@ class SwipeBook {
 	  if (mode == "forward") {
 	    // transition 
 	    if (nextTransition == "fadeIn") {
-		    $("#page_" + nextStep ).css({ "opacity": ration });
+		    $("#page_" + nextStep ).css({ "opacity": ratio });
 	    }else if (nextTransition == "replace") {
 		    $("#page_" + nextStep ).css({ "opacity": 1 });
 	    }else if (nextTransition == "scroll") {
-		    this.pageSlide2("in", nextStep, ration);
+		    this.pageSlide2("in", nextStep, ratio);
 	    }else if (nextTransition == "slide") {
-		    this.pageSlideDown2("in", nextStep, ration);
+		    this.pageSlideDown2("in", nextStep, ratio);
 	    } else {
 		    console.log("wrong transition in step " + String(nextStep));
 	    }
@@ -747,21 +747,21 @@ class SwipeBook {
 	    console.log("back");
 	    // transition 
 	    if (nextTransition == "fadeIn") {
-		    $("#page_" + nextStep).css({"opacity": Math.abs(ration)});
+		    $("#page_" + nextStep).css({"opacity": Math.abs(ratio)});
 	    }
 	    
 	    if (currentTransition == "fadeIn") {
-		    $("#page_" + currentStep).css({"opacity": (1 - Math.abs(ration))});
+		    $("#page_" + currentStep).css({"opacity": (1 - Math.abs(ratio))});
 	    } else if (currentTransition == "scroll") {
-		    this.pageSlide2("in_back", currentStep, ration);
+		    this.pageSlide2("in_back", currentStep, ratio);
 	    } else if (currentTransition == "slide") {
-		    this.pageSlideDown2("back", currentStep, ration);
+		    this.pageSlideDown2("back", currentStep, ratio);
 	    }		
 
 	  }
 	  
   }
-  nextStart(ration){
+  nextStart(ratio){
 	  if (!this.first_touch && this.isReady){
 	    this.media_player.load();
       /*
@@ -833,7 +833,7 @@ class SwipeBook {
 	  this.step = nextStep;
 	  location.hash = nextStep;
   }
-  prevStart(ration){
+  prevStart(ratio){
 	  console.log("prevStart");
 	  if (this.step <= 0) {
 	    return 0;
@@ -886,13 +886,13 @@ class SwipeBook {
 	  this.step = nextStep;
 	  location.hash = nextStep;
   }
-  pageSlide2(mode, step, ration) {
+  pageSlide2(mode, step, ratio) {
 	  if (mode == "in") {
 	    $("#page_" + step ).css("opacity", 1);
 	    if (this.paging == "vertical") {
-		    $("#page_" + step ).css("top", SwipeScreen.virtualheight() * (1 - ration));
+		    $("#page_" + step ).css("top", SwipeScreen.virtualheight() * (1 - ratio));
 	    } else if (this.paging == "leftToRight"){
-		    $("#page_" + step ).css("left", SwipeScreen.virtualwidth() * (1 - ration));
+		    $("#page_" + step ).css("left", SwipeScreen.virtualwidth() * (1 - ratio));
 	    } else if (this.paging == "rightToLeft"){
 		    $("#page_" + step ).css("left", - SwipeScreen.virtualwidth());
 		    $("#page_" + step ).animate({
@@ -903,12 +903,12 @@ class SwipeBook {
 	    }
 	  } else if (mode == "in_back") {
 	    if (this.paging == "vertical") {
-		    $("#page_" + step ).css("top",  - SwipeScreen.virtualheight() * ration);
+		    $("#page_" + step ).css("top",  - SwipeScreen.virtualheight() * ratio);
 	    } else if (this.paging == "leftToRight"){
-		    $("#page_" + step ).css("left", - SwipeScreen.virtualheight() * ration);
+		    $("#page_" + step ).css("left", - SwipeScreen.virtualheight() * ratio);
 		    $("#page_" + step ).css("opacity", 1);
 	    } else if (this.paging == "rightToLeft"){
-		    $("#page_" + step ).css("left", SwipeScreen.virtualheight() * ration);
+		    $("#page_" + step ).css("left", SwipeScreen.virtualheight() * ratio);
 		    $("#page_" + step ).css("opacity", 1);
 	    }
 	  }

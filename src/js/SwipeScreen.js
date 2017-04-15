@@ -34,11 +34,11 @@ class SwipeScreen {
   // todo
   //  set vertical and horizontal mode
   static setVirtualSize() {
-	  var real_ration = this.window_width / this.window_height;
-	  var virtual_ration = this.width / this.height;
-	  this.ration = 1.0;
+	  var real_ratio = this.window_width / this.window_height;
+	  var virtual_ratio = this.width / this.height;
+	  this.ratio = 1.0;
 	  
-	  if (real_ration / virtual_ration >= 1) {
+	  if (real_ratio / virtual_ratio >= 1) {
 	    this.virtual_height = $(window).height();
 	    this.virtual_width = this.width / this.height * this.virtual_height;
 	  } else {
@@ -49,11 +49,11 @@ class SwipeScreen {
 	    this.virtual_width  = this.virtual_width  * this.size / 100;
 	    this.virtual_height = this.virtual_height * this.size / 100;
 	  }
-	  this.ration = this.virtual_width / this.width;
+	  this.ratio = this.virtual_width / this.width;
   }
 
-  static getRation(){
-	  return this.ration;
+  static getRatio(){
+	  return this.ratio;
   }
   static swipewidth() {
 	  return this.width;

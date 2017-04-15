@@ -65,9 +65,9 @@ class SwipeMediaPlayer {
 	  }
 	  return this;
   }
-  playing(ration) {
-	  if (ration < 0) {
-	    ration = 1 + ration;
+  playing(ratio) {
+	  if (ratio < 0) {
+	    ratio = 1 + ratio;
 	  }
 	  var instance = this;
 	  if (this.media[this.current_page]) {
@@ -79,7 +79,7 @@ class SwipeMediaPlayer {
 		    var start = start = (page[key] && page[key].videoStart) ?  page[key].videoStart : 0;
 		    var duration = (page[key] && page[key].videoDuration) ? page[key].videoDuration : 1.0;
 
-		    var currentTime = start  + ration * duration;
+		    var currentTime = start  + ratio * duration;
 		    //player.setCurrentTime(currentTime);
 		    if (Math.abs(data["currentTime"] - currentTime) > 0.05) {
 		      dom.currentTime = currentTime;

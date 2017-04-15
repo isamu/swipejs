@@ -739,24 +739,24 @@ var SwipeBook = function () {
 		}
 	}, {
 		key: 'pageSlideDown2',
-		value: function pageSlideDown2(mode, step, ration) {
+		value: function pageSlideDown2(mode, step, ratio) {
 			console.log("pageSlideDown");
 			if (mode == "in") {
 				$("#page_" + step).css({ "opacity": 1 });
 				if (this.paging == "vertical") {
-					$("#page_" + step).css({ "top": 0, "height": SwipeScreen.virtualheight() * ration });
+					$("#page_" + step).css({ "top": 0, "height": SwipeScreen.virtualheight() * ratio });
 					console.log("in vertical slide");
 				} else if (this.paging == "leftToRight") {
-					$("#page_" + step).css({ "left": 0, "width": SwipeScreen.virtualwidth() * ration });
+					$("#page_" + step).css({ "left": 0, "width": SwipeScreen.virtualwidth() * ratio });
 				} else if (this.paging == "rightToLeft") {
 					// not supported
 				}
 			} else if (mode == "back") {
 				if (this.paging == "vertical") {
-					$("#page_" + step).css({ "top": 0, "height": SwipeScreen.virtualheight() * (1 + ration) });
+					$("#page_" + step).css({ "top": 0, "height": SwipeScreen.virtualheight() * (1 + ratio) });
 					console.log("in_back vertical slide");
 				} else if (this.paging == "leftToRight") {
-					$("#page_" + step).css({ "left": 0, "width": SwipeScreen.virtualwidth() * (1 + ration) });
+					$("#page_" + step).css({ "left": 0, "width": SwipeScreen.virtualwidth() * (1 + ratio) });
 				} else if (this.paging == "rightToLeft") {
 					// not supported
 				}
@@ -767,8 +767,8 @@ var SwipeBook = function () {
 
 	}, {
 		key: 'view',
-		value: function view(ration) {
-			var nextStep = this.step + (ration > 0 ? 1 : -1);
+		value: function view(ratio) {
+			var nextStep = this.step + (ratio > 0 ? 1 : -1);
 			var currentStep = this.step;
 			var mode = nextStep >= currentStep ? "forward" : "back";
 
@@ -780,10 +780,10 @@ var SwipeBook = function () {
 
 			if (mode == "forward" && this.pages[nextStep].getPlayStyle() == "scroll") {
 				// for video
-				this.media_player.playing(ration);
+				this.media_player.playing(ratio);
 			}
 			if (mode == "back" && this.pages[currentStep].getPlayStyle() == "scroll") {
-				this.media_player.playing(ration);
+				this.media_player.playing(ratio);
 			}
 
 			if (this.pages[nextStep].getPlayStyle() == "pause") {
@@ -799,13 +799,13 @@ var SwipeBook = function () {
 			if (mode == "forward") {
 				// transition
 				if (nextTransition == "fadeIn") {
-					$("#page_" + nextStep).css({ "opacity": ration });
+					$("#page_" + nextStep).css({ "opacity": ratio });
 				} else if (nextTransition == "replace") {
 					$("#page_" + nextStep).css({ "opacity": 1 });
 				} else if (nextTransition == "scroll") {
-					this.pageSlide2("in", nextStep, ration);
+					this.pageSlide2("in", nextStep, ratio);
 				} else if (nextTransition == "slide") {
-					this.pageSlideDown2("in", nextStep, ration);
+					this.pageSlideDown2("in", nextStep, ratio);
 				} else {
 					console.log("wrong transition in step " + String(nextStep));
 				}
@@ -814,21 +814,21 @@ var SwipeBook = function () {
 				console.log("back");
 				// transition
 				if (nextTransition == "fadeIn") {
-					$("#page_" + nextStep).css({ "opacity": Math.abs(ration) });
+					$("#page_" + nextStep).css({ "opacity": Math.abs(ratio) });
 				}
 
 				if (currentTransition == "fadeIn") {
-					$("#page_" + currentStep).css({ "opacity": 1 - Math.abs(ration) });
+					$("#page_" + currentStep).css({ "opacity": 1 - Math.abs(ratio) });
 				} else if (currentTransition == "scroll") {
-					this.pageSlide2("in_back", currentStep, ration);
+					this.pageSlide2("in_back", currentStep, ratio);
 				} else if (currentTransition == "slide") {
-					this.pageSlideDown2("back", currentStep, ration);
+					this.pageSlideDown2("back", currentStep, ratio);
 				}
 			}
 		}
 	}, {
 		key: 'nextStart',
-		value: function nextStart(ration) {
+		value: function nextStart(ratio) {
 			if (!this.first_touch && this.isReady) {
 				this.media_player.load();
 				/*
@@ -905,7 +905,7 @@ var SwipeBook = function () {
 		}
 	}, {
 		key: 'prevStart',
-		value: function prevStart(ration) {
+		value: function prevStart(ratio) {
 			console.log("prevStart");
 			if (this.step <= 0) {
 				return 0;
@@ -964,13 +964,13 @@ var SwipeBook = function () {
 		}
 	}, {
 		key: 'pageSlide2',
-		value: function pageSlide2(mode, step, ration) {
+		value: function pageSlide2(mode, step, ratio) {
 			if (mode == "in") {
 				$("#page_" + step).css("opacity", 1);
 				if (this.paging == "vertical") {
-					$("#page_" + step).css("top", SwipeScreen.virtualheight() * (1 - ration));
+					$("#page_" + step).css("top", SwipeScreen.virtualheight() * (1 - ratio));
 				} else if (this.paging == "leftToRight") {
-					$("#page_" + step).css("left", SwipeScreen.virtualwidth() * (1 - ration));
+					$("#page_" + step).css("left", SwipeScreen.virtualwidth() * (1 - ratio));
 				} else if (this.paging == "rightToLeft") {
 					$("#page_" + step).css("left", -SwipeScreen.virtualwidth());
 					$("#page_" + step).animate({
@@ -981,12 +981,12 @@ var SwipeBook = function () {
 				}
 			} else if (mode == "in_back") {
 				if (this.paging == "vertical") {
-					$("#page_" + step).css("top", -SwipeScreen.virtualheight() * ration);
+					$("#page_" + step).css("top", -SwipeScreen.virtualheight() * ratio);
 				} else if (this.paging == "leftToRight") {
-					$("#page_" + step).css("left", -SwipeScreen.virtualheight() * ration);
+					$("#page_" + step).css("left", -SwipeScreen.virtualheight() * ratio);
 					$("#page_" + step).css("opacity", 1);
 				} else if (this.paging == "rightToLeft") {
-					$("#page_" + step).css("left", SwipeScreen.virtualheight() * ration);
+					$("#page_" + step).css("left", SwipeScreen.virtualheight() * ratio);
 					$("#page_" + step).css("opacity", 1);
 				}
 			}
@@ -1199,12 +1199,12 @@ var SwipeElement = function () {
 	}, {
 		key: "setImageCss",
 		value: function setImageCss() {
-			var div_ration = this.w / this.h;
+			var div_ratio = this.w / this.h;
 			var w = $("#" + this.css_id + "_image").attr("__default_width");
 			var h = $("#" + this.css_id + "_image").attr("__default_height");
-			var image_ration = w / h;
+			var image_ratio = w / h;
 
-			if (div_ration < image_ration) {
+			if (div_ratio < image_ratio) {
 				$("#" + this.css_id + "_image").css("height", "100%");
 				$("#" + this.css_id + "_image").css("width", "auto");
 			} else {
@@ -1556,7 +1556,7 @@ var SwipeElement = function () {
 		key: "transformPath",
 		value: function transformPath(info, scale) {
 			var ret = [];
-			var default_scale = [SwipeScreen.getRation(), SwipeScreen.getRation()];
+			var default_scale = [SwipeScreen.getRatio(), SwipeScreen.getRatio()];
 			var scale_array = [];
 
 			var scale_x = Math.abs(scale[0]);
@@ -1682,11 +1682,11 @@ var SwipeElement = function () {
 
 	}, {
 		key: "animateTransform",
-		value: function animateTransform(ration) {
+		value: function animateTransform(ratio) {
 			var transform = [];
 
 			if (this.angle != this.to_angle) {
-				var angle = this.angle * (1 - ration) + this.to_angle * ration;
+				var angle = this.angle * (1 - ratio) + this.to_angle * ratio;
 				transform.push("rotate(" + angle + "deg)");
 			} else {
 				transform.push("rotate(" + this.angle + "deg)");
@@ -1694,7 +1694,7 @@ var SwipeElement = function () {
 
 			if (!this.isPath()) {
 				if (this.scale != this.to_scale) {
-					var scale = [this.scale[0] * (1 - ration) + this.to_scale[0] * ration, this.scale[1] * (1 - ration) + this.to_scale[1] * ration];
+					var scale = [this.scale[0] * (1 - ratio) + this.to_scale[0] * ratio, this.scale[1] * (1 - ratio) + this.to_scale[1] * ratio];
 					transform.push("scale(" + scale[0] + ", " + scale[1] + ")");
 				} else {
 					transform.push("scale(" + this.scale[0] + ", " + this.scale[1] + ")");
@@ -1749,11 +1749,11 @@ var SwipeElement = function () {
 		}
 	}, {
 		key: "animateShow",
-		value: function animateShow(ration) {
+		value: function animateShow(ratio) {
 			console.log("animateShow");
 			if (this.elements) {
 				this.elements.forEach(function (element, elem_index) {
-					element.animateShow(ration);
+					element.animateShow(ratio);
 				});
 			}
 
@@ -1770,7 +1770,7 @@ var SwipeElement = function () {
 					},
 					easing: "swipe",
 					progress: function progress(a, b) {
-						instance.animateTransform(SwipeUtil.getRation());
+						instance.animateTransform(SwipeUtil.getRatio());
 						if (instance.isPath()) {
 							$("#" + instance.css_id).css("overflow", "visible");
 						}
@@ -1792,7 +1792,7 @@ var SwipeElement = function () {
 					var path = SwipeParser.clone(instance.finPath.path);
 					delete path.stroke;
 					instance.path.animate(path, 100000000, function (x, t, b, c, d) {
-						return Math.abs(SwipeUtil.getRation());
+						return Math.abs(SwipeUtil.getRatio());
 					}, function () {
 						if (instance.prevPath.fill != instance.finPath.fill) {
 							instance.path.attr({ fill: instance.finPath.fill });
@@ -1821,11 +1821,11 @@ var SwipeElement = function () {
 		}
 	}, {
 		key: "animateShowBack",
-		value: function animateShowBack(ration) {
+		value: function animateShowBack(ratio) {
 			console.log("animateShowBack");
 			if (this.elements) {
 				this.elements.forEach(function (element, elem_index) {
-					element.animateShowBack(ration);
+					element.animateShowBack(ratio);
 				});
 			}
 
@@ -1841,7 +1841,7 @@ var SwipeElement = function () {
 					},
 					easing: "swipe",
 					progress: function progress(a, b) {
-						instance.animateTransform(Math.abs(1 + SwipeUtil.getRation()));
+						instance.animateTransform(Math.abs(1 + SwipeUtil.getRatio()));
 						if (instance.isPath()) {
 							$("#" + instance.css_id).css("overflow", "visible");
 						}
@@ -1851,7 +1851,7 @@ var SwipeElement = function () {
 					var path = SwipeParser.clone(this.prevPath.path);
 					delete path.stroke;
 					this.path.animate(path, 100000000, function (x, t, b, c, d) {
-						return Math.abs(SwipeUtil.getRation());
+						return Math.abs(SwipeUtil.getRatio());
 					}, function () {
 						if (this.prevPath.fill != this.finPath.fill) {
 							this.path.attr({ fill: this.prevPath.fill });
@@ -2714,9 +2714,9 @@ var SwipeMediaPlayer = function () {
 		}
 	}, {
 		key: "playing",
-		value: function playing(ration) {
-			if (ration < 0) {
-				ration = 1 + ration;
+		value: function playing(ratio) {
+			if (ratio < 0) {
+				ratio = 1 + ratio;
 			}
 			var instance = this;
 			if (this.media[this.current_page]) {
@@ -2728,7 +2728,7 @@ var SwipeMediaPlayer = function () {
 					var start = start = page[key] && page[key].videoStart ? page[key].videoStart : 0;
 					var duration = page[key] && page[key].videoDuration ? page[key].videoDuration : 1.0;
 
-					var currentTime = start + ration * duration;
+					var currentTime = start + ratio * duration;
 					//player.setCurrentTime(currentTime);
 					if (Math.abs(data["currentTime"] - currentTime) > 0.05) {
 						dom.currentTime = currentTime;
@@ -3261,11 +3261,11 @@ var SwipeScreen = function () {
 	}, {
 		key: "setVirtualSize",
 		value: function setVirtualSize() {
-			var real_ration = this.window_width / this.window_height;
-			var virtual_ration = this.width / this.height;
-			this.ration = 1.0;
+			var real_ratio = this.window_width / this.window_height;
+			var virtual_ratio = this.width / this.height;
+			this.ratio = 1.0;
 
-			if (real_ration / virtual_ration >= 1) {
+			if (real_ratio / virtual_ratio >= 1) {
 				this.virtual_height = $(window).height();
 				this.virtual_width = this.width / this.height * this.virtual_height;
 			} else {
@@ -3276,12 +3276,12 @@ var SwipeScreen = function () {
 				this.virtual_width = this.virtual_width * this.size / 100;
 				this.virtual_height = this.virtual_height * this.size / 100;
 			}
-			this.ration = this.virtual_width / this.width;
+			this.ratio = this.virtual_width / this.width;
 		}
 	}, {
-		key: "getRation",
-		value: function getRation() {
-			return this.ration;
+		key: "getRatio",
+		value: function getRatio() {
+			return this.ratio;
 		}
 	}, {
 		key: "swipewidth",
@@ -3357,7 +3357,7 @@ var SwipeTouch = function () {
 			this.startY = 0;
 			this.currentY = 0;
 			this.diff = 0;
-			this.ration = 0;
+			this.ratio = 0;
 			this.options = options;
 			this.status = "stop";
 
@@ -3384,16 +3384,16 @@ var SwipeTouch = function () {
 				}
 				//$("#debug").html("scroll" + self.currentY );
 				self.diff = self.currentY - self.startY;
-				self.ration = self.diff / $(window).innerHeight();
+				self.ratio = self.diff / $(window).innerHeight();
 
-				if (self.ration > 1) {
-					self.ration = 1;
+				if (self.ratio > 1) {
+					self.ratio = 1;
 				}
-				if (self.ration < -1) {
-					self.ration = -1;
+				if (self.ratio < -1) {
+					self.ratio = -1;
 				}
 
-				SwipeTouch.scroll_event_handler(e, self.ration);
+				SwipeTouch.scroll_event_handler(e, self.ratio);
 			}).on("scrollstop", function (e) {
 				//$("#debug").html("scroll stop");
 				SwipeTouch.stop_event(e);
@@ -3406,9 +3406,9 @@ var SwipeTouch = function () {
 
 				var current = e.originalEvent && e.originalEvent.pageY ? e.originalEvent.pageY : event.changedTouches[0].pageY;
 				self.diff = self.startY - current;
-				self.ration = self.diff / $(window).innerHeight();
+				self.ratio = self.diff / $(window).innerHeight();
 				//$("#debug").html("touchmove" + self.startY +":" + current );
-				SwipeTouch.scroll_event_handler(e, self.ration);
+				SwipeTouch.scroll_event_handler(e, self.ratio);
 			}).on("touchend", function (e) {
 				//$("#debug").html("touchend");
 				SwipeTouch.stop_event(e);
@@ -3416,11 +3416,11 @@ var SwipeTouch = function () {
 		}
 	}, {
 		key: 'scroll_event_handler',
-		value: function scroll_event_handler(event, ration) {
+		value: function scroll_event_handler(event, ratio) {
 			console.log("scroll");
 			this.status = "scroll";
 			if (this.options.scroll_callback) {
-				this.options.scroll_callback(event, ration);
+				this.options.scroll_callback(event, ratio);
 			}
 		}
 	}, {
@@ -3429,22 +3429,22 @@ var SwipeTouch = function () {
 			console.log("stop");
 			this.status = "stop";
 			if (this.options.stop_callback) {
-				this.options.stop_callback(event, this.ration);
+				this.options.stop_callback(event, this.ratio);
 			}
 		}
 	}, {
-		key: 'getRation',
-		value: function getRation() {
-			return this.ration;
+		key: 'getRatio',
+		value: function getRatio() {
+			return this.ratio;
 		}
 	}, {
 		key: 'start_event',
 		value: function start_event() {
-			this.ration = 0;
+			this.ratio = 0;
 			console.log("start");
 			this.status = "start";
 			if (this.options.start_callback) {
-				this.options.start_callback(event, this.ration);
+				this.options.start_callback(event, this.ratio);
 			}
 		}
 	}, {
@@ -3559,7 +3559,7 @@ var SwipeUtil = function () {
 
 			var swipe_book = new SwipeBook(data, 0, "#swipe", "#swipe_back");
 			this.swipe_book = swipe_book;
-			this.ration = null;
+			this.ratio = null;
 			$(window).resize(function () {
 				clearTimeout(window.resizedFinished);
 				window.resizedFinished = setTimeout(function () {
@@ -3569,10 +3569,10 @@ var SwipeUtil = function () {
 
 			$.extend($.easing, {
 				swipe: function swipe(x, t, b, c, d) {
-					return Math.abs(SwipeUtil.getRation());
+					return Math.abs(SwipeUtil.getRatio());
 				},
 				swipeangle: function swipeangle(x, t, b, c, d) {
-					return b + Math.abs(SwipeUtil.getRation()) * c;
+					return b + Math.abs(SwipeUtil.getRatio()) * c;
 				}
 
 			});
@@ -3584,14 +3584,14 @@ var SwipeUtil = function () {
 			});
 		}
 	}, {
-		key: "getRation",
-		value: function getRation() {
-			return this.ration;
+		key: "getRatio",
+		value: function getRatio() {
+			return this.ratio;
 		}
 	}, {
-		key: "setRation",
-		value: function setRation(ration) {
-			this.ration = ration;
+		key: "setRatio",
+		value: function setRatio(ratio) {
+			this.ratio = ratio;
 		}
 	}, {
 		key: "getStatus",
@@ -3605,24 +3605,24 @@ var SwipeUtil = function () {
 		}
 	}, {
 		key: "start_event",
-		value: function start_event(event, ration) {
+		value: function start_event(event, ratio) {
 			var swipe_book = SwipeUtil.getSwipeBook();
 			if (SwipeUtil.getStatus() == "stopping") {
 				SwipeUtil.stop();
 			}
-			this.ration = 0;
-			console.log("start ration " + String(ration));
+			this.ratio = 0;
+			console.log("start ratio " + String(ratio));
 			SwipeUtil.setStatus("start");
 		}
 	}, {
 		key: "scroll_event_handler",
-		value: function scroll_event_handler(event, ration) {
+		value: function scroll_event_handler(event, ratio) {
 			var currentStatus = "start";
-			SwipeUtil.setRation(ration);
-			if (ration > 0) {
+			SwipeUtil.setRatio(ratio);
+			if (ratio > 0) {
 				currentStatus = "forward";
 			}
-			if (ration < 0) {
+			if (ratio < 0) {
 				currentStatus = "back";
 			}
 
@@ -3632,29 +3632,29 @@ var SwipeUtil = function () {
 					if (SwipeUtil.getStatus() == "back") {
 						swipe_book.prevHide();
 					}
-					swipe_book.nextStart(ration);
+					swipe_book.nextStart(ratio);
 				}
 				if (currentStatus == "back") {
 					if (SwipeUtil.getStatus() == "forward") {
 						swipe_book.nextHide();
 					}
-					swipe_book.prevStart(ration);
+					swipe_book.prevStart(ratio);
 				}
 				SwipeUtil.setStatus(currentStatus);
 			}
 
-			swipe_book.view(ration);
+			swipe_book.view(ratio);
 		}
 	}, {
 		key: "stop_event",
-		value: function stop_event(event, ration) {
-			SwipeUtil.setRation(ration);
-			if (ration > 0) {
+		value: function stop_event(event, ratio) {
+			SwipeUtil.setRatio(ratio);
+			if (ratio > 0) {
 				SwipeUtil.setStatus("stopping");
-				SwipeUtil.go_ration(0.1);
+				SwipeUtil.go_ratio(0.1);
 			} else {
 				SwipeUtil.setStatus("stopping");
-				SwipeUtil.go_ration(-0.1);
+				SwipeUtil.go_ratio(-0.1);
 			}
 		}
 	}, {
@@ -3662,31 +3662,31 @@ var SwipeUtil = function () {
 		value: function stop() {
 			var swipe_book = SwipeUtil.getSwipeBook();
 			SwipeUtil.setStatus("stop");
-			if (this.ration > 0) {
-				SwipeUtil.setRation(1);
+			if (this.ratio > 0) {
+				SwipeUtil.setRatio(1);
 				swipe_book.nextEnd();
-			} else if (this.ration < 0) {
-				SwipeUtil.setRation(-1);
+			} else if (this.ratio < 0) {
+				SwipeUtil.setRatio(-1);
 				swipe_book.prevEnd();
 			}
 		}
 	}, {
-		key: "go_ration",
-		value: function go_ration(delta) {
+		key: "go_ratio",
+		value: function go_ratio(delta) {
 			if (SwipeUtil.getStatus() != "stopping") {
 				return;
 			}
-			this.ration = this.ration + delta;
+			this.ratio = this.ratio + delta;
 
 			var swipe_book = SwipeUtil.getSwipeBook();
-			if (Math.abs(this.ration) > 1) {
+			if (Math.abs(this.ratio) > 1) {
 				SwipeUtil.stop();
 			} else {
 				var swipe_book = SwipeUtil.getSwipeBook();
-				swipe_book.view(this.ration);
+				swipe_book.view(this.ratio);
 
 				setTimeout(function () {
-					SwipeUtil.go_ration(delta);
+					SwipeUtil.go_ratio(delta);
 				}, 10);
 			}
 		}

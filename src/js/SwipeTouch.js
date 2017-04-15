@@ -3,7 +3,7 @@ class SwipeTouch {
 	  this.startY = 0;
 	  this.currentY = 0;
 	  this.diff = 0;
-	  this.ration = 0;
+	  this.ratio = 0;
 	  this.options = options;
 	  this.status = "stop";
 	  
@@ -30,12 +30,12 @@ class SwipeTouch {
 	    }
 	    //$("#debug").html("scroll" + self.currentY );
 	    self.diff =  self.currentY - self.startY;
-	    self.ration =   (self.diff / $(window).innerHeight());
+	    self.ratio =   (self.diff / $(window).innerHeight());
 
-	    if (self.ration > 1){ self.ration = 1;}
-	    if (self.ration < -1){ self.ration = -1;}
+	    if (self.ratio > 1){ self.ratio = 1;}
+	    if (self.ratio < -1){ self.ratio = -1;}
 
-	    SwipeTouch.scroll_event_handler(e, self.ration);
+	    SwipeTouch.scroll_event_handler(e, self.ratio);
 	  }).on("scrollstop", function(e) {
 	    //$("#debug").html("scroll stop");
 	    SwipeTouch.stop_event(e);
@@ -48,20 +48,20 @@ class SwipeTouch {
 	    
 	    var current = (e.originalEvent && e.originalEvent.pageY) ? e.originalEvent.pageY : event.changedTouches[0].pageY;
 	    self.diff = self.startY - current;
-	    self.ration = self.diff / $(window).innerHeight()      
+	    self.ratio = self.diff / $(window).innerHeight()      
 	    //$("#debug").html("touchmove" + self.startY +":" + current );
-	    SwipeTouch.scroll_event_handler(e, self.ration);
+	    SwipeTouch.scroll_event_handler(e, self.ratio);
 	  }).on("touchend", function(e) {
 	    //$("#debug").html("touchend");
 	    SwipeTouch.stop_event(e);
 	  });
   }	     
   
-  static scroll_event_handler(event, ration) {
+  static scroll_event_handler(event, ratio) {
 	  console.log("scroll");
 	  this.status = "scroll";
 	  if(this.options.scroll_callback) {
-	    this.options.scroll_callback(event, ration)
+	    this.options.scroll_callback(event, ratio)
 	  }
   }
 
@@ -69,19 +69,19 @@ class SwipeTouch {
 	  console.log("stop");
 	  this.status = "stop";
 	  if(this.options.stop_callback) {
-	    this.options.stop_callback(event, this.ration)
+	    this.options.stop_callback(event, this.ratio)
 	  }
   }
   
-  static getRation() {
-	  return this.ration;
+  static getRatio() {
+	  return this.ratio;
   }
   static start_event(){
-	  this.ration = 0;
+	  this.ratio = 0;
 	  console.log("start");
 	  this.status = "start";
 	  if(this.options.start_callback) {
-	    this.options.start_callback(event, this.ration)
+	    this.options.start_callback(event, this.ratio)
 	  }
   }
 

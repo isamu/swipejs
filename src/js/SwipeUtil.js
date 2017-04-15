@@ -86,7 +86,7 @@ class SwipeUtil {
 
 	  var swipe_book = new SwipeBook(data, 0, "#swipe", "#swipe_back");
 	  this.swipe_book = swipe_book;
-	  this.ration = null;
+	  this.ratio = null;
 	  $(window).resize(function() {
 	    clearTimeout(window.resizedFinished);
 	    window.resizedFinished = setTimeout(function(){
@@ -97,10 +97,10 @@ class SwipeUtil {
 	  $.extend($.easing,
 		         {
 		           swipe: function (x, t, b, c, d) {
-			           return Math.abs(SwipeUtil.getRation());
+			           return Math.abs(SwipeUtil.getRatio());
 		           },
 		           swipeangle: function (x, t, b, c, d) {
-			           return b + Math.abs(SwipeUtil.getRation()) * c
+			           return b + Math.abs(SwipeUtil.getRatio()) * c
 		           }
 		           
 		         });
@@ -112,11 +112,11 @@ class SwipeUtil {
 	  });
 	  
   }
-  static getRation(){
-	  return  this.ration;
+  static getRatio(){
+	  return  this.ratio;
   }
-  static setRation(ration){
-	  this.ration = ration;
+  static setRatio(ratio){
+	  this.ratio = ratio;
   }
 
   static getStatus(){
@@ -126,23 +126,23 @@ class SwipeUtil {
 	  this.status = status;
   }
   
-  static start_event(event, ration){
+  static start_event(event, ratio){
 	  var swipe_book = SwipeUtil.getSwipeBook();
 	  if (SwipeUtil.getStatus() == "stopping") {
 	    SwipeUtil.stop();
 	  }
-	  this.ration = 0;
-	  console.log("start ration " + String(ration));
+	  this.ratio = 0;
+	  console.log("start ratio " + String(ratio));
 	  SwipeUtil.setStatus("start");
   }
 
-  static scroll_event_handler(event, ration) {
+  static scroll_event_handler(event, ratio) {
 	  var currentStatus = "start";
-	  SwipeUtil.setRation(ration);
-	  if (ration > 0) {
+	  SwipeUtil.setRatio(ratio);
+	  if (ratio > 0) {
 	    currentStatus = "forward";
 	  }
-	  if (ration < 0) {
+	  if (ratio < 0) {
 	    currentStatus = "back";
 	  }
 	  
@@ -152,58 +152,58 @@ class SwipeUtil {
 		    if (SwipeUtil.getStatus() == "back") {
 		      swipe_book.prevHide();
 		    }
-		    swipe_book.nextStart(ration);
+		    swipe_book.nextStart(ratio);
 	    }
 	    if (currentStatus == "back") {
 		    if (SwipeUtil.getStatus() == "forward") {
 		      swipe_book.nextHide();
 		    }
-		    swipe_book.prevStart(ration);
+		    swipe_book.prevStart(ratio);
 	    }
 	    SwipeUtil.setStatus(currentStatus);
 	  }
 	  
-	  swipe_book.view(ration);
+	  swipe_book.view(ratio);
   }
 	
-  static stop_event(event, ration){
-	  SwipeUtil.setRation(ration);
-	  if (ration > 0) {
+  static stop_event(event, ratio){
+	  SwipeUtil.setRatio(ratio);
+	  if (ratio > 0) {
 	    SwipeUtil.setStatus("stopping");
-	    SwipeUtil.go_ration(0.1);
+	    SwipeUtil.go_ratio(0.1);
 	  } else {
 	    SwipeUtil.setStatus("stopping");
-	    SwipeUtil.go_ration(-0.1);
+	    SwipeUtil.go_ratio(-0.1);
 	  }
   }
 
   static stop(){
 	  var swipe_book = SwipeUtil.getSwipeBook();
 	  SwipeUtil.setStatus("stop");
-	  if (this.ration > 0){
-	    SwipeUtil.setRation(1);
+	  if (this.ratio > 0){
+	    SwipeUtil.setRatio(1);
 	    swipe_book.nextEnd();
-	  } else if (this.ration < 0){
-	    SwipeUtil.setRation(-1);
+	  } else if (this.ratio < 0){
+	    SwipeUtil.setRatio(-1);
 	    swipe_book.prevEnd();
 	  }
   }
 
-  static go_ration(delta) {
+  static go_ratio(delta) {
 	  if( SwipeUtil.getStatus() != "stopping") {
 	    return ;
 	  }
-	  this.ration = this.ration + delta;
+	  this.ratio = this.ratio + delta;
 	  
 	  var swipe_book = SwipeUtil.getSwipeBook();
-	  if (Math.abs(this.ration) > 1){
+	  if (Math.abs(this.ratio) > 1){
 	    SwipeUtil.stop();
 	  } else {
 	    var swipe_book = SwipeUtil.getSwipeBook();
-	    swipe_book.view(this.ration);
+	    swipe_book.view(this.ratio);
 	    
 	    setTimeout(function(){
-		    SwipeUtil.go_ration(delta);
+		    SwipeUtil.go_ratio(delta);
 	    }, 10);
 	  }
   }
