@@ -741,7 +741,6 @@ var SwipeBook = function () {
 		key: 'pageSlideDown2',
 		value: function pageSlideDown2(mode, step, ration) {
 			console.log("pageSlideDown");
-
 			if (mode == "in") {
 				$("#page_" + step).css({ "opacity": 1 });
 				if (this.paging == "vertical") {
@@ -966,7 +965,6 @@ var SwipeBook = function () {
 	}, {
 		key: 'pageSlide2',
 		value: function pageSlide2(mode, step, ration) {
-
 			if (mode == "in") {
 				$("#page_" + step).css("opacity", 1);
 				if (this.paging == "vertical") {
@@ -981,35 +979,6 @@ var SwipeBook = function () {
 						duration: SwipeBook.pageInDuration()
 					});
 				}
-			} else if (mode == "out") {
-				if (this.paging == "vertical") {
-					$("#page_" + step).css("top", 0);
-					$("#page_" + step).css("opacity", 1);
-					$("#page_" + step).animate({
-						"top": -SwipeScreen.virtualheight()
-					}, {
-						duration: SwipeBook.pageInDuration()
-					});
-				} else if (this.paging == "leftToRight") {
-					$("#page_" + step).css("left", 0);
-					$("#page_" + step).css("opacity", 1);
-					$("#page_" + step).animate({
-						"left": -SwipeScreen.virtualwidth()
-					}, {
-						duration: SwipeBook.pageInDuration()
-					});
-				} else if (this.paging == "rightToLeft") {
-					$("#page_" + step).css("left", 0);
-					$("#page_" + step).css("opacity", 1);
-					$("#page_" + step).animate({
-						"left": SwipeScreen.virtualwidth()
-					}, {
-						duration: SwipeBook.pageInDuration()
-					});
-				}
-				setTimeout(function () {
-					$("#page_" + step).css("opacity", 0);
-				}, SwipeBook.pageInDuration());
 			} else if (mode == "in_back") {
 				if (this.paging == "vertical") {
 					$("#page_" + step).css("top", -SwipeScreen.virtualheight() * ration);
@@ -1018,17 +987,6 @@ var SwipeBook = function () {
 					$("#page_" + step).css("opacity", 1);
 				} else if (this.paging == "rightToLeft") {
 					$("#page_" + step).css("left", SwipeScreen.virtualheight() * ration);
-					$("#page_" + step).css("opacity", 1);
-				}
-			} else if (mode == "out_back") {
-				$("#page_" + step).css("opacity", 1);
-				if (this.paging == "vertical") {
-					$("#page_" + step).css("top", SwipeScreen.virtualheight() * (-ration - 1));
-				} else if (this.paging == "leftToRight") {
-					$("#page_" + step).css("left", SwipeScreen.virtualwidth() * (-ration - 1));
-					$("#page_" + step).css("opacity", 1);
-				} else if (this.paging == "rightToLeft") {
-					$("#page_" + step).css("left", SwipeScreen.virtualwidth() * (-ration - 1));
 					$("#page_" + step).css("opacity", 1);
 				}
 			}
