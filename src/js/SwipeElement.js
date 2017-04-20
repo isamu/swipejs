@@ -39,7 +39,13 @@ class SwipeElement {
 	    this.bc = this.info["bc"];
 	  }
 	  if (this.info["elements"]) {
-	    this.info["elements"].forEach(function(element, elem_index){
+      let elements = [];
+      if (Array.isArray(this.info["elements"])) {
+        elements = this.info["elements"];
+      } else {
+        elements = [this.info["elements"]];
+      }
+	    elements.forEach(function(element, elem_index){
 		    var e_id = element_id + "-" + elem_index;
 		    instance.elements.push(new SwipeElement(element, page_id, e_id, play, duration, instance));
 	    });
