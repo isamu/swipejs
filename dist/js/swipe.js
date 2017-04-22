@@ -1087,16 +1087,18 @@ var SwipeElement = function () {
 			this.bc = this.info["bc"];
 		}
 		if (this.info["elements"]) {
-			var elements = [];
-			if (Array.isArray(this.info["elements"])) {
-				elements = this.info["elements"];
-			} else {
-				elements = [this.info["elements"]];
+			if (!this.isPathRoot()) {
+				var elements = [];
+				if (Array.isArray(this.info["elements"])) {
+					elements = this.info["elements"];
+				} else {
+					elements = [this.info["elements"]];
+				}
+				elements.forEach(function (element, elem_index) {
+					var e_id = element_id + "-" + elem_index;
+					instance.elements.push(new SwipeElement(element, page_id, e_id, play, duration, instance));
+				});
 			}
-			elements.forEach(function (element, elem_index) {
-				var e_id = element_id + "-" + elem_index;
-				instance.elements.push(new SwipeElement(element, page_id, e_id, play, duration, instance));
-			});
 		}
 	}
 
@@ -1281,6 +1283,9 @@ var SwipeElement = function () {
 			}
 
 			if (this.info["clip"] && this.info["clip"] === true) {
+				$("#" + this.css_id).css("overflow", "hidden");
+			}
+			if (this.info._pathRoot) {
 				$("#" + this.css_id).css("overflow", "hidden");
 			}
 		}
@@ -2015,6 +2020,8 @@ var SwipeElement = function () {
 				return "markdown";
 			} else if (this.info.path) {
 				return "path";
+			} else if (this.info._pathRoot) {
+				return "pathRoot";
 			} else {
 				return "div";
 			}
@@ -2048,6 +2055,11 @@ var SwipeElement = function () {
 		key: "isPath",
 		value: function isPath() {
 			return this.type() == "path";
+		}
+	}, {
+		key: "isPathRoot",
+		value: function isPathRoot() {
+			return this.type() == "pathRoot";
 		}
 	}, {
 		key: "isDiv",
@@ -2088,6 +2100,15 @@ var SwipeElement = function () {
 				var attrs = this.defaultAttr('element video_element element_page_' + this.page_id + ' video_element_' + this.page_id);
 				var attr_str = this.getAttrStr(attrs);
 				return "<div " + attr_str + "><div id='" + this.css_id + "_inner' class='element_inner'>" + "<video id='" + this.css_id + "-video'  webkit-playsinline playsinline muted><source type='video/mp4' src='" + this.info.video + "'  /></video>" + child_html + "</div></div>";
+			} else if (this.isPathRoot()) {
+				var elements = [];
+				if (Array.isArray(this.info["elements"])) {
+					elements = this.info["elements"];
+				} else {
+					elements = [this.info["elements"]];
+				}
+				var paths = this.swipe_to_path({ element: this.info, depth: 0 });
+				return '<div id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id + '" class="element svg_element element_page_' + this.page_id + '"><div id="' + this.css_id + '_inner" class="element_inner"><svg id="' + this.css_id + '_svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">' + paths + '</svg></div></div>';
 			} else if (this.isPath()) {
 				return '<div id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id + '" class="element svg_element element_page_' + this.page_id + '"><div id="' + this.css_id + '_inner" class="element_inner"><svg id="' + this.css_id + '_svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"></svg></div></div>';
 			} else if (this.isDiv()) {
@@ -2096,6 +2117,72 @@ var SwipeElement = function () {
 				return "";
 			}
 		}
+		// from studio js
+
+	}, {
+		key: "swipe_to_path",
+		value: function swipe_to_path(props) {
+			var element = props.element;
+			var depth = props.depth;
+			var instance = this;
+			var scale = SwipeScreen.getRatio();
+
+			var ret = "";
+			if (Array.isArray(element)) {
+				ret = element.map(function (elem) {
+					return instance.swipe_to_path({ element: elem, scale: scale, depth: depth + 1 });
+				});
+			} else {
+				if (element.elements) {
+					if (Array.isArray(element.elements)) {
+						ret = element.elements.map(function (elem) {
+							return instance.swipe_to_path({ element: elem, scale: scale, depth: depth + 1 });
+						});
+					} else {
+						ret = instance.swipe_to_path({ element: element.elements, scale: scale, depth: depth + 1 });
+					}
+				}
+				if (element.path) {
+					return "<path className='svgPath' d='" + element.path + "' stroke='" + this.strokeColor(element) + "' fill='" + this.fillColor(element) + "' strokeWidth='" + this.pathLine(element) + "' >" + ret + "</path>";
+				}
+			}
+
+			if (depth === 0) {
+				return "<g style='transform: scale(" + scale + ", " + scale + ")'>" + ret + "</g>";
+			} else {
+				return ret;
+			}
+		}
+	}, {
+		key: "strokeColor",
+		value: function strokeColor(elem) {
+			var color = elem.strokeColor ? elem.strokeColor : "black";
+			return this.convRgba2rgb(color);
+		}
+	}, {
+		key: "fillColor",
+		value: function fillColor(elem) {
+			var color = elem.fillColor ? elem.fillColor === "#0000" ? "none" : elem.fillColor : "none";
+			return this.convRgba2rgb(color);
+		}
+	}, {
+		key: "pathLine",
+		value: function pathLine(elem) {
+			return elem.lineWidth ? elem.lineWidth : 1;
+		}
+	}, {
+		key: "convRgba2rgb",
+		value: function convRgba2rgb(color) {
+			if (color) {
+				var match = color.match(/^(#\w{6})(\w{2})$/);
+				if (match) {
+					return match[1];
+				}
+			}
+			return color;
+		}
+		// end from studio
+
 	}, {
 		key: "defaultAttr",
 		value: function defaultAttr(class_name) {

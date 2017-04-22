@@ -39,16 +39,18 @@ class SwipeElement {
 	    this.bc = this.info["bc"];
 	  }
 	  if (this.info["elements"]) {
-      let elements = [];
-      if (Array.isArray(this.info["elements"])) {
-        elements = this.info["elements"];
-      } else {
-        elements = [this.info["elements"]];
+      if (!this.isPathRoot()) {
+        let elements = [];
+        if (Array.isArray(this.info["elements"])) {
+          elements = this.info["elements"];
+        } else {
+          elements = [this.info["elements"]];
+        }
+	      elements.forEach(function(element, elem_index){
+		      var e_id = element_id + "-" + elem_index;
+		      instance.elements.push(new SwipeElement(element, page_id, e_id, play, duration, instance));
+	      });
       }
-	    elements.forEach(function(element, elem_index){
-		    var e_id = element_id + "-" + elem_index;
-		    instance.elements.push(new SwipeElement(element, page_id, e_id, play, duration, instance));
-	    });
 	  }
   }
 
@@ -223,7 +225,9 @@ class SwipeElement {
 	  if(this.info["clip"] && this.info["clip"] === true) {
 	    $("#" + this.css_id).css("overflow", "hidden");
 	  }
-
+    if (this.info._pathRoot) {
+	    $("#" + this.css_id).css("overflow", "hidden");
+    }
   }	
   initVideo() {
 	  this.videoStart = 0;
@@ -912,6 +916,8 @@ class SwipeElement {
 	    return "markdown";
 	  } else if (this.info.path) {
 	    return "path";
+	  } else if (this.info._pathRoot) {
+	    return "pathRoot";
 	  } else {
 	    return "div";
 	  }
@@ -934,6 +940,9 @@ class SwipeElement {
   }
   isPath() {
 	  return this.type() == "path";
+  }
+  isPathRoot() {
+    return this.type() == "pathRoot";
   }
   isDiv() {
 	  return this.type() == "div";
@@ -979,14 +988,81 @@ class SwipeElement {
 	    return  "<div " + attr_str + "><div id='" + this.css_id + "_inner' class='element_inner'>" + 
 		    "<video id='" + this.css_id + "-video'  webkit-playsinline playsinline muted><source type='video/mp4' src='" + this.info.video + "'  /></video>" +
 		    child_html + "</div></div>";
+    } else if (this.isPathRoot()) {
+      let elements = [];
+      if (Array.isArray(this.info["elements"])) {
+        elements = this.info["elements"];
+      } else {
+        elements = [this.info["elements"]];
+      }
+      let paths = this.swipe_to_path({element: this.info, depth: 0});
+      return  '<div id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id +  '" class="element svg_element element_page_' + this.page_id + '"><div id="' + this.css_id + '_inner" class="element_inner"><svg id="' + this.css_id + '_svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">' + paths + '</svg></div></div>';
 	  } else if (this.isPath()) {
 	    return  '<div id="' + this.css_id + '" __page_id="' + this.page_id + '" __element_id="' + this.element_id +  '" class="element svg_element element_page_' + this.page_id + '"><div id="' + this.css_id + '_inner" class="element_inner"><svg id="' + this.css_id + '_svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"></svg></div></div>';
-	  } else if (this.isDiv()) {
+
+
+    } else if (this.isDiv()) {
 	    return "<div class='element boxelement-" + this.page_id + " element_page_" +  this.page_id + "' id='" + this.css_id + "' __page_id='" + this.page_id + "' __element_id='" + this.element_id + "' >" + child_html + "</div>" ;
 	  } else {
 	    return "";
 	  }
   }
+  // from studio js 
+  swipe_to_path(props) {
+    let element = props.element;
+    let depth = props.depth;
+    let instance = this;
+    let scale = SwipeScreen.getRatio();
+    
+    let ret = "";
+    if (Array.isArray(element)){
+      ret = element.map((elem) => {
+        return instance.swipe_to_path({element: elem, scale: scale, depth: depth+1});
+      });
+    } else {
+      if (element.elements) {
+        if (Array.isArray(element.elements)) {
+          ret = element.elements.map((elem) => {
+            return instance.swipe_to_path({element: elem, scale: scale, depth: depth+1});
+          });
+        } else {
+          ret = instance.swipe_to_path({element: element.elements, scale: scale, depth: depth+1});
+        }
+      }
+      if (element.path) {
+         return "<path className='svgPath' d='" + element.path + "' stroke='" + this.strokeColor(element) + "' fill='" + this.fillColor(element) + "' strokeWidth='" + this.pathLine(element) + "' >" + ret + "</path>";
+      }
+    }
+    
+    if (depth === 0){
+      return "<g style='transform: scale(" + scale + ", " + scale +")'>" + ret + "</g>";
+    } else {
+      return ret;
+    }
+  }
+  strokeColor(elem) {
+	  let color = elem.strokeColor ? elem.strokeColor : "black";
+    return this.convRgba2rgb(color);
+  }
+  fillColor(elem) {
+	  let color = elem.fillColor ?
+	      (elem.fillColor === "#0000" ? "none" : elem.fillColor ) : "none";
+    return this.convRgba2rgb(color);
+  }
+  pathLine(elem) {
+	  return elem.lineWidth ? elem.lineWidth : 1;
+  }
+  convRgba2rgb(color){
+	  if (color) {
+      let match = color.match(/^(#\w{6})(\w{2})$/);
+      if (match) {
+	      return match[1];
+	    }
+    }
+	  return color;
+  }
+  // end from studio
+
   defaultAttr(class_name){
 	  var attrs = {}
 	  attrs["class"] = class_name;
