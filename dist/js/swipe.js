@@ -926,6 +926,7 @@ var SwipeBook = function () {
 				this.media_player.play(this.step - 1);
 			} else {
 				this.pages[this.step - 1].finShow();
+				this.media_player.setCurrent(this.step - 1);
 			}
 			if (currentPlayStyle == "scroll") {
 				this.pages[this.step].finShow();
@@ -2761,6 +2762,30 @@ var SwipeMediaPlayer = function () {
 			return this;
 		}
 	}, {
+		key: "setCurrent",
+		value: function setCurrent() {
+			var page = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+
+			if (page) {
+				this.current_page = page;
+			}
+			var instance = this;
+			if (this.current_playing != this.current_page) {
+				this.stop();
+			}
+			if (this.media[this.current_page]) {
+				var page = this.media[this.current_page];
+				Object.keys(page).forEach(function (key) {
+					var data = page[key];
+					var player = data.media;
+					var duration = page[key] && page[key].videoDuration ? page[key].videoDuration : player.duration;
+					var start = page[key] && page[key].videoStart ? page[key].videoStart : 0;
+					var last = start + duration;
+					player.setCurrentTime(last);
+				});
+			}
+		}
+	}, {
 		key: "play",
 		value: function play() {
 			var page = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
@@ -2782,6 +2807,7 @@ var SwipeMediaPlayer = function () {
 							player.setCurrentTime(start);
 						}
 						if (data["canPlay"]) {
+							player.currentTime = 0;
 							player.play();
 							player.addEventListener('ended', function () {
 								instance.current_playing = null;
@@ -2796,6 +2822,7 @@ var SwipeMediaPlayer = function () {
 								// accuracy of settimeout is not good. so I add  a second.
 								if (player.currentTime + 1 > Number(start) + Number(duration)) {
 									player.stop();
+									instance.current_playing = null;
 								}
 							}, duration * 1000);
 						}

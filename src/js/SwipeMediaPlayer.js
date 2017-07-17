@@ -24,6 +24,26 @@ class SwipeMediaPlayer {
 	  return this;
   }
 
+  setCurrent(page=null){
+	  if (page) {
+	    this.current_page = page;
+	  }
+	  var instance = this;
+	  if (this.current_playing != this.current_page){
+	    this.stop();
+    }
+	  if (this.media[this.current_page]) {
+		  var page = this.media[this.current_page];
+		  Object.keys(page).forEach(function (key) {
+		    var data = page[key];
+		    var player = data.media;
+        let duration = (page[key] && page[key].videoDuration) ? page[key].videoDuration : player.duration;
+		    let start = (page[key] && page[key].videoStart) ? page[key].videoStart : 0;
+        let last = start + duration;
+			  player.setCurrentTime(last);
+      });
+    }                      
+  }
   play(page=null){
 	  if (page) {
 	    this.current_page = page;
@@ -42,6 +62,7 @@ class SwipeMediaPlayer {
 			      player.setCurrentTime(start);
 		      }
 		      if (data["canPlay"]) {
+            player.currentTime = 0;
 			      player.play();
 			      player.addEventListener('ended', function() {
 			        instance.current_playing = null;
@@ -56,6 +77,7 @@ class SwipeMediaPlayer {
 			        // accuracy of settimeout is not good. so I add  a second.
 			        if (player.currentTime + 1 > (Number(start) + Number(duration))) {
 				        player.stop();
+			          instance.current_playing = null;
 			        }
 			      }, duration * 1000);
 		      }
