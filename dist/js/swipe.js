@@ -266,6 +266,7 @@ var SwipeBook = function () {
 				this.media_player.page($(element).attr("__page_id")).push($(element).attr("id"), data);
 				instance.counterDecrease();
 			});
+			this.checkAndUpdateNextPage();
 		}
 	}, {
 		key: 'domLoad',
@@ -322,7 +323,11 @@ var SwipeBook = function () {
 		value: function counterDecrease() {
 			SwipeCounter.decrease();
 			$("#counter").html(SwipeCounter.getCounter());
-
+			this.checkAndUpdateNextPage();
+		}
+	}, {
+		key: 'checkAndUpdateNextPage',
+		value: function checkAndUpdateNextPage() {
 			if (SwipeCounter.getCounter() == 0) {
 				if (this.loadingPage == this.step) {
 					$("#loading").remove();
@@ -339,7 +344,6 @@ var SwipeBook = function () {
 				} else {
 					this.loadFinish();
 				}
-				console.log("OK!!!");
 			}
 			console.log(SwipeCounter.getCounter());
 		}

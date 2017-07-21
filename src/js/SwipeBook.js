@@ -223,6 +223,8 @@ class SwipeBook {
 	    this.media_player.page($(element).attr("__page_id")).push($(element).attr("id"), data);
 	    instance.counterDecrease();
 	  });
+    this.checkAndUpdateNextPage();
+    
   }
   
   domLoad() {
@@ -276,7 +278,10 @@ class SwipeBook {
   counterDecrease(){
 	  SwipeCounter.decrease();
 	  $("#counter").html(SwipeCounter.getCounter());
+    this.checkAndUpdateNextPage()
+  }    
 
+  checkAndUpdateNextPage() {
 	  if(SwipeCounter.getCounter() == 0){
       if (this.loadingPage == this.step) {
 	      $("#loading").remove();
@@ -293,7 +298,6 @@ class SwipeBook {
       } else {
 	      this.loadFinish();
       }
-	    console.log("OK!!!");
 	  }
 	  console.log(SwipeCounter.getCounter());
   }
