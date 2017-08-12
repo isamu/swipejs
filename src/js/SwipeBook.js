@@ -24,6 +24,8 @@ class SwipeBook {
 	  this.base_css_id = base_css_id;
 	  this.back_css_id = back_css_id;
 	  this.media_player = SwipeMediaPlayer.getInstance();
+	  this.loaded_callback = null;
+	  this.start_callback = null;
 	  this.finish_callback = null;
 	  if (data["type"] == "net.swipe.list") {
 	    let html = []
@@ -305,6 +307,16 @@ class SwipeBook {
   loadFinish(){
     this.isReady = true;
 	  // $("#loading").remove();
+	  if (this.loaded_callback) {
+      this.loaded_callback();
+    }
+  }
+  set_loaded_callback(func) {
+	  this.loaded_callback = func;
+  }
+  set_start_callback(func) {
+	  this.start_callback = func;
+    console.log( this.start_callback );
   }
   set_finish_callback(func) {
 	  this.finish_callback = func;
@@ -395,6 +407,9 @@ class SwipeBook {
 	  if (!this.first_touch && this.isReady){
 	    this.media_player.load();
 	    this.first_touch = true;
+      if (this.start_callback) {
+        this.start_callback();
+      }
 	  }
 	  var transition = this.pages[Math.max(currentStep, nextStep)].getTransition();
 	  var currentTransition = this.pages[currentStep].getTransition();
@@ -774,6 +789,9 @@ class SwipeBook {
 		    video.load();
 	      });
       */
+      if (this.start_callback) {
+        this.start_callback();
+      }
 	    this.first_touch = true;
 	  }
 	  
