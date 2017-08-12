@@ -5,7 +5,7 @@ var concat = require('gulp-concat');
 var runSequence = require('run-sequence');
  
 
-var version = "1.0.8";
+var version = "1.0.9";
 
 gulp.task("babel", function () {
     return gulp.src("src/js/*.js")
