@@ -66,6 +66,9 @@ class SwipeElement {
 	  return info;
   }
 
+    insertBr(text) {
+	return text.replace(/\n/g, "<br/>").replace(/\s/g, "&nbsp;");
+    }
   parseText(element) {
 	  if (typeof element == "string") {
 	    return element;
@@ -389,7 +392,7 @@ class SwipeElement {
 	    this.setSpritePos(sprite_pos);
 	  }
 	  if (this.isText()) {
-	    $("#" + this.css_id + "-body").css(this.prevText);
+	      $("#" + this.css_id + "-body").css(this.prevText);
 	  }
 	  if (this.isPath()) {
 	    this.path.attr(this.prevPath.path);
@@ -427,13 +430,11 @@ class SwipeElement {
 	  }
 
 	  var fontname = SwipeParser.parseFontName(info, false);
-
 	  var fontSize = function(info, scale) {
 	    var defaultSize = 20 / 480 * SwipeScreen.swipeheight();
-      let size = SwipeParser.parseFontSize(info, SwipeScreen.swipeheight(), defaultSize, false);
-      return Math.round(size * Math.abs(scale[1]));
+	      let size = SwipeParser.parseFontSize(info, SwipeScreen.swipeheight(), defaultSize, false);
+	      return Math.round(size * Math.abs(scale[1]));
 	  }(info, data[6]);
-	  
 	  var containerHeight = fontSize;
 	  var divHeight = data[3];
 	  var top = 0;
@@ -446,15 +447,14 @@ class SwipeElement {
 	    return {
 		    position: "relative",
 		    top: "0px",
-		    "font-size": String(SwipeScreen.virtualY(fontSize)) + "px",
-		    "line-height" : String(SwipeScreen.virtualY( Math.abs(fontSize * 1.5))) + "px",
-		    "font-family": fontname,
+		    "font-size": String(Math.round(fontSize)) + "px",
+     		    "line-height" : String(Math.round(Math.abs(fontSize * 1.5))) + "px",
+      		    "font-family": String(fontname),
 		    "textAlign": textAlign,
 		    "width": "inherit",
 		    "display": "table-cell",
 		    "vertical-align": "middle",
 		    "height": String(SwipeScreen.virtualY(divHeight)) + "px",
-
 		    "color": this.conv_rgba2rgb(SwipeParser.parseColor(info, "#000"))
 	    };
 	  }
@@ -462,9 +462,9 @@ class SwipeElement {
 	  return {
 	    position: "relative",
 	    top: String(SwipeScreen.virtualY(top)) + "px",
-	    "font-size": String(SwipeScreen.virtualY(fontSize)) + "px",
-	    "line-height" : String(SwipeScreen.virtualY( Math.abs(fontSize * 1.5))) + "px",
-	    "font-family": fontname,
+	      "font-size": String(Math.round(fontSize)) + "px",
+	    "line-height" : String(Math.abs(fontSize * 1.5)) + "px",
+	      "font-family": String(fontname),
 	    "textAlign": textAlign,
 	    "color": this.conv_rgba2rgb(SwipeParser.parseColor(info, "#000"))
 	  };
@@ -551,6 +551,9 @@ class SwipeElement {
 		    }
 	    });
 	    if (this.isText()) {
+		if (instance.finText["font-family"]) {
+		    delete instance.finText["font-family"];
+		}
 		    $("#" + this.css_id + "-body").animate(this.prevText, {
 		      duration: this.duration
 		    });
@@ -609,7 +612,7 @@ class SwipeElement {
 	    transform.push("rotate("+ this.angle + "deg)");
 	  }
 
-	  if (!this.isPath()) {
+      if (!this.isPath() && !this.isText()) {
 	    if (this.scale != this.to_scale) {
 		    var scale = [
 		      this.scale[0] * ( 1- ratio) + this.to_scale[0] * ratio,
@@ -648,7 +651,10 @@ class SwipeElement {
 		    }
 		    
 		    if (instance.isText()) {
-		      $("#" + instance.css_id + "-body").animate(instance.finText, {
+			if (instance.finText["font-family"]) {
+			    delete instance.finText["font-family"];
+			}
+			$("#" + instance.css_id + "-body").animate(instance.finText, {
 			      duration: do_duration
           });
 		    }
@@ -828,6 +834,14 @@ class SwipeElement {
 	  if(to["scale"]) {
 	    ret[6] = this.getScale(to);
 	  }
+      if (this.isText()) {
+	  var w_org = ret[2];
+	  var h_org = ret[3];
+	  ret[2] =  ret[2] * ret[6][0];
+	  ret[3] =  ret[3] * ret[6][1];
+	  ret[0]  = ret[0]  - (ret[2] - w_org ) / 2
+	  ret[1]  = ret[1]  - (ret[3] - h_org ) / 2
+      }
 	  return ret;
   }
 
@@ -876,7 +890,7 @@ class SwipeElement {
 	    transform.push("rotate(" + angle +"deg)");
 	  }
 	  // path is not apply default transform
-	  if (!this.isPath() && !skip_transform){
+      if (!this.isText() && !this.isPath() && !skip_transform){
 	    var scale = data[6];
 	    if (SwipeParser.is("Array", scale) && scale.length == 2) {
 		    transform.push("scale(" + scale[0] + "," + scale[1] +")");
@@ -975,7 +989,7 @@ class SwipeElement {
 	    var attr_str = this.getAttrStr(attrs);
 
 	    return  "<div "+ attr_str + "><div id='" + this.css_id + "_inner' class='element_inner'>" +
-		    "<div class='text_body' id='" + this.css_id + "-body'><span>" + this.parseText(this.info.text) + child_html + "</span></div>" +
+		  "<div class='text_body' id='" + this.css_id + "-body'><span>" + this.insertBr(this.parseText(this.info.text)) + child_html + "</span></div>" +
 		    "</div></div>";
 	  } else if (this.isMarkdown()){
 	    let md_array = this.parseMarkdown(this.info.markdown);
