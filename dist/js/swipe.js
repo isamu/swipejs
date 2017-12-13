@@ -3804,10 +3804,10 @@ var SwipeUtil = function () {
 			SwipeUtil.setRatio(ratio);
 			if (ratio > 0) {
 				SwipeUtil.setStatus("stopping");
-				SwipeUtil.go_ratio(0.1);
+				SwipeUtil.go_ratio(0.03);
 			} else {
 				SwipeUtil.setStatus("stopping");
-				SwipeUtil.go_ratio(-0.1);
+				SwipeUtil.go_ratio(-0.03);
 			}
 		}
 	}, {
@@ -3840,7 +3840,7 @@ var SwipeUtil = function () {
 
 				setTimeout(function () {
 					SwipeUtil.go_ratio(delta);
-				}, 10);
+				}, 20);
 			}
 		}
 	}]);
