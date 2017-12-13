@@ -688,7 +688,7 @@ class SwipeElement {
 	    $("#" + instance.css_id).animate(instance.convCssPos(instance.finPos), {
 		    duration: 100000000, 
 		    step: function(s){
-		      if (SwipeTouch.getStatus() == "stop") {
+		      if (SwipeUtil.getStatus() == "stop") {
 			      $(this).stop(0);
 		      }
 		    },

@@ -200,11 +200,12 @@ class SwipeUtil {
 	    SwipeUtil.stop();
 	  } else {
 	    var swipe_book = SwipeUtil.getSwipeBook();
+	    SwipeUtil.setRatio(this.ratio);
 	    swipe_book.view(this.ratio);
 	    
 	    setTimeout(function(){
 		    SwipeUtil.go_ratio(delta);
-	    }, 20);
+	    }, 2);
 	  }
   }
 	
