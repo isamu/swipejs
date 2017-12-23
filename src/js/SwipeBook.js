@@ -35,6 +35,7 @@ class SwipeBook {
 	    $(base_css_id).html("<ul>" + html.join("") + "</ul>");
 	    this.setScreen();
 	  } else {
+      $(base_css_id).html("");
 	    // 	"type":"net.swipe.swipe"
 	    this.step = defaultPage;
 	    
@@ -118,7 +119,7 @@ class SwipeBook {
   
   setSwipeCss() {
 	  var x = ($(window).width() -  SwipeScreen.virtualwidth()) / 2.0;
-
+    
 	  $("#loading").css({
 	    height: SwipeScreen.virtualheight(),
 	    width: SwipeScreen.virtualwidth(),

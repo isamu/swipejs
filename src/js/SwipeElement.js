@@ -66,9 +66,9 @@ class SwipeElement {
 	  return info;
   }
 
-    insertBr(text) {
-	return text.replace(/\n/g, "<br/>").replace(/\s/g, "&nbsp;");
-    }
+  insertBr(text) {
+	  return text.replace(/\n/g, "<br/>").replace(/\s/g, "&nbsp;");
+  }
   parseText(element) {
 	  if (typeof element == "string") {
 	    return element;
