@@ -217,6 +217,21 @@ class SwipeUtil {
 	    }, 2);
 	  }
   }
-	
-  
+  static replaceObject(obj, key, replace) {
+    if(Array.isArray(obj)) {
+      obj = obj.map((elem) => {
+        return SwipeUtil.replaceObject(elem, key, replace);
+      });
+      return obj;
+    } else if( typeof(obj) === "object" && obj !== null) {
+      Object.keys(obj).map((obj_key) => {
+        obj[obj_key] = SwipeUtil.replaceObject(obj[obj_key], key, replace);
+      });
+      return obj;
+    } else if(obj === key) {
+      return replace
+    } else {
+      return obj;
+    }
+  }
 }
