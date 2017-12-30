@@ -1497,6 +1497,9 @@ var SwipeElement = function () {
 			}
 			if (this.isText()) {
 				$("#" + this.css_id + "-body").css(this.prevText);
+				if (this.info["textVertical"]) {
+					$("#" + this.css_id).css(this.textVertical());
+				}
 			}
 			if (this.isPath()) {
 				this.path.attr(this.prevPath.path);
@@ -1543,36 +1546,35 @@ var SwipeElement = function () {
 			}(info, data[6]);
 			var containerHeight = fontSize;
 			var divHeight = data[3];
-			var top = 0;
+			var top = x == "bottom" ? divHeight - containerHeight : 0;
 
-			// todo font size
-			if (x == "bottom") {
-				top = divHeight - containerHeight;
-			} else if (x == "center") {
-				// top = (divHeight - containerHeight) / 2;
-				return {
-					position: "relative",
-					top: "0px",
-					"font-size": String(Math.round(fontSize)) + "px",
-					"line-height": String(Math.round(Math.abs(fontSize * 1.5))) + "px",
-					"font-family": String(fontname),
-					"textAlign": textAlign,
-					"width": "inherit",
-					"display": "table-cell",
-					"vertical-align": "middle",
-					"height": String(SwipeScreen.virtualY(divHeight)) + "px",
-					"color": this.conv_rgba2rgb(SwipeParser.parseColor(info, "#000"))
-				};
-			}
-
-			return {
-				position: "relative",
+			var ret_base = {
 				top: String(SwipeScreen.virtualY(top)) + "px",
+				position: "relative",
 				"font-size": String(Math.round(fontSize)) + "px",
-				"line-height": String(Math.abs(fontSize * 1.5)) + "px",
+				"line-height": String(Math.round(Math.abs(fontSize * 1.5))) + "px",
 				"font-family": String(fontname),
 				"textAlign": textAlign,
 				"color": this.conv_rgba2rgb(SwipeParser.parseColor(info, "#000"))
+
+				// todo font size
+			};if (x == "center") {
+				ret_base = SwipeUtil.merge(ret_base, {
+					"width": "inherit",
+					"height": String(SwipeScreen.virtualY(divHeight)) + "px",
+					"display": "table-cell",
+					"vertical-align": "middle"
+				});
+			}
+			return ret_base;
+		}
+	}, {
+		key: "textVertical",
+		value: function textVertical() {
+			return {
+				"-webkit-writing-mode": "vertical-rl",
+				"-ms-writing-mode": "tb-rl",
+				"writing-mode": "vertical-rl"
 			};
 		}
 	}, {
@@ -1705,6 +1707,9 @@ var SwipeElement = function () {
 			if (this.isText()) {
 				var text_css = this.textLayout(this.info, this.originalFinPos);
 				$("#" + this.css_id + "-body").css(text_css);
+				if (this.info["textVertical"]) {
+					$("#" + this.css_id).css(this.textVertical());
+				}
 			}
 			if (this.isPath()) {
 				this.path.attr(this.finPath.path);
@@ -3376,7 +3381,7 @@ var SwipeScreen = function () {
 		key: "getSize",
 		value: function getSize() {
 			if (this.size) {
-				return this.size;
+				return this.size[1];
 			} else {
 				return 100;
 			}
@@ -3384,7 +3389,12 @@ var SwipeScreen = function () {
 	}, {
 		key: "setSize",
 		value: function setSize(size) {
-			this.size = size;
+			this.size = [size, size];
+		}
+	}, {
+		key: "setSizes",
+		value: function setSizes(width, height) {
+			this.size = [width, height];
 		}
 	}, {
 		key: "init",
@@ -3427,8 +3437,8 @@ var SwipeScreen = function () {
 				this.virtual_height = this.height / this.width * this.virtual_width;
 			}
 			if (this.size) {
-				this.virtual_width = this.virtual_width * this.size / 100;
-				this.virtual_height = this.virtual_height * this.size / 100;
+				this.virtual_width = this.virtual_width * this.size[0] / 100;
+				this.virtual_height = this.virtual_height * this.size[1] / 100;
 			}
 			this.ratio = this.virtual_width / this.width;
 		}

@@ -1,13 +1,16 @@
 class SwipeScreen {
   static getSize(){
 	  if (this.size) {
-	    return this.size;
+	    return this.size[1];
 	  } else {
 	    return 100;
 	  }
   }
   static setSize(size){
-	  this.size = size;
+	  this.size = [size, size];
+  }
+  static setSizes(width, height){
+	  this.size = [width, height];
   }
 
   static init(width, height){
@@ -46,8 +49,8 @@ class SwipeScreen {
 	    this.virtual_height = this.height / this.width * this.virtual_width;
 	  }
 	  if (this.size) {
-	    this.virtual_width  = this.virtual_width  * this.size / 100;
-	    this.virtual_height = this.virtual_height * this.size / 100;
+	    this.virtual_width  = this.virtual_width  * this.size[0] / 100;
+	    this.virtual_height = this.virtual_height * this.size[1] / 100;
 	  }
 	  this.ratio = this.virtual_width / this.width;
   }

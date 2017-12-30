@@ -392,7 +392,10 @@ class SwipeElement {
 	    this.setSpritePos(sprite_pos);
 	  }
 	  if (this.isText()) {
-	      $("#" + this.css_id + "-body").css(this.prevText);
+	    $("#" + this.css_id + "-body").css(this.prevText);
+      if(this.info["textVertical"]) {
+        $("#" + this.css_id).css(this.textVertical());
+      }
 	  }
 	  if (this.isPath()) {
 	    this.path.attr(this.prevPath.path);
@@ -437,37 +440,36 @@ class SwipeElement {
 	  }(info, data[6]);
 	  var containerHeight = fontSize;
 	  var divHeight = data[3];
-	  var top = 0;
-
-	  // todo font size
-	  if (x == "bottom") {
-	    top = divHeight - containerHeight;
-	  } else if ( x == "center") {
-	    // top = (divHeight - containerHeight) / 2;
-	    return {
-		    position: "relative",
-		    top: "0px",
-		    "font-size": String(Math.round(fontSize)) + "px",
-     		    "line-height" : String(Math.round(Math.abs(fontSize * 1.5))) + "px",
-      		    "font-family": String(fontname),
-		    "textAlign": textAlign,
-		    "width": "inherit",
-		    "display": "table-cell",
-		    "vertical-align": "middle",
-		    "height": String(SwipeScreen.virtualY(divHeight)) + "px",
-		    "color": this.conv_rgba2rgb(SwipeParser.parseColor(info, "#000"))
-	    };
-	  }
-	  
-	  return {
-	    position: "relative",
+	  var top = (x == "bottom") ? (divHeight - containerHeight) : 0;
+    
+    var ret_base = {
 	    top: String(SwipeScreen.virtualY(top)) + "px",
-	      "font-size": String(Math.round(fontSize)) + "px",
-	    "line-height" : String(Math.abs(fontSize * 1.5)) + "px",
-	      "font-family": String(fontname),
+	    position: "relative",
+	    "font-size": String(Math.round(fontSize)) + "px",
+     	"line-height" : String(Math.round(Math.abs(fontSize * 1.5))) + "px",
+	    "font-family": String(fontname),
 	    "textAlign": textAlign,
 	    "color": this.conv_rgba2rgb(SwipeParser.parseColor(info, "#000"))
-	  };
+	  }
+    
+	  // todo font size
+	  if ( x == "center") {
+	    ret_base = SwipeUtil.merge(ret_base, {
+		    "width": "inherit",
+		    "height": String(SwipeScreen.virtualY(divHeight)) + "px",
+		    "display": "table-cell",
+		    "vertical-align": "middle",
+	    });
+	  }
+    return ret_base;
+  }
+
+  textVertical() {
+    return {
+      "-webkit-writing-mode": "vertical-rl",
+      "-ms-writing-mode": "tb-rl",
+      "writing-mode": "vertical-rl"
+    };
   }
 
   conv_rgba2rgb(color){
@@ -551,9 +553,9 @@ class SwipeElement {
 		    }
 	    });
 	    if (this.isText()) {
-		if (instance.finText["font-family"]) {
-		    delete instance.finText["font-family"];
-		}
+		    if (instance.finText["font-family"]) {
+		      delete instance.finText["font-family"];
+		    }
 		    $("#" + this.css_id + "-body").animate(this.prevText, {
 		      duration: this.duration
 		    });
@@ -592,6 +594,9 @@ class SwipeElement {
 	  if (this.isText()) {
 	    var text_css = this.textLayout(this.info, this.originalFinPos);
 	    $("#" + this.css_id + "-body").css(text_css);
+      if(this.info["textVertical"]) {
+        $("#" + this.css_id).css(this.textVertical());
+      }
 	  }
 	  if (this.isPath()){
 	    this.path.attr(this.finPath.path);
@@ -651,10 +656,10 @@ class SwipeElement {
 		    }
 		    
 		    if (instance.isText()) {
-			if (instance.finText["font-family"]) {
-			    delete instance.finText["font-family"];
-			}
-			$("#" + instance.css_id + "-body").animate(instance.finText, {
+			    if (instance.finText["font-family"]) {
+			      delete instance.finText["font-family"];
+			    }
+			    $("#" + instance.css_id + "-body").animate(instance.finText, {
 			      duration: do_duration
           });
 		    }
