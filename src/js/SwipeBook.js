@@ -330,12 +330,13 @@ class SwipeBook {
 	  if (this.isLoaded[this.step + 1]) {
 	    if (this.step < this.pages.length - 1){
 		    this.show(this.step + 1);
-	    } else {
-		    this.isFinished = true;
-		    if (this.finish_callback) {
-		      this.finish_callback(true);
-		    }
 	    }
+    }
+    if (this.step === this.pages.length - 1) {
+		  this.isFinished = true;
+		  if (this.finish_callback) {
+		    this.finish_callback(true);
+		  }
 	  }
   }
 
@@ -347,7 +348,6 @@ class SwipeBook {
 		      if (this.finish_callback) {
 			      this.finish_callback(false);
 		      }
-		      
 		      this.isFinished = false;
 		    }
 	    }

@@ -381,11 +381,12 @@ var SwipeBook = function () {
 			if (this.isLoaded[this.step + 1]) {
 				if (this.step < this.pages.length - 1) {
 					this.show(this.step + 1);
-				} else {
-					this.isFinished = true;
-					if (this.finish_callback) {
-						this.finish_callback(true);
-					}
+				}
+			}
+			if (this.step === this.pages.length - 1) {
+				this.isFinished = true;
+				if (this.finish_callback) {
+					this.finish_callback(true);
 				}
 			}
 		}
@@ -399,7 +400,6 @@ var SwipeBook = function () {
 						if (this.finish_callback) {
 							this.finish_callback(false);
 						}
-
 						this.isFinished = false;
 					}
 				}
@@ -3425,20 +3425,17 @@ var SwipeScreen = function () {
 	}, {
 		key: "setVirtualSize",
 		value: function setVirtualSize() {
-			var real_ratio = this.window_width / this.window_height;
+			var size = this.size || [100, 100];
+			var real_ratio = this.window_width * this.size[0] / (this.window_height * this.size[1]);
 			var virtual_ratio = this.width / this.height;
 			this.ratio = 1.0;
 
 			if (real_ratio / virtual_ratio >= 1) {
-				this.virtual_height = $(window).height();
+				this.virtual_height = $(window).height() * this.size[1] / 100;
 				this.virtual_width = this.width / this.height * this.virtual_height;
 			} else {
-				this.virtual_width = $(window).width();
+				this.virtual_width = $(window).width() * this.size[0] / 100;
 				this.virtual_height = this.height / this.width * this.virtual_width;
-			}
-			if (this.size) {
-				this.virtual_width = this.virtual_width * this.size[0] / 100;
-				this.virtual_height = this.virtual_height * this.size[1] / 100;
 			}
 			this.ratio = this.virtual_width / this.width;
 		}
@@ -3676,8 +3673,14 @@ var SwipeUtil = function () {
 			});
 
 			$(window).on('hashchange', function () {
+				var nextStep = Number(location.hash.substr(1));
 				if ("#" + swipe_book.getStep() != location.hash) {
-					swipe_book.show(Number(location.hash.substr(1)));
+					if (swipe_book.getStep() > nextStep) {
+						swipe_book.back();
+					} else {
+						swipe_book.next();
+					}
+					// swipe_book.show(Number(location.hash.substr(1)));
 				}
 			});
 

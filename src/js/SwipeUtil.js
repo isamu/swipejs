@@ -36,8 +36,14 @@ class SwipeUtil {
 	  });
 	  
 	  $(window).on('hashchange', function(){
+      var nextStep = Number(location.hash.substr(1));
 	    if( ("#" + swipe_book.getStep()) != location.hash) {
-		    swipe_book.show(Number(location.hash.substr(1)));
+        if (swipe_book.getStep() > nextStep) {
+          swipe_book.back();
+        } else {
+          swipe_book.next();
+        }
+		    // swipe_book.show(Number(location.hash.substr(1)));
 	    }
 	  });
 
