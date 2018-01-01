@@ -3734,11 +3734,14 @@ var SwipeUtil = function () {
 	}, {
 		key: "initTouchSwipe",
 		value: function initTouchSwipe(data) {
+			var css_id = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "#swipe";
+			var back_css_id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "#swipe_back";
+
 			$(document.body).css({ "margin": 0, "padding": 0, "background-color": "#fff", "font-size": "26px" });
 			$('div').css({ "margin": 0, "padding": 0, "background-color": "#fff", "font-size": "26px" });
-			$('#swipe_back').css({ "touch-action": "none" });
+			$(back_css_id).css({ "touch-action": "none" });
 
-			var swipe_book = new SwipeBook(data, 0, "#swipe", "#swipe_back");
+			var swipe_book = new SwipeBook(data, 0, css_id, back_css_id);
 			this.swipe_book = swipe_book;
 			this.ratio = null;
 			$(window).resize(function () {

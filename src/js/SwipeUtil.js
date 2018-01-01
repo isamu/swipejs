@@ -94,12 +94,12 @@ class SwipeUtil {
 	  return newObject;
   }
 
-  static initTouchSwipe(data){
+  static initTouchSwipe(data, css_id="#swipe", back_css_id="#swipe_back") {
 	  $(document.body).css({"margin":0, "padding": 0, "background-color": "#fff", "font-size": "26px"})
 	  $('div').css({"margin":0, "padding": 0, "background-color": "#fff", "font-size": "26px"})
-	  $('#swipe_back').css({"touch-action": "none"});
+	  $(back_css_id).css({"touch-action": "none"});
 
-	  var swipe_book = new SwipeBook(data, 0, "#swipe", "#swipe_back");
+	  var swipe_book = new SwipeBook(data, 0, css_id, back_css_id);
 	  this.swipe_book = swipe_book;
 	  this.ratio = null;
 	  $(window).resize(function() {
