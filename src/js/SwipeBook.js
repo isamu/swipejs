@@ -327,17 +327,17 @@ class SwipeBook {
   }
   
   next(){
-	  if (this.isLoaded[this.step + 1]) {
-	    if (this.step < this.pages.length - 1){
-		    this.show(this.step + 1);
-	    }
-    }
     if (this.step === this.pages.length - 1) {
 		  this.isFinished = true;
 		  if (this.finish_callback) {
 		    this.finish_callback(true);
 		  }
 	  }
+	  if (this.isLoaded[this.step + 1]) {
+	    if (this.step < this.pages.length - 1){
+		    this.show(this.step + 1);
+	    }
+    } 
   }
 
   back(){
