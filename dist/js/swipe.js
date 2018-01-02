@@ -3426,15 +3426,15 @@ var SwipeScreen = function () {
 		key: "setVirtualSize",
 		value: function setVirtualSize() {
 			var size = this.size || [100, 100];
-			var real_ratio = this.window_width * this.size[0] / (this.window_height * this.size[1]);
+			var real_ratio = this.window_width * size[0] / (this.window_height * size[1]);
 			var virtual_ratio = this.width / this.height;
 			this.ratio = 1.0;
 
 			if (real_ratio / virtual_ratio >= 1) {
-				this.virtual_height = $(window).height() * this.size[1] / 100;
+				this.virtual_height = $(window).height() * size[1] / 100;
 				this.virtual_width = this.width / this.height * this.virtual_height;
 			} else {
-				this.virtual_width = $(window).width() * this.size[0] / 100;
+				this.virtual_width = $(window).width() * size[0] / 100;
 				this.virtual_height = this.height / this.width * this.virtual_width;
 			}
 			this.ratio = this.virtual_width / this.width;
