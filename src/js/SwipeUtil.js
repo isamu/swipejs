@@ -99,6 +99,7 @@ class SwipeUtil {
 	  $('div').css({"margin":0, "padding": 0, "background-color": "#fff", "font-size": "26px"})
 	  $(back_css_id).css({"touch-action": "none"});
 
+    let paging = data.paging || "vertical";
 	  var swipe_book = new SwipeBook(data, 0, css_id, back_css_id);
 	  this.swipe_book = swipe_book;
 	  this.ratio = null;
@@ -123,7 +124,8 @@ class SwipeUtil {
 	  SwipeTouch.init({
 	    start_callback: SwipeUtil.start_event,
 	    scroll_callback: SwipeUtil.scroll_event_handler,
-	    stop_callback: SwipeUtil.stop_event
+	    stop_callback: SwipeUtil.stop_event,
+      paging: paging,
 	  });
 	  
   }

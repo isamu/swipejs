@@ -3499,123 +3499,160 @@ var SwipeScreen = function () {
 
 	return SwipeScreen;
 }();
-'use strict';
+"use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var SwipeTouch = function () {
-	function SwipeTouch() {
-		_classCallCheck(this, SwipeTouch);
-	}
+					function SwipeTouch() {
+										_classCallCheck(this, SwipeTouch);
+					}
 
-	_createClass(SwipeTouch, null, [{
-		key: 'init',
-		value: function init() {
-			var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+					_createClass(SwipeTouch, null, [{
+										key: "init",
+										value: function init() {
+															var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-			this.startY = 0;
-			this.currentY = 0;
-			this.diff = 0;
-			this.ratio = 0;
-			this.options = options;
-			this.status = "stop";
+															this.startY = 0;
+															this.currentY = 0;
+															this.diff = 0;
+															this.ratio = 0;
+															this.options = options;
+															this.status = "stop";
 
-			var dom = options.dom ? options.dom : window;
+															// this.paging = "vertical"; //"rightToLeft", "leftToRight"
+															this.paging = options.paging ? options.paging : "vertical";
+															console.log(this.paging);
+															// "leftToRight"; //"rightToLeft", "leftToRight"
+															// this.paging = "rightToLeft"; //"rightToLeft", "leftToRight"
 
-			var scroll_event = 'onwheel' in document ? 'wheel' : 'onmousewheel' in document ? 'mousewheel' : 'DOMMouseScroll';
+															var dom = options.dom ? options.dom : window;
 
-			var self = this;
-			$(window).on("scrollstart", function (e) {
-				var current = e.originalEvent.clientY ? e.originalEvent.clientY : event.changedTouches[0].pageY;
+															var scroll_event = 'onwheel' in document ? 'wheel' : 'onmousewheel' in document ? 'mousewheel' : 'DOMMouseScroll';
 
-				self.currentY = current;
-				self.startY = current;
-				SwipeTouch.start_event(e);
-				//$("#debug").html("start" + current);
-			}).on(scroll_event, function (e) {
-				e.preventDefault();
+															var self = this;
+															$(window).on("scrollstart", function (e) {
+																				var current = void 0;
+																				if (self.paging == "rightToLeft" || self.paging == "leftToRight") {
+																									current = e.originalEvent.clientX ? e.originalEvent.clientX : event.changedTouches[0].pageX;
+																				} else if (self.paging == "vertical") {
+																									current = e.originalEvent.clientY ? e.originalEvent.clientY : event.changedTouches[0].pageY;
+																				}
 
-				var delta = e.originalEvent.deltaY ? -e.originalEvent.deltaY : e.originalEvent.wheelDelta ? e.originalEvent.wheelDelta : -e.originalEvent.detail;
-				if (delta || delta === 0) {
-					self.currentY = self.currentY - delta;
-				} else {
-					self.currentY = event.changedTouches[0].pageY;
-				}
-				//$("#debug").html("scroll" + self.currentY );
-				self.diff = self.currentY - self.startY;
-				self.ratio = self.diff / $(window).innerHeight();
+																				self.currentY = current;
+																				self.startY = current;
+																				SwipeTouch.start_event(e);
+															}).on(scroll_event, function (e) {
+																				e.preventDefault();
 
-				if (self.ratio > 1) {
-					self.ratio = 1;
-				}
-				if (self.ratio < -1) {
-					self.ratio = -1;
-				}
+																				var delta = void 0;
+																				if (self.paging == "rightToLeft" || self.paging == "leftToRight") {
+																									delta = e.originalEvent.deltaX ? -e.originalEvent.deltaX : e.originalEvent.wheelDelta ? e.originalEvent.wheelDelta : -e.originalEvent.detail;
+																				} else if (self.paging == "vertical") {
+																									delta = e.originalEvent.deltaY ? -e.originalEvent.deltaY : e.originalEvent.wheelDelta ? e.originalEvent.wheelDelta : -e.originalEvent.detail;
+																				}
 
-				SwipeTouch.scroll_event_handler(e, self.ratio);
-			}).on("scrollstop", function (e) {
-				//$("#debug").html("scroll stop");
-				SwipeTouch.stop_event(e);
-			}).on("touchstart", function (e) {
-				var current = e.originalEvent.clientY ? e.originalEvent.clientY : event.changedTouches[0].pageY;
-				self.startY = current;
-				SwipeTouch.start_event(e);
-			}).on('touchmove.noScroll', function (e) {
-				e.preventDefault();
+																				if (delta || delta === 0) {
+																									self.currentY = self.currentY - delta;
+																				} else {
+																									if (self.paging == "rightToLeft" || self.paging == "leftToRight") {
+																														self.currentY = event.changedTouches[0].pageX;
+																									} else if (self.paging == "vertical") {
+																														self.currentY = event.changedTouches[0].pageY;
+																									}
+																				}
+																				self.diff = self.currentY - self.startY;
+																				if (self.paging == "rightToLeft") {
+																									self.ratio = self.diff / $(window).innerWidth();
+																				} else if (self.paging == "leftToRight") {
+																									self.ratio = -(self.diff / $(window).innerWidth());
+																				} else if (self.paging == "vertical") {
+																									self.ratio = self.diff / $(window).innerHeight();
+																				}
+																				if (self.ratio > 1) {
+																									self.ratio = 1;
+																				}
+																				if (self.ratio < -1) {
+																									self.ratio = -1;
+																				}
 
-				var current = e.originalEvent && e.originalEvent.pageY ? e.originalEvent.pageY : event.changedTouches[0].pageY;
-				self.diff = self.startY - current;
-				self.ratio = self.diff / $(window).innerHeight();
-				//$("#debug").html("touchmove" + self.startY +":" + current );
-				SwipeTouch.scroll_event_handler(e, self.ratio);
-			}).on("touchend", function (e) {
-				//$("#debug").html("touchend");
-				SwipeTouch.stop_event(e);
-			});
-		}
-	}, {
-		key: 'scroll_event_handler',
-		value: function scroll_event_handler(event, ratio) {
-			console.log("scroll");
-			this.status = "scroll";
-			if (this.options.scroll_callback) {
-				this.options.scroll_callback(event, ratio);
-			}
-		}
-	}, {
-		key: 'stop_event',
-		value: function stop_event(event) {
-			console.log("stop");
-			this.status = "stop";
-			if (this.options.stop_callback) {
-				this.options.stop_callback(event, this.ratio);
-			}
-		}
-	}, {
-		key: 'getRatio',
-		value: function getRatio() {
-			return this.ratio;
-		}
-	}, {
-		key: 'start_event',
-		value: function start_event() {
-			this.ratio = 0;
-			console.log("start");
-			this.status = "start";
-			if (this.options.start_callback) {
-				this.options.start_callback(event, this.ratio);
-			}
-		}
-	}, {
-		key: 'getStatus',
-		value: function getStatus() {
-			return this.status;
-		}
-	}]);
+																				SwipeTouch.scroll_event_handler(e, self.ratio);
+															}).on("scrollstop", function (e) {
+																				console.log("scrollstop");
+																				SwipeTouch.stop_event(e);
+															}).on("touchstart", function (e) {
+																				var current;
+																				if (self.paging == "rightToLeft" || self.paging == "leftToRight") {
+																									current = e.originalEvent.clientX ? e.originalEvent.clientX : event.changedTouches[0].pageX;
+																				} else if (self.paging == "vertical") {
+																									current = e.originalEvent.clientY ? e.originalEvent.clientY : event.changedTouches[0].pageY;
+																				}
+																				self.startY = current;
+																				SwipeTouch.start_event(e);
+															}).on('touchmove.noScroll', function (e) {
+																				e.preventDefault();
+																				var current = void 0;
+																				if (self.paging == "rightToLeft" || self.paging == "leftToRight") {
+																									current = e.originalEvent && e.originalEvent.pageX ? e.originalEvent.pageX : event.changedTouches[0].pageX;
+																				} else if (self.paging == "vertical") {
+																									current = e.originalEvent && e.originalEvent.pageY ? e.originalEvent.pageY : event.changedTouches[0].pageY;
+																				}
+																				self.diff = self.startY - current;
+																				if (self.paging == "rightToLeft") {
+																									self.ratio = self.diff / $(window).innerWidth();
+																				} else if (self.paging == "leftToRight") {
+																									self.ratio = -self.diff / $(window).innerWidth();
+																				} else if (self.paging == "vertical") {
+																									self.ratio = self.diff / $(window).innerHeight();
+																				}
+																				SwipeTouch.scroll_event_handler(e, self.ratio);
+															}).on("touchend", function (e) {
+																				SwipeTouch.stop_event(e);
+															});
+										}
+					}, {
+										key: "scroll_event_handler",
+										value: function scroll_event_handler(event, ratio) {
+															console.log("scroll");
+															this.status = "scroll";
+															if (this.options.scroll_callback) {
+																				this.options.scroll_callback(event, ratio);
+															}
+										}
+					}, {
+										key: "stop_event",
+										value: function stop_event(event) {
+															console.log("stop");
+															this.status = "stop";
+															if (this.options.stop_callback) {
+																				this.options.stop_callback(event, this.ratio);
+															}
+										}
+					}, {
+										key: "getRatio",
+										value: function getRatio() {
+															return this.ratio;
+										}
+					}, {
+										key: "start_event",
+										value: function start_event() {
+															this.ratio = 0;
+															console.log("start");
+															this.status = "start";
+															if (this.options.start_callback) {
+																				this.options.start_callback(event, this.ratio);
+															}
+										}
+					}, {
+										key: "getStatus",
+										value: function getStatus() {
+															return this.status;
+										}
+					}]);
 
-	return SwipeTouch;
+					return SwipeTouch;
 }();
 "use strict";
 
@@ -3741,6 +3778,7 @@ var SwipeUtil = function () {
 			$('div').css({ "margin": 0, "padding": 0, "background-color": "#fff", "font-size": "26px" });
 			$(back_css_id).css({ "touch-action": "none" });
 
+			var paging = data.paging || "vertical";
 			var swipe_book = new SwipeBook(data, 0, css_id, back_css_id);
 			this.swipe_book = swipe_book;
 			this.ratio = null;
@@ -3764,7 +3802,8 @@ var SwipeUtil = function () {
 			SwipeTouch.init({
 				start_callback: SwipeUtil.start_event,
 				scroll_callback: SwipeUtil.scroll_event_handler,
-				stop_callback: SwipeUtil.stop_event
+				stop_callback: SwipeUtil.stop_event,
+				paging: paging
 			});
 		}
 	}, {
