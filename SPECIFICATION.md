@@ -1,14 +1,14 @@
-#Swipe Language Specification
+# Swipe Language Specification
 
-##Abstract
+## Abstract
 
 This specification defines the features and syntax of Swipe, a mark-up language for non-developers to create media-rich and animated documents for touch-enabled devices.
 
-##Status of this document
+## Status of this document
 
 This specification describes the current snapshot of the Swipe 0.1, which is still under development and may change drastically.
 
-##1. Introduction
+## 1. Introduction
 
 Swipe is a domain-specific, declarative language for non-developers (such as designers, animators, illustrators, musicians, videographers and comic writers) to create media-rich documents (books and presentations) that contains photos, videos, vector graphics, animations, voices, music and sound effects, which will be consumed on touch-enabled devices (such as smartphones, tablets and touch-enabled set-top-boxes). 
 
@@ -63,7 +63,7 @@ Swipe is NOT
 - **StringId**: Regular string used as an identifier
 - **LangId**: Language identifier, such as "\*", "en", "ja", "de", etc., where "\*" represents the default
 
-##2. Document
+## 2. Document
 
 A **Document** is a UTF8 JSON file, which consists of a collection of **Pages**. The order of **Pages** in the collection is significant, and they will be presented to the user in the specified order. 
 
@@ -108,7 +108,7 @@ When the user opens this document with a Swipe viewer, the user will see only th
 - **languages** ({"id":LangId, "title":String},...): Languages to display via the "Lang." button in the Swipe viewer.
 
 
-##3. Page
+## 3. Page
 
 **Page** consists of a collection of **Elements**. The order of **Elements** in the collection is significant, those elements will be rendered in the specified order (from bottom to top). 
 
@@ -144,7 +144,7 @@ Here is a **Document** with a **Page**, which has two **Elements**.
 - **eyePosition** (Float): Eye position (z-height) for the perspective relative to width, default is 1.0 (not supported)
 - **strings** ([StringId:[LangId:String]]): String resources
  
-##4. Paging direction, inter-page transition and animation
+## 4. Paging direction, inter-page transition and animation
 
 The paging direction is defined by the "paging" property of the **Document**. It must be either *vertical*, *leftToRight* or *rightToLeft*, and the default is *vertical*.
 
@@ -165,7 +165,7 @@ The "play" property defines the timing of play/animation defined on the **Page**
 - *always*: The animation on the **Page** will be played after scrolling to this page
 - *scroll*: The animation on the **Page** will be performed while the user scrolls the page
 
-##5. Page Template
+## 5. Page Template
 
 A **PageTemplate** defines a set of properties and **Elements** to be shared among multiple **Pages**. It also defines a background music to be played when one of those **Pages** is active.
 
@@ -230,7 +230,7 @@ The following example uses the "id" to identify a particular **Element** in the 
 ### PageTemplate specific properties
 - bgm (URL): Specifies the background music to play.
 
-##6. Element
+## 6. Element
 
 An **Element** is a visible entity on a **Page**. It occupies a specified rectangle area within a **Page**. An **Element** may contain child **Elements**. 
 
@@ -346,7 +346,7 @@ The following example shows how to use a **ElementTemplate** with child **Elemen
 }
 ```
 
-##7. Transition Animation
+## 7. Transition Animation
 
 The **Transition Animation** specifies a set of animations to play right after or during the page transition (depending on the "transition" property of the page).
 
@@ -394,7 +394,7 @@ If the "play" property of the page is "scroll" like the example below, the anima
 }
 ```
 
-##8. Loop Animation
+## 8. Loop Animation
 
 The "loop" property of the element specifies the **Loop Animation** associated with the element. Unlike **Transition Animation**, it repeats the same animation multiple times specified by the *count* property (the default is 1). 
 
@@ -427,7 +427,7 @@ Following example wiggles the text "I'm wiggling!" three times when the second p
 }
 ```
 
-##9. Multilingual Strings
+## 9. Multilingual Strings
 
 The "strings" property of the page specifies strings in multiple languages.  The format is:
 
