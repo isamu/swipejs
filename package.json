@@ -4,7 +4,7 @@
   "description": "",
   "main": "swipe.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mkdir -p test && gulp run-test"
   },
   "author": "",
   "license": "ISC",
