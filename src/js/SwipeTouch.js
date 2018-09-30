@@ -1,4 +1,4 @@
-class SwipeTouch {
+export default class SwipeTouch {
   static init(options = {}) {
 	  this.startY = 0;
 	  this.currentY = 0;

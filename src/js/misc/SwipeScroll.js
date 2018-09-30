@@ -1,4 +1,4 @@
-class SwipeScroll {
+export default class SwipeScroll {
     
     static init(size){
 	this.size = size;

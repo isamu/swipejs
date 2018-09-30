@@ -1,4 +1,4 @@
-class SwipeMarkdown {
+export default class SwipeMarkdown {
   constructor (info) {
 	  this.info = info;
 

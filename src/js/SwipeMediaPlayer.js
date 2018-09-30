@@ -1,4 +1,4 @@
-class SwipeMediaPlayer {
+export default class SwipeMediaPlayer {
   static getInstance() {
 	  if(this.instance) {
 	    return this.instance;

@@ -1,4 +1,6 @@
-class SwipeElement {
+import SwipeCounter from "./SwipeCounter";
+
+export default class SwipeElement {
 
   constructor (info, page_id, element_id, play, duration, parent=null) {
 	  var css_id = "element-" + page_id + "-" + element_id;
@@ -973,6 +975,7 @@ class SwipeElement {
   
   html() {
 	  if (this.type()){
+      console.log("increase");
 	    SwipeCounter.increase();
 	    if (this.isVideo()){
 		    SwipeCounter.increase();

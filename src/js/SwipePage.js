@@ -1,4 +1,7 @@
-class SwipePage {
+import SwipeParser from "./SwipeParser";
+import SwipeElement from "./SwipeElement";
+
+export default class SwipePage {
   constructor (page, scene, index) {
 	  if (scene) {
 	    page = SwipeParser.inheritProperties(page, scene );

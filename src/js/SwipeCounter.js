@@ -1,24 +1,24 @@
-class SwipeCounter {
+export default class SwipeCounter {
   
   static increase(){
-	  if(this.counter === undefined){
-	    this.counter = 1;
+	  if(window.counter === undefined){
+	    window.counter = 1;
 	  } else {
-	    this.counter ++;
+	    window.counter ++;
 	  }
-	  return this.counter;
+	  return window.counter;
   }
 
   static decrease(){
-	  if(this.counter === undefined){
-	    this.counter = -1;
+	  if(window.counter === undefined){
+	    window.counter = -1;
 	  } else {
-	    this.counter --;
+	    window.counter --;
 	  }
-	  return this.counter;
+	  return window.counter;
   }
 
   static getCounter(){
-	  return this.counter;
+	  return window.counter;
   }
 }

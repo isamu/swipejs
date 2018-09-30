@@ -1,4 +1,8 @@
-class SwipeBook {
+import SwipeCounter from "./SwipeCounter";
+import SwipeMediaPlayer from "./SwipeMediaPlayer";
+import SwipeScreen from "./SwipeScreen";
+
+export default class SwipeBook {
   static setTemplateElements(template) {
 	  this.templateElements = template;
   }
@@ -279,6 +283,7 @@ class SwipeBook {
   }
   
   counterDecrease(){
+    console.log("decrease");
 	  SwipeCounter.decrease();
 	  $("#counter").html(SwipeCounter.getCounter());
     this.checkAndUpdateNextPage()

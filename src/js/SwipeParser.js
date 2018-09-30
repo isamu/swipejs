@@ -1,5 +1,4 @@
-
-class SwipeParser {
+export default class SwipeParser {
   constructor (_handlers = {}) {
   }
 
@@ -31,7 +30,9 @@ class SwipeParser {
 	  var idMap = {};
 	  if (tempObj){
 	    var tempClone = SwipeParser.clone(tempObj);
-	    $.each(tempClone, (keyString, tempValue) => {
+      for (let keyString in tempClone) {
+        const tempValue = tempClone[keyString];
+	      // $.each(tempClone, (keyString, tempValue) => {
 		    var ret_val = SwipeParser.clone(tempValue);
 
 		    if (ret[keyString] == null){
@@ -40,11 +41,13 @@ class SwipeParser {
  		      if ((SwipeParser.is("Array", ret[keyString]) && SwipeParser.is("Array", ret_val))) {
 			      idMap = {};
 
-			      $.each(ret_val, (index, tempItem) => {
+			      // $.each(ret_val, (index, tempItem) => {
+            for (let index in ret_val) {
+              const tempItem = ret_val[index];
 			        if (SwipeParser.is("String", tempItem["id"])) {
 				        idMap[tempItem["id"]] = index;
 			        }
-			      });
+			      }
 			      ret[keyString].forEach((objItem, key) => {
 			        if ((SwipeParser.is("String", objItem["id"]) && ((key = idMap[objItem["id"]]) != null))) {
 				        ret_val[key] = SwipeParser.inheritProperties(objItem, ret_val[key]);
@@ -55,7 +58,7 @@ class SwipeParser {
 			      ret[keyString] = ret_val;
 		      }
 		    }
-	    });
+	    }
 	  }
 	  return ret;
   }

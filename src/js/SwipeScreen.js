@@ -1,27 +1,27 @@
-class SwipeScreen {
+export default class SwipeScreen {
   static getSize(){
-	  if (this.size) {
-	    return this.size[1];
+	  if (window.swipe_screen_size) {
+	    return window.swipe_screen_size[1];
 	  } else {
 	    return 100;
 	  }
   }
   static setSize(size){
-	  this.size = [size, size];
+	  window.swipe_screen_size = [size, size];
   }
   static setSizes(width, height){
-	  this.size = [width, height];
+	  window.swipe_screen_size = [width, height];
   }
 
   static init(width, height){
-	  this.width = width;
-	  this.height = height;
+	  window.swipe_screen_width = width;
+	  window.swipe_screen_height = height;
 
-	  if (this.width == 0) {
-	    this.width = this.height * $(window).width() / $(window).height();
+	  if (window.swipe_screen_width == 0) {
+	    window.swipe_screen_width = window.swipe_screen_height * $(window).width() / $(window).height();
 	  }
-	  if (this.height == 0) {
-	    this.height =  this.width * $(window).height() /  $(window).width();
+	  if (window.swipe_screen_height == 0) {
+	    window.swipe_screen_height =  window.swipe_screen_width * $(window).height() /  $(window).width();
 	  }
 	  
 	  SwipeScreen.setOriginalSize();
@@ -30,45 +30,45 @@ class SwipeScreen {
   }
 
   static setOriginalSize() {
-	  this.window_width = $(window).width();
-	  this.window_height = $(window).height();
+	  window.swipe_screen_window_width = $(window).width();
+	  window.swipe_screen_window_height = $(window).height();
   }
 
   // todo
   //  set vertical and horizontal mode
   static setVirtualSize() {
-    var size = this.size || [100, 100]
-	  var real_ratio = (this.window_width * size[0]) / (this.window_height * size[1]);
-	  var virtual_ratio = this.width / this.height;
-	  this.ratio = 1.0;
+    var size = window.swipe_screen_size || [100, 100]
+	  var real_ratio = (window.swipe_screen_window_width * size[0]) / (window.swipe_screen_window_height * size[1]);
+	  var virtual_ratio = window.swipe_screen_width / window.swipe_screen_height;
+	  window.swipe_screen_ratio = 1.0;
 	  
 	  if (real_ratio / virtual_ratio >= 1) {
-	    this.virtual_height = $(window).height() * size[1] / 100;
-	    this.virtual_width = this.width / this.height * this.virtual_height;
+	    window.swipe_screen_virtual_height = $(window).height() * size[1] / 100;
+	    window.swipe_screen_virtual_width = window.swipe_screen_width / window.swipe_screen_height * window.swipe_screen_virtual_height;
 	  } else {
-	    this.virtual_width = $(window).width()  * size[0] / 100;
-	    this.virtual_height = this.height / this.width * this.virtual_width;
+	    window.swipe_screen_virtual_width = $(window).width()  * size[0] / 100;
+	    window.swipe_screen_virtual_height = window.swipe_screen_height / window.swipe_screen_width * window.swipe_screen_virtual_width;
 	  }
-	  this.ratio = this.virtual_width / this.width;
+	  window.swipe_screen_ratio = window.swipe_screen_virtual_width / window.swipe_screen_width;
   }
 
   static getRatio(){
-	  return this.ratio;
+	  return window.swipe_screen_ratio;
   }
   static swipewidth() {
-	  return this.width;
+	  return window.swipe_screen_width;
   }
 
   static swipeheight() {
-	  return this.height;
+	  return window.swipe_screen_height;
   }
 
   static virtualwidth() {
-	  return this.virtual_width;
+	  return window.swipe_screen_virtual_width;
   }
 
   static virtualheight() {
-	  return this.virtual_height;
+	  return window.swipe_screen_virtual_height;
   }
 
   static refresh() {
@@ -79,10 +79,10 @@ class SwipeScreen {
   // width
   static virtualX(x){
 	  if(x == undefined){
-	    return this.virtual_width;
+	    return window.swipe_screen_virtual_width;
 	  }
-	  if(this.width) {
-	    return x / this.width * this.virtual_width;
+	  if(window.swipe_screen_width) {
+	    return x / window.swipe_screen_width * window.swipe_screen_virtual_width;
 	  }
 	  return x;
   }
@@ -90,10 +90,10 @@ class SwipeScreen {
   
   static virtualY(y){
 	  if(y == undefined){
-	    return this.virtual_height;
+	    return window.swipe_screen_virtual_height;
 	  }
-	  if(this.height) {
-	    return y / this.height * this.virtual_height;
+	  if(window.swipe_screen_height) {
+	    return y / window.swipe_screen_height * window.swipe_screen_virtual_height;
 	  }
 	  return y;
   }
