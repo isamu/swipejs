@@ -1,0 +1,13 @@
+#ignore project files
+*.swipe
+*~
+tmp/
+html/
+Gemfile*
+vendor/
+node_modules
+lib/misc/
+src/js/misc/
+.bundle/
+.vim/
+dist/sample*
