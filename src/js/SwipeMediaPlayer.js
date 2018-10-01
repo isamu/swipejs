@@ -33,12 +33,12 @@ export default class SwipeMediaPlayer {
 	    this.stop();
     }
 	  if (this.media[this.current_page]) {
-		  var page = this.media[this.current_page];
-		  Object.keys(page).forEach(function (key) {
-		    var data = page[key];
+		  var current_page = this.media[this.current_page];
+		  Object.keys(current_page).forEach(function (key) {
+		    var data = current_page[key];
 		    var player = data.media;
-        let duration = (page[key] && page[key].videoDuration) ? page[key].videoDuration : player.duration;
-		    let start = (page[key] && page[key].videoStart) ? page[key].videoStart : 0;
+        let duration = (current_page[key] && current_page[key].videoDuration) ? current_page[key].videoDuration : player.duration;
+		    let start = (current_page[key] && current_page[key].videoStart) ? current_page[key].videoStart : 0;
         let last = start + duration;
 			  player.setCurrentTime(last);
       });
@@ -52,13 +52,13 @@ export default class SwipeMediaPlayer {
 	  if (this.current_playing != this.current_page){
 	    this.stop();
 	    if (this.media[this.current_page]) {
-		    var page = this.media[this.current_page];
-		    Object.keys(page).forEach(function (key) {
-		      var data = page[key];
+		    var current_page = this.media[this.current_page];
+		    Object.keys(current_page).forEach(function (key) {
+		      var data = current_page[key];
 		      var player = data.media;
 		      var start = 0;
-		      if (page[key] && page[key].videoStart) {
-			      start = page[key].videoStart;
+		      if (current_page[key] && current_page[key].videoStart) {
+			      start = current_page[key].videoStart;
 			      player.setCurrentTime(start);
 		      }
 		      if (data["canPlay"]) {
@@ -69,10 +69,10 @@ export default class SwipeMediaPlayer {
 			      });
 		      } else {
 			      data["waitPlay"] = true;
-			      instance.media[instance.current_page][key] = data;
+			      instance.media[instance.current_current_page][key] = data;
 		      }
-		      if (page[key] && page[key].videoDuration) {
-			      var duration = page[key].videoDuration;
+		      if (current_page[key] && current_page[key].videoDuration) {
+			      var duration = current_page[key].videoDuration;
 			      setTimeout(function(){
 			        // accuracy of settimeout is not good. so I add  a second.
 			        if (player.currentTime + 1 > (Number(start) + Number(duration))) {

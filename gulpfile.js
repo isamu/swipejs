@@ -2,7 +2,6 @@ var gulp = require("gulp");
 var babel = require("gulp-babel");
 var uglify = require('gulp-uglify');
 var concat = require('gulp-concat');
-var runSequence = require('run-sequence');
 
 const webpackStream = require("webpack-stream");
 const webpack = require("webpack");
@@ -26,30 +25,30 @@ const babel_conf = {
 const version = "2.0.0";
 
 gulp.task("babel", function () {
-  gulp.src("src/js/*.js")
+  return gulp.src("src/js/*.js")
     .pipe(babel(babel_conf))
     .pipe(gulp.dest("lib/"));
 });
 gulp.task("babel2", function () {
-  gulp.src("src/js/misc/*.js")
+  return gulp.src("src/js/misc/*.js")
         .pipe(babel(babel_conf))
         .pipe(gulp.dest("lib/misc/"));
 });
 
 gulp.task("babel3", function () {
-  gulp.src("src/js/misc/*.js")
+  return gulp.src("src/js/misc/*.js")
         .pipe(babel(babel_conf))
         .pipe(gulp.dest("dist/js/mics/"));
 });
 
 gulp.task("babeltest", function () {
-  gulp.src("src/test/*.js")
+  return gulp.src("src/test/*.js")
         .pipe(babel(babel_conf))
         .pipe(gulp.dest("test/"));
 });
 
 gulp.task('uglify', function(){
-  gulp.src("lib/*.js")
+  return gulp.src("lib/*.js")
     .pipe(uglify({}))
     .pipe(gulp.dest("tmp/"));
 });
@@ -65,37 +64,27 @@ gulp.task('webpackdev', function(cb) {
     .pipe(gulp.dest("tmp/webpackdev"));
 });
 
-gulp.task('concat', function(){
-  gulp.src('tmp/webpackdev/*.js')
+gulp.task('concat1', function(){
+  return gulp.src('tmp/webpackdev/*.js')
     .pipe(concat('swipe.js'))
-    .pipe(gulp.dest('dist/js/')) ;
-  gulp.src('tmp/webpack/*.js')
+    .pipe(gulp.dest('dist/js/'));
+});
+gulp.task('concat2', function(){
+  return gulp.src('tmp/webpack/*.js')
     .pipe(concat('swipe.min.js'))
-    .pipe(gulp.dest('dist/js/')) ;
-
-  gulp.src('tmp/webpackdev/*.js')
+    .pipe(gulp.dest('dist/js/'));
+});
+gulp.task('concat3', function(){
+  return gulp.src('tmp/webpackdev/*.js')
     .pipe(concat('swipe-' + version + '.js'))
     .pipe(gulp.dest('dist/js/')) ;
-  gulp.src('tmp/webpack/*.js')
-    .pipe(concat('swipe-' + version + '.min.js'))
-    .pipe(gulp.dest('dist/js/')) ;
-  
-/*  
-  gulp.src('tmp/*.js')
-    .pipe(concat('swipe-' + version + '.min.js'))
-    .pipe(gulp.dest('dist/js/')) ;
-  gulp.src('tmp/*.js')
-    .pipe(concat('swipe.min.js'))
-    .pipe(gulp.dest('dist/js/')) ;
-  gulp.src('lib/*.js')
-    .pipe(concat('swipe-' + version +'.js'))
-    .pipe(gulp.dest('dist/js/')) ;
-  gulp.src('lib/*.js')
-    .pipe(concat('swipe.js'))
-    .pipe(gulp.dest('dist/js/')) ;
-*/
-  
 });
+gulp.task('concat4', function(){
+  return gulp.src('tmp/webpack/*.js')
+    .pipe(concat('swipe-' + version + '.min.js'))
+    .pipe(gulp.dest('dist/js/'));
+});
+gulp.task('concat',  gulp.series('concat1', 'concat2', 'concat3', 'concat4'));
 
 
 gulp.task('mocha', function() {
@@ -104,17 +93,17 @@ gulp.task('mocha', function() {
     .on('error', log);
 });
 
-gulp.task('test', function() {
-  gulp.watch(['src/test/*.js'], ['run-test']);
+gulp.task('wtest', function() {
+  gulp.watch(['src/test/*.js'], gulp.series('run-test'));
 });
-gulp.task('run-test', function(cb) {
-  runSequence('babel', 'babeltest', 'mocha', cb);
-});
+gulp.task('run-test', gulp.series('babel', 'babeltest', 'mocha'));
 
 gulp.task('watch', function() {
-  gulp.watch(['src/js/*.js', 'src/js/misc/*.js', 'src/test/*.js'], ['default'])
+  gulp.watch(['src/js/*.js', 'src/js/misc/*.js', 'src/test/*.js'], gulp.series('default'))
 });
 
-gulp.task('default', function(cb) {
-  runSequence('babel', 'babel2', 'babel3', 'babeltest', 'mocha', 'uglify', 'webpack', 'webpackdev', 'concat', cb);
-});
+gulp.task('default', gulp.series('babel', 'babel2', 'babel3', 'babeltest', 'mocha', 'uglify', 'webpack', 'webpackdev', 'concat'));
+
+
+gulp.task('build',  gulp.series('babel', 'babel2', 'babel3', 'babeltest'));
+
