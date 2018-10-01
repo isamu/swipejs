@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/isamu/swipejs.png?branch=master)](http://travis-ci.org/isamu/swipejs)
+
 # Swipe Javascript Engine 
 
 Yet another swipe engine.
