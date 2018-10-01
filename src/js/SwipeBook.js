@@ -283,7 +283,6 @@ export default class SwipeBook {
   }
   
   counterDecrease(){
-    console.log("decrease");
 	  SwipeCounter.decrease();
 	  $("#counter").html(SwipeCounter.getCounter());
     this.checkAndUpdateNextPage()

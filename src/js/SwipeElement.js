@@ -975,7 +975,6 @@ export default class SwipeElement {
   
   html() {
 	  if (this.type()){
-      console.log("increase");
 	    SwipeCounter.increase();
 	    if (this.isVideo()){
 		    SwipeCounter.increase();

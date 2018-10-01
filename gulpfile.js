@@ -13,28 +13,38 @@ var log = require('fancy-log');
 const webpackConfig = require("./webpack.config.js");
 const webpackDevConfig = require("./webpack.dev.config.js");
 
-var version = "2.0.0";
+const babel_conf = {
+  presets: [
+    '@babel/env',
+    {
+      "plugins": [
+        "add-module-exports"
+      ]
+    }
+  ]};
+
+const version = "2.0.0";
 
 gulp.task("babel", function () {
   gulp.src("src/js/*.js")
-    .pipe(babel({presets: ['@babel/env']}))
+    .pipe(babel(babel_conf))
     .pipe(gulp.dest("lib/"));
 });
 gulp.task("babel2", function () {
   gulp.src("src/js/misc/*.js")
-        .pipe(babel({presets: ['@babel/env']}))
+        .pipe(babel(babel_conf))
         .pipe(gulp.dest("lib/misc/"));
 });
 
 gulp.task("babel3", function () {
   gulp.src("src/js/misc/*.js")
-        .pipe(babel({presets: ['@babel/env']}))
+        .pipe(babel(babel_conf))
         .pipe(gulp.dest("dist/js/mics/"));
 });
 
 gulp.task("babeltest", function () {
   gulp.src("src/test/*.js")
-        .pipe(babel({presets: ['@babel/env']}))
+        .pipe(babel(babel_conf))
         .pipe(gulp.dest("test/"));
 });
 
