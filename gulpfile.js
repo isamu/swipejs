@@ -8,7 +8,7 @@ const webpackStream = require("webpack-stream");
 const webpack = require("webpack");
 
 var mocha = require('gulp-mocha');
-var gutil = require('gulp-util');
+var log = require('fancy-log');
 
 const webpackConfig = require("./webpack.config.js");
 const webpackDevConfig = require("./webpack.dev.config.js");
@@ -92,7 +92,7 @@ gulp.task('concat', function(){
 gulp.task('mocha', function() {
   return gulp.src(['test/*.js'], { read: false })
     .pipe(mocha({ reporter: 'list'}))
-    .on('error', gutil.log);
+    .on('error', log);
 });
 
 gulp.task('test', function() {
@@ -107,5 +107,5 @@ gulp.task('watch', function() {
 });
 
 gulp.task('default', function(cb) {
-  return runSequence('babel', 'babel2', 'babel3', 'babeltest', 'mocha', 'uglify', 'webpack', 'webpackdev', 'concat', cb);
+  runSequence('babel', 'babel2', 'babel3', 'babeltest', 'mocha', 'uglify', 'webpack', 'webpackdev', 'concat', cb);
 });
