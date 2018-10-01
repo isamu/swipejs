@@ -39,9 +39,9 @@ gulp.task("babeltest", function () {
 });
 
 gulp.task('uglify', function(){
-    return gulp.src("lib/*.js")
-        .pipe(uglify({preserveComments: 'some'}))
-        .pipe(gulp.dest("tmp/"))
+  return gulp.src("lib/*.js")
+    .pipe(uglify({}))
+    .pipe(gulp.dest("tmp/"))
     ;
 });
 

@@ -18,7 +18,7 @@
     "gulp-babel": "^6.1.2",
     "gulp-concat": "^2.6.0",
     "gulp-mocha": "^6.0.0",
-    "gulp-uglify": "^2.0.0",
+    "gulp-uglify": "^3.0.1",
     "webpack": "^4.20.2",
     "webpack-stream": "^5.1.1"
   },
