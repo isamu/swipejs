@@ -4,7 +4,7 @@
   "description": "",
   "main": "swipe.js",
   "scripts": {
-    "test": "mkdir -p test && gulp run-test"
+    "test": "mkdir -p test && cp js/jquery-2.2.3.min.js test/ && gulp run-test"
   },
   "author": "",
   "license": "ISC",
