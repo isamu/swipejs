@@ -16,33 +16,32 @@ const webpackDevConfig = require("./webpack.dev.config.js");
 var version = "2.0.0";
 
 gulp.task("babel", function () {
-  return gulp.src("src/js/*.js")
-    .pipe(babel())
+  gulp.src("src/js/*.js")
+    .pipe(babel({presets: ['@babel/env']}))
     .pipe(gulp.dest("lib/"));
 });
 gulp.task("babel2", function () {
-    return gulp.src("src/js/misc/*.js")
-        .pipe(babel())
+  gulp.src("src/js/misc/*.js")
+        .pipe(babel({presets: ['@babel/env']}))
         .pipe(gulp.dest("lib/misc/"));
 });
 
 gulp.task("babel3", function () {
-    return gulp.src("src/js/misc/*.js")
-        .pipe(babel())
+  gulp.src("src/js/misc/*.js")
+        .pipe(babel({presets: ['@babel/env']}))
         .pipe(gulp.dest("dist/js/mics/"));
 });
 
 gulp.task("babeltest", function () {
-    return gulp.src("src/test/*.js")
-        .pipe(babel())
+  gulp.src("src/test/*.js")
+        .pipe(babel({presets: ['@babel/env']}))
         .pipe(gulp.dest("test/"));
 });
 
 gulp.task('uglify', function(){
-  return gulp.src("lib/*.js")
+  gulp.src("lib/*.js")
     .pipe(uglify({}))
-    .pipe(gulp.dest("tmp/"))
-    ;
+    .pipe(gulp.dest("tmp/"));
 });
 
 // lib/*.js -> dist/js/swipe-new-*.js
