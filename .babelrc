@@ -1,6 +1,9 @@
 {
-  "presets": [ "es2015", "stage-3" ],
-  "plugins": [
-    "add-module-exports"
-  ]
+  "presets": [
+     "env", {
+       "plugins": [
+           "add-module-exports"
+        ]
+       }
+   ]
 }
